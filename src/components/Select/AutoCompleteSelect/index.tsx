@@ -1,5 +1,12 @@
 import { AutoComplete, AutoCompleteProps } from "antd";
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import classNames from "classnames";
 import styles from "./index.module.scss";
 import { generateRandomStr } from "hsu-utils";
@@ -52,11 +59,13 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
     popupMatchSelectWidth,
     popupMatchContentWidth,
     optionFontSize = 14,
+    value,
     ...antdAutoCompleteConfig
   } = props;
   const [focused, setFocused] = useState<boolean>(false);
   const autoCompleteRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<boolean>(false);
+  const [searchText, setSearchText] = useState<string>("");
   const [legacyHasErrorStatus, setLegacyHasErrorStatus] =
     useState<boolean>(false);
   const [legacyHasArrowOrClear, setLegacyHasArrowOrClear] =
@@ -65,9 +74,17 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
 
   const cls = useMemo(() => generateRandomStr(10), []);
 
-  const { isComposing } = useSelectComposition({ onSearch });
+  const handleSearch = useCallback(
+    (searchValue: string) => {
+      setSearchText(searchValue);
+      onSearch?.(searchValue);
+    },
+    [onSearch],
+  );
 
-  useSelectPopupPosition(autoCompleteRef, open, cls);
+  // Always pass handleSearch so IME composition events stay observed
+  // (an in-progress pinyin input must not wipe out the option list)
+  const { isComposing } = useSelectComposition({ onSearch: handleSearch });
 
   const autoCompleteWidth = autoCompleteRef.current
     ? autoCompleteRef.current.offsetWidth
@@ -97,30 +114,54 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
     });
   }, [options]);
 
-  // Handle filterOption
-  const handleFilterOption = useMemo(() => {
-    // If a custom filterOption is provided, use it first
+  // Filter rule: prefer the custom filterOption, otherwise fall back to a
+  // case-insensitive substring match
+  const matchOption = useMemo(() => {
     if (customFilterOption) {
-      return (inputValue: string, option?: AutoCompleteOption) => {
-        return customFilterOption(inputValue, option);
-      };
+      return customFilterOption;
     }
 
-    // Default filtering logic: case-insensitive substring match
     return (inputValue: string, option?: AutoCompleteOption): boolean => {
-      if (!isComposing && option) {
-        const searchText = inputValue.toUpperCase();
-        const optionValue = (option.value ?? "").toString().toUpperCase();
-        const optionLabel = (option.label ?? option.value ?? "")
-          .toString()
-          .toUpperCase();
-        return (
-          optionValue.includes(searchText) || optionLabel.includes(searchText)
-        );
+      if (!option) {
+        return true;
       }
-      return true;
+      const keyword = inputValue.toUpperCase();
+      const optionValue = (option.value ?? "").toString().toUpperCase();
+      const optionLabel = (option.label ?? option.value ?? "")
+        .toString()
+        .toUpperCase();
+      return optionValue.includes(keyword) || optionLabel.includes(keyword);
     };
-  }, [customFilterOption, isComposing]);
+  }, [customFilterOption]);
+
+  // Text the filter runs against: the controlled value wins, otherwise use the
+  // internally tracked search keyword
+  const filterText = useMemo(() => {
+    if (value !== undefined && value !== null) {
+      return String(value);
+    }
+    return searchText;
+  }, [value, searchText]);
+
+  // Filter inside the component (antd's own filterOption is turned off) so we
+  // know whether any candidate survives, keeping controlled open in sync
+  const filteredOptions = useMemo(() => {
+    // Skip filtering while composing so an in-progress pinyin input does not
+    // empty the candidate list
+    if (isComposing || !filterText) {
+      return autoCompleteOptions;
+    }
+    return autoCompleteOptions.filter((option) =>
+      matchOption(filterText, option),
+    );
+  }, [autoCompleteOptions, filterText, isComposing, matchOption]);
+
+  // In combobox mode antd hides the popup by itself when there is no candidate
+  // and skips onDropdownVisibleChange, so fold "no candidate" into open to stop
+  // the controlled state from drifting and leaving an empty popup behind
+  const mergedOpen = open && filteredOptions.length > 0;
+
+  useSelectPopupPosition(autoCompleteRef, mergedOpen, cls);
 
   useEffect(() => {
     if (!legacyHasSelector) {
@@ -177,7 +218,7 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
     return () => {
       observer.disconnect();
     };
-  }, [legacyHasSelector, open]);
+  }, [legacyHasSelector, mergedOpen]);
 
   return (
     <div
@@ -197,19 +238,23 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
         {...{
           allowClear: true,
           ...antdAutoCompleteConfig,
+          value,
           onFocus: (e) => {
             setFocused(true);
             onFocus?.(e);
           },
           onBlur: (e) => {
             setFocused(false);
+            // antd skips onDropdownVisibleChange when there is no candidate,
+            // so collapse the controlled state manually on blur
+            setOpen(false);
             onBlur?.(e);
           },
-          options: autoCompleteOptions,
-          filterOption: handleFilterOption,
+          options: filteredOptions,
+          filterOption: false,
           onChange,
-          onSearch,
-          open,
+          onSearch: handleSearch,
+          open: mergedOpen,
           onDropdownVisibleChange: (visible) => {
             setOpen(visible);
             onDropdownVisibleChange?.(visible);
