@@ -8,7 +8,8 @@ import styles from "./index.module.scss";
 
 export interface CopyProps {
   id: string;
-  isMessage?: true;
+  /** true (default): report via a global toast; false: swap the button for an inline "已复制！" state */
+  isMessage?: boolean;
   md?: boolean;
   text?: string;
   copyIcon?: ReactNode;
