@@ -1,6 +1,6 @@
 {
   "name": "@hsu-react/ui",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "一套基于 React + Ant Design 的中后台业务组件库",
   "license": "MIT",
   "type": "module",

@@ -109,6 +109,8 @@ const TextEllipsis: React.FC<TextEllipsisProps> = ({
     const textContent = getTextContent(children);
 
     const update = () => {
+      // Detached nodes measure 0/0 — never let them overwrite a live measurement
+      if (!element.isConnected) return;
       const isTextOverflow =
         element.scrollWidth > element.clientWidth ||
         element.scrollHeight > element.clientHeight;
@@ -189,30 +191,29 @@ const TextEllipsis: React.FC<TextEllipsisProps> = ({
     </span>
   );
 
-  // Show the Tooltip only when overflowing and not disabled
-  if (isOverflow && !disabled) {
-    return (
-      <Tooltip
-        arrow={false}
-        placement="bottomLeft"
-        {...restTooltipConfig}
-        title={tooltipTitle}
-        styles={{
-          body: {
-            width: tooltipWidth,
-            overflow: "auto",
-            maxHeight: "300px",
-            whiteSpace: "pre-wrap",
-          },
-          ...styles,
-        }}
-      >
-        {content}
-      </Tooltip>
-    );
-  }
-
-  return content;
+  // Always keep the Tooltip wrapper mounted and toggle via title:
+  // conditionally wrapping remounts the text DOM when isOverflow flips, which detaches
+  // the node the measurement effect's ResizeObserver holds — its final callback then
+  // reads 0/0 from the detached node and resets isOverflow, so the Tooltip never shows.
+  return (
+    <Tooltip
+      arrow={false}
+      placement="bottomLeft"
+      {...restTooltipConfig}
+      title={isOverflow && !disabled ? tooltipTitle : undefined}
+      styles={{
+        body: {
+          width: tooltipWidth,
+          overflow: "auto",
+          maxHeight: "300px",
+          whiteSpace: "pre-wrap",
+        },
+        ...styles,
+      }}
+    >
+      {content}
+    </Tooltip>
+  );
 };
 
 export default TextEllipsis;
