@@ -26,3 +26,6 @@ playwright
 .idea
 *.local
 *.zip
+
+# codebase-memory-mcp 本机索引排除（个人偏好，不入库）
+.cbmignore
