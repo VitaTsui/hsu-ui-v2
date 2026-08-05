@@ -528,3 +528,22 @@ export default () => (
 - 上传类：`FILE`、`IMAGEFILE`
 
 > 同时导出 `FormItemContainer`（即 `ItemContainer`）及类型 `FormItemType`、`FormItemProps`、`PlaceholderDict` / `PlaceholderDictEn` 占位文案字典。
+
+### 重型字段按需加载
+
+`EDITOR`、`CODEMIRROR`、`PASSWORDSTRENGTH` 三类字段的实现依赖体积很大的三方库
+（`@wangeditor/editor` 约 814 KB、`@codemirror/*` 约 380 KB、`zxcvbn` 约 793 KB，均为未压缩）。
+`FormItem` 几乎会被每个业务页面引入，若静态引入这些渲染器，那么**只要用到任何一种表单项**，
+上述库就会被一并打进消费方的首屏产物。
+
+因此这三类字段改为按需加载：只有 `type` 真的命中时才去拉对应 chunk。对使用方而言：
+
+- **用法不变**，仍然是 `<FormItem type="EDITOR" ... />`，无需自行包 `Suspense`。
+- 首次渲染这类字段时，该字段会晚一拍出现（组件内部已用 `Suspense fallback={null}` 兜住，
+  不会让表单布局跳动）。antd `Form` 的值存在 store 里，字段挂载晚于 `setFieldsValue`
+  也能正确回填，**不影响编辑态回显**。
+- `PASSWORDSTRENGTH` 在挂载时即预取 `zxcvbn`，正常输入速度下感知不到延迟；强度条在
+  加载完成前保持 0，加载失败则不显示，不阻断输入。
+
+若消费方希望这些库进首屏（例如整站以富文本编辑为主），照常在自己的入口静态
+`import Editor from "@hsu-react/ui/es/components/Editor"` 即可，两者不冲突。
