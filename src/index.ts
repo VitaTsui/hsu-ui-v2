@@ -25,6 +25,8 @@ export { default as Button } from "./components/Button";
 export * from "./components/Button";
 export { default as ChainGraph } from "./components/ChainGraph";
 export * from "./components/ChainGraph";
+export { default as ChakraRoot } from "./components/ChakraRoot";
+export * from "./components/ChakraRoot";
 export { default as Chart } from "./components/Chart";
 export * from "./components/Chart";
 export { default as Chat } from "./components/Chat";

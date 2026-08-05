@@ -37,7 +37,11 @@ export default () => (
 
 ## Chakra 按钮
 
-基于 Chakra UI 的按钮，支持 `hasPermi`、`hidden`、`iconPosition`、`icon` 等扩展属性（Chakra system 由文档站全局提供）。
+基于 Chakra UI 的按钮，支持 `hasPermi`、`hidden`、`iconPosition`、`icon` 等扩展属性。
+
+Chakra 的 system 与 emotion cache 由组件**自带**（内部包了一层 `ChakraRoot`），消费方**不需要**在应用入口挂全局 `ChakraProvider` / `CacheProvider`。这样 `@chakra-ui/react` + `@emotion/*` + zag-js（合计约 570 KB）只存在于 `Button.Chakra` 的异步 chunk 里，不进首屏。
+
+> 从 `0.0.23` 起：入口若仍留着全局 Provider，不会出错，但那 570 KB 会照旧留在首屏——要拿到收益需把它删掉。若页面要**直接**使用 chakra 组件（不经 `Button.Chakra`），用库导出的 `ChakraRoot` 自行包一层即可。
 
 ```tsx
 import React from "react";

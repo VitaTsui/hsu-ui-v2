@@ -3,6 +3,7 @@ import { Button, ButtonProps } from "@chakra-ui/react";
 import usePermissions from "../../../hooks/usePermissions";
 import styles from "./index.module.scss";
 import classNames from "classnames";
+import ChakraRoot from "../../ChakraRoot";
 
 export interface ChakraButtonProps extends ButtonProps {
   hasPermi?: string[];
@@ -31,7 +32,33 @@ const ChakraButton: React.FC<ChakraButtonProps> = (props) => {
   }
 
   if (reRender) {
-    return reRender(
+    return (
+      <ChakraRoot>
+        {reRender(
+          <Button
+            {...buttonConfig}
+            className={classNames(className, styles.button, {
+              [styles[iconPosition]]: iconPosition,
+            })}
+            children={
+              <>
+                {iconPosition === "start" && icon && (
+                  <span className={styles.icon}>{icon}</span>
+                )}
+                {children ?? title}
+                {iconPosition === "end" && icon && (
+                  <span className={styles.icon}>{icon}</span>
+                )}
+              </>
+            }
+          />,
+        )}
+      </ChakraRoot>
+    );
+  }
+
+  return (
+    <ChakraRoot>
       <Button
         {...buttonConfig}
         className={classNames(className, styles.button, {
@@ -48,28 +75,8 @@ const ChakraButton: React.FC<ChakraButtonProps> = (props) => {
             )}
           </>
         }
-      />,
-    );
-  }
-
-  return (
-    <Button
-      {...buttonConfig}
-      className={classNames(className, styles.button, {
-        [styles[iconPosition]]: iconPosition,
-      })}
-      children={
-        <>
-          {iconPosition === "start" && icon && (
-            <span className={styles.icon}>{icon}</span>
-          )}
-          {children ?? title}
-          {iconPosition === "end" && icon && (
-            <span className={styles.icon}>{icon}</span>
-          )}
-        </>
-      }
-    />
+      />
+    </ChakraRoot>
   );
 };
 
