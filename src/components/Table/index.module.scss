@@ -59,12 +59,15 @@
           white-space: nowrap;
         }
 
-        &:global(.ant-table-column-sort) {
+        // 排序列：antd 会用 bodySortBg 单独给该列的单元格上底色，这里抹掉，
+        // 让「哪一列在排序」只由表头的高亮与箭头表达。
+        // 只抹静止态——从前连悬浮态一起抹掉、再补一支 --cf-subtle 回来，
+        // 而整行其余单元格走的是 antd 的 rowHoverBg，两支值并不相等（库自带调色板下
+        // 是 #fafbfc vs #f6f7f9），悬浮一行时排序列会比其余列深一块、整行裂成两截。
+        // 排除掉悬浮态后，该单元格自然落回 antd 的行悬浮规则，与整行始终同色，
+        // 且不依赖消费方是否同步设置了 --cf-subtle / rowHoverBg。
+        &:global(.ant-table-column-sort):not(:global(.ant-table-cell-row-hover)) {
           background: transparent;
-
-          &:global(.ant-table-cell-row-hover) {
-            background: var(--cf-subtle);
-          }
         }
       }
 
@@ -87,12 +90,9 @@
       :global(.ant-table-cell) {
         padding: var(--td-padding);
 
-        &:global(.ant-table-column-sort) {
+        // 同上：只抹静止态，悬浮态落回 antd 的行悬浮色，避免汇总行也裂成两截
+        &:global(.ant-table-column-sort):not(:global(.ant-table-cell-row-hover)) {
           background: transparent;
-
-          &:global(.ant-table-cell-row-hover) {
-            background: var(--cf-subtle);
-          }
         }
       }
     }
