@@ -7,6 +7,11 @@ export interface AutoScrollLegendProps {
   interval?: number;
   autoStart?: boolean;
   stopOnWheel?: boolean;
+  /**
+   * 是否接管滚轮翻图例，默认 true。
+   * 图表自身已用滚轮平移 x 轴时传 false，避免一次滚动既翻图例又移坐标轴。
+   */
+  enableWheel?: boolean;
 }
 
 export function autoScrollLegend(props: AutoScrollLegendProps) {
@@ -17,9 +22,14 @@ export function autoScrollLegend(props: AutoScrollLegendProps) {
     interval = 1500,
     autoStart = true,
     stopOnWheel = true,
+    enableWheel = true,
   } = props;
 
-  let currentIndex = 0;
+  // 组件重渲染会重建滚动器，从图例当前位置接着轮播，避免每次都跳回第一项
+  const legendOption = (
+    chart.getOption() as { legend?: Array<{ scrollDataIndex?: number }> }
+  )?.legend?.[0];
+  let currentIndex = legendOption?.scrollDataIndex ?? 0;
   let scrollInterval: NodeJS.Timeout | null = null;
   let isManualScrolling = false;
 
@@ -90,13 +100,17 @@ export function autoScrollLegend(props: AutoScrollLegendProps) {
   const chartDom = chart.getDom();
   chartDom.addEventListener("mouseover", handleMouseOver);
   chartDom.addEventListener("mouseout", handleMouseOut);
-  chartDom.addEventListener("wheel", handleWheel, { passive: false });
+  if (enableWheel) {
+    chartDom.addEventListener("wheel", handleWheel, { passive: false });
+  }
 
   function dispose() {
     stop();
     chartDom.removeEventListener("mouseover", handleMouseOver);
     chartDom.removeEventListener("mouseout", handleMouseOut);
-    chartDom.removeEventListener("wheel", handleWheel);
+    if (enableWheel) {
+      chartDom.removeEventListener("wheel", handleWheel);
+    }
   }
 
   if (autoStart) {

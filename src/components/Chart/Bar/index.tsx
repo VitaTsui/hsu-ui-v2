@@ -280,14 +280,28 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
     // Set the option: notMerge resets the dataZoom window to its initial position,
     // so when x-axis data is unchanged (e.g. re-render triggered by axis recalculation / legend selection), record the current window first and restore it afterwards
     const xAxisKey = xAxisData?.join("\u0001") ?? "";
-    const prevZoomRanges =
-      prevXAxisKeyRef.current === xAxisKey
-        ? ((chart.getOption() as ChartsOption | undefined)?.dataZoom as
-            | Array<{ start?: number; end?: number }>
-            | undefined)
-        : undefined;
+    const sameXAxis = prevXAxisKeyRef.current === xAxisKey;
+    const prevZoomRanges = sameXAxis
+      ? ((chart.getOption() as ChartsOption | undefined)?.dataZoom as
+          | Array<{ start?: number; end?: number }>
+          | undefined)
+      : undefined;
+    // 滚动图例的翻页位置同样会被 notMerge 重置，x 轴未变时恢复，
+    // 否则点一次图例、或坐标轴重算触发一次重渲染，图例就跳回第一页
+    const prevLegendScrollIndex = sameXAxis
+      ? (
+          (chart.getOption() as ChartsOption | undefined)?.legend as
+            | Array<{ scrollDataIndex?: number }>
+            | undefined
+        )?.[0]?.scrollDataIndex
+      : undefined;
     prevXAxisKeyRef.current = xAxisKey;
     chart.setOption(chartOption as ChartOptionType, true);
+    if (prevLegendScrollIndex) {
+      chart.setOption({
+        legend: { scrollDataIndex: prevLegendScrollIndex },
+      } as unknown as ChartOptionType);
+    }
     const nextZooms = (chartOption as ChartsOption).dataZoom;
     if (
       prevZoomRanges?.length &&
@@ -406,6 +420,10 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
         visibleCount: legendVisibleCount,
         interval: legendScrollInterval,
         autoStart: true,
+        // 滚轮已被 x 轴平移占用时不再让图例抢，否则一次滚动两处都动
+        enableWheel:
+          !normalizedScroll.zoomEnabled ||
+          normalizedScroll.wheelModeWhenSliderHidden !== "scroll",
       });
     }
 
@@ -443,6 +461,8 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
     enableLegendAutoScroll,
     legendVisibleCount,
     legendScrollInterval,
+    // 图例是否接管滚轮由它推导，漏了会拿到过期的滚动配置
+    normalizedScroll,
   ]);
 
   // Handle auto play
