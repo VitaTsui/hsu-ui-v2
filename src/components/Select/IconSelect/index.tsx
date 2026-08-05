@@ -6,35 +6,42 @@ import Input from "../../Input";
 import styles from "./index.module.scss";
 import classNames from "classnames";
 
-import antDesignIcons from "@iconify/json/json/ant-design.json";
-import elementPlusIcons from "@iconify/json/json/ep.json";
-import fontAwesome4Icons from "@iconify/json/json/fa.json";
-import fontAwesome5SolidIcons from "@iconify/json/json/fa-solid.json";
-
-const icons: Array<{
+/**
+ * The four selectable icon sets are loaded on demand.
+ *
+ * Together these JSON files weigh about 1.9 MB, and a static import drags them into the
+ * initial bundle along with IconSelect:
+ *
+ *   FormItem → FormSelect → IconSelect → @iconify/json/json/*.json
+ *
+ * Only pages like menu management ever actually open the icon picker, so the set metadata
+ * and the icon-name list are split apart: label / name stay static (the Tabs must render
+ * immediately), and the matching set is fetched for the current tab once the popover opens.
+ */
+const ICON_SETS: Array<{
   label: string;
   name: string;
-  icons: string[];
+  load: () => Promise<unknown>;
 }> = [
   {
     label: "Ant Design",
     name: "ant-design",
-    icons: Object.keys(antDesignIcons.icons),
+    load: () => import("@iconify/json/json/ant-design.json"),
   },
   {
     label: "Element Plus",
     name: "ep",
-    icons: Object.keys(elementPlusIcons.icons),
+    load: () => import("@iconify/json/json/ep.json"),
   },
   {
     label: "Font Awesome 4",
     name: "fa",
-    icons: Object.keys(fontAwesome4Icons.icons),
+    load: () => import("@iconify/json/json/fa.json"),
   },
   {
     label: "Font Awesome 5 Solid",
     name: "fa-solid",
-    icons: Object.keys(fontAwesome5SolidIcons.icons),
+    load: () => import("@iconify/json/json/fa-solid.json"),
   },
 ];
 
@@ -50,21 +57,50 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
   const [search, setSearch] = useState<string>("");
   const [currentTab, setCurrentTab] = useState<string>("");
   const [activeIcon, setActiveIcon] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
+  /** Loaded icon-name lists, cached by set name */
+  const [iconNames, setIconNames] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    setCurrentTab(icons[0].name);
+    setCurrentTab(ICON_SETS[0].name);
   }, []);
 
   useEffect(() => {
     if (value && value !== _value) {
       setValue(value);
 
-      if (icons.find((item) => item.name === value.split(":")[0])) {
+      if (ICON_SETS.find((item) => item.name === value.split(":")[0])) {
         setCurrentTab(value.split(":")[0]);
         setActiveIcon(value);
       }
     }
   }, [value, _value]);
+
+  // Only fetch the current tab's icon names once the popover is open, and only once per set
+  useEffect(() => {
+    if (!open || !currentTab || iconNames[currentTab]) return;
+
+    const target = ICON_SETS.find((item) => item.name === currentTab);
+    if (!target) return;
+
+    let alive = true;
+    target.load().then((module) => {
+      if (!alive) return;
+
+      const json = ((module as { default?: unknown }).default ?? module) as {
+        icons: Record<string, unknown>;
+      };
+
+      setIconNames((prev) => ({
+        ...prev,
+        [currentTab]: Object.keys(json.icons ?? {}),
+      }));
+    });
+
+    return () => {
+      alive = false;
+    };
+  }, [open, currentTab, iconNames]);
 
   const _onChange = (value: string) => {
     setValue(value);
@@ -82,6 +118,8 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
           placement="bottom"
           trigger="click"
           zIndex={1000}
+          open={open}
+          onOpenChange={setOpen}
           content={
             <div className={styles.popoverContent}>
               <Input
@@ -96,14 +134,14 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
                 onChange={(key) => {
                   setCurrentTab(key);
                 }}
-                items={icons?.map((type) => ({
+                items={ICON_SETS.map((type) => ({
                   label: type.label,
                   key: type.name,
                   children: (
                     <div className={classNames(styles.typeIcon)}>
-                      {type.icons
-                        ?.filter((i) => i.includes(search))
-                        ?.map((item: string) => {
+                      {(iconNames[type.name] ?? [])
+                        .filter((i) => i.includes(search))
+                        .map((item: string) => {
                           return (
                             <Tooltip
                               key={item}

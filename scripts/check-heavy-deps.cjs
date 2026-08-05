@@ -27,6 +27,9 @@ const GUARDED_ENTRIES = [
   "components/FormItem/index.js",
   // Panel.List 会经 Search 用到 FormItem，同属高频入口
   "components/Panel/index.js",
+  // 全库最基础的组件，页面/弹窗/工具栏无处不引；Button.Chakra 曾把 chakra 全家
+  // （chakra-ui + zag-js + floating-ui + emotion，实测约 560 KB）带进每个首屏
+  "components/Button/index.js",
 ];
 
 /**
@@ -49,6 +52,11 @@ const HEAVY = [
   "katex",
   "node-sql-parser",
   "mongodb-query-parser",
+  // 图标集数据（四套约 1.9 MB）。注意只拉黑数据包 @iconify/json，
+  // 渲染用的 @iconify/react 很小且被 Icon 组件正常静态引入
+  "@iconify/json",
+  // 只服务于 Button.Chakra 这一个变体
+  "@chakra-ui/react",
 ];
 
 /** 从 babel 产物里抽静态 import 的模块说明符（刻意不匹配动态 import(...)） */
