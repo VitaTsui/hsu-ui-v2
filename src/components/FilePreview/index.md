@@ -59,3 +59,14 @@ export default () => {
 | onClose | 关闭回调 | `() => void` | - |
 
 > 另导出类型 `FilePreviewType` 与常量 `FilePreviewTypeArr`（支持的文件类型数组）。
+
+### 重型格式按需加载
+
+`pdf`、`xlsx`、`md` 三种预览器依赖体积很大的三方库（pdfjs、xlsx ＋ x-data-spreadsheet、
+katex 等），已改为按需加载：只有 `fileType` 真的命中时才去拉对应 chunk。
+`mp4` / 图片 / `txt` 是轻量实现，保持同步渲染。
+
+这一点对使用方很重要：`FilePreview` 在 `Upload`、`FormItem`（`FILE` / `IMAGEFILE`）的
+静态依赖图上，若不这么做，**业务侧只要用到任何一种表单项，上述库就会被打进首屏**。
+
+用法不变，组件内部已包 `Suspense`。首次预览某种重型格式时弹窗内容会晚一拍出现。
