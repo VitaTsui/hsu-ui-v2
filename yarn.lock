@@ -1718,12 +1718,12 @@
   dependencies:
     ws "^8.17.0"
 
-"@hsu-react/single-router@0.0.27":
-  version "0.0.27"
-  resolved "https://registry.npmjs.org/@hsu-react/single-router/-/single-router-0.0.27.tgz#392113c66f0b2af47b55bf09b518ff13c9d9bbbc"
-  integrity sha512-4NGgQIsyu/h/LsWU2WdTH+jw+vQxPhLyC3FWCqXsuaL8a6t+peQvQrSiCjGSW2In0KB1XHrykoIT7gzBdA1htQ==
+"@hsu-react/single-router@>=0.0.28 <0.1.0":
+  version "0.0.28"
+  resolved "https://registry.npmjs.org/@hsu-react/single-router/-/single-router-0.0.28.tgz#bf9ee337a42c598f1f0fc81b5aa08d6a55d214e3"
+  integrity sha512-xsK4giJDYhAynunmcUM+3fgBkYXPDo6o80Ug6IxqeDsUnHLYB6Tb9NuJbpHAJ48SOfYC24p+XPahhyioS8QTsA==
   dependencies:
-    hsu-utils "^0.0.55"
+    hsu-utils ">=0.0.56 <0.1.0"
 
 "@iconify/json@^2.2.385":
   version "2.2.491"
@@ -8658,10 +8658,10 @@ hpack.js@^2.1.6:
     readable-stream "^2.0.1"
     wbuf "^1.1.0"
 
-hsu-utils@^0.0.55:
-  version "0.0.55"
-  resolved "https://registry.npmjs.org/hsu-utils/-/hsu-utils-0.0.55.tgz#0a8302452563f6b617d99c95c5a06afc5cfed936"
-  integrity sha512-63+7kY1CwbIaLKurqhTzu+7fPygqIz9AquJ6ofss663YOC6MkLYyQwqZrXBWmaK5ojBuq09ZYjH/dungrbXVAA==
+"hsu-utils@>=0.0.56 <0.1.0":
+  version "0.0.56"
+  resolved "https://registry.npmjs.org/hsu-utils/-/hsu-utils-0.0.56.tgz#4a89d7625b2d6c2ed05d838b956ff96d53881d7e"
+  integrity sha512-AmRAia5M+ntRzff4OQ621P5aVVKWiMeksOCLcCteGT/tRkvQ3jHaaOHykpGbON99Pi1oUr6p4XZ1TX6KTvuiCw==
   dependencies:
     dayjs "^1.11.19"
     pdfjs-dist "2.13.216"
