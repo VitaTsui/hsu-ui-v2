@@ -4,7 +4,13 @@
   margin: 0px;
   padding-block: 0px;
 
-  overflow-x: hidden;
+  // 横向裁切用 clip 而不是 hidden：把手（36px 命中区）比轨道（32px）高 4px，靠
+  // overflow-y: visible 露出上下那点溢出。但按 CSS Overflow L3，visible 一旦与
+  // 「既非 visible 也非 clip」的值同时出现，就会被计算成 auto——写 hidden 时
+  // overflow-y 实际变成 auto，溢出的 4px 成了一条真能滚的区域：滚轮停在滑块上
+  // 滚的是它自己，把手还会跟着上下错位。
+  // clip 同样裁掉横向溢出，但不创建滚动容器，也不会把另一轴的 visible 拽下水。
+  overflow-x: clip;
   overflow-y: visible;
 
   :global(.ant-slider-step),
