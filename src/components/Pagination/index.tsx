@@ -6,10 +6,10 @@ import {
 import React, { ReactNode, useMemo, useRef } from "react";
 
 import { BaseSelectRef } from "rc-select";
-import Icon from "../../../Icon";
+import Icon from "../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import usePaginationSync from "../../_hooks/usePaginationSync";
+import usePaginationSync from "./_hooks/usePaginationSync";
 
 export interface PaginationProps
   extends Omit<AntdPaginationProps, "pageSizeOptions" | "showTotal"> {

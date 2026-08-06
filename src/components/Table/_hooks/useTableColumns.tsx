@@ -17,7 +17,7 @@ import {
   HELP_TOOLTIP_CONFIG,
 } from "../_utils/tableUtils";
 import usePermissions from "../../../hooks/usePermissions";
-import { PaginationProps } from "../_components/Pagination";
+import { PaginationProps } from "../../Pagination";
 
 // measureAlign columns: measured at 14px, consistent with the table body and autoWidth title measurement
 const MEASURE_ALIGN_FONT_SIZE = 14;

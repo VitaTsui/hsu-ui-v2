@@ -63,6 +63,8 @@ export { default as Modal } from "./components/Modal";
 export * from "./components/Modal";
 export { default as Operate } from "./components/Operate";
 export * from "./components/Operate";
+export { default as Pagination } from "./components/Pagination";
+export * from "./components/Pagination";
 export { default as Panel } from "./components/Panel";
 export * from "./components/Panel";
 export { default as Search } from "./components/Search";

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Equal } from "hsu-utils";
-import { PaginationProps } from "../_components/Pagination";
+import { PaginationProps } from "../../Pagination";
 import { TableProps } from "..";
 import { AnyObject } from "antd/es/_util/type";
-import usePaginationSync from "./usePaginationSync";
+import usePaginationSync from "../../Pagination/_hooks/usePaginationSync";
 
 interface UseTablePaginationParams<T extends AnyObject> {
   dataSource?: TableProps<T>["dataSource"];

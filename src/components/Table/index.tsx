@@ -8,7 +8,7 @@ import {
   TooltipProps,
 } from "antd";
 import Drag, { DragProps } from "./_components/Drag";
-import Pagination, { PaginationProps } from "./_components/Pagination";
+import Pagination, { PaginationProps } from "../Pagination";
 import React, { CSSProperties, ReactNode, useMemo, useRef } from "react";
 
 import { AnyObject } from "antd/es/_util/type";
