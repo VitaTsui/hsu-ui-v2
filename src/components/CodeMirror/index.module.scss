@@ -2,7 +2,7 @@
   width: 100%;
   height: 100%;
 
-  border: 1px solid var(--cf-border);
+  border: 1px solid var(--vita-border);
   border-radius: 6px;
 
   overflow: hidden;
@@ -22,15 +22,15 @@
   }
 
   &.hasError {
-    border-color: var(--cf-error);
+    border-color: var(--vita-error);
 
     &:hover {
-      border-color: var(--cf-error);
+      border-color: var(--vita-error);
     }
 
     :global(.cm-focused) {
-      border-color: var(--cf-error);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--cf-error) 20%, transparent);
+      border-color: var(--vita-error);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-error) 20%, transparent);
     }
   }
 }

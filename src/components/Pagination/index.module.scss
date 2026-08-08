@@ -80,7 +80,7 @@
   &.bordered {
     > li {
       &:not(:global(.ant-pagination-options)):not(:global(.ant-pagination-total-text)) {
-        border: 1px solid var(--cf-border);
+        border: 1px solid var(--vita-border);
         border-radius: 4px;
       }
 
@@ -91,8 +91,8 @@
             :global(.ant-pagination-item-disabled)
           ):hover,
         &:global(.ant-pagination-item-active) {
-          background-color: var(--primary-color, #1890ff);
-          border-color: var(--primary-color, #1890ff);
+          background-color: var(--vita-primary, #1890ff);
+          border-color: var(--vita-primary, #1890ff);
 
           > a {
             color: #ffffff;
@@ -100,7 +100,7 @@
         }
 
         &:not(:global(.ant-pagination-item-active)):not(:global(.ant-pagination-item-disabled)) {
-          border-color: var(--cf-border);
+          border-color: var(--vita-border);
         }
 
         &:not(:global(.ant-pagination-item-active)):global(.ant-pagination-item-disabled) {
@@ -111,7 +111,7 @@
           }
 
           > a {
-            color: var(--cf-text-3);
+            color: var(--vita-subtle-foreground);
 
             cursor: not-allowed;
           }
@@ -180,7 +180,7 @@
     user-select: none;
 
     &:hover {
-      background-color: var(--cf-subtle);
+      background-color: var(--vita-muted);
     }
 
     .icon {

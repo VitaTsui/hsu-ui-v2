@@ -5,7 +5,7 @@
 
   padding: 0px 10px;
 
-  background-color: var(--cf-subtle);
+  background-color: var(--vita-muted);
 
   .newChat {
     display: flex;
@@ -18,17 +18,17 @@
 
     font-size: 14px;
 
-    background-color: var(--cf-surface);
+    background-color: var(--vita-surface);
 
     border-radius: 6px;
-    border: 1px solid var(--cf-border-weak);
+    border: 1px solid var(--vita-border-weak);
 
     cursor: pointer;
 
     transition: box-shadow 0.3s;
 
     &:hover {
-      box-shadow: var(--cf-shadow-2);
+      box-shadow: var(--vita-shadow-2);
     }
   }
 }

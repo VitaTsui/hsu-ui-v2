@@ -55,12 +55,12 @@
 
       font-size: 16px;
 
-      border: 1px solid var(--cf-border-weak);
+      border: 1px solid var(--vita-border-weak);
 
       cursor: pointer;
 
       &.active {
-        background: var(--cf-row-hover);
+        background: var(--vita-hover);
       }
     }
   }

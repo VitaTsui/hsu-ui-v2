@@ -73,7 +73,7 @@
 
     border-radius: 4px;
 
-    background-color: var(--cf-surface);
+    background-color: var(--vita-surface);
 
     overflow: auto;
 
@@ -83,7 +83,7 @@
     }
 
     &::-webkit-scrollbar-track {
-      background-color: var(--cf-surface);
+      background-color: var(--vita-surface);
     }
   }
 }

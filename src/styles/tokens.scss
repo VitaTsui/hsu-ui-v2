@@ -1,62 +1,96 @@
 // =============================================================
-// Hsu UI design tokens (single source of truth)
-// Two value sets, light/dark; dark is activated by html[data-theme="dark"] (Theme toggle in consuming projects)
-// or html[data-prefers-color-scheme="dark"] (dumi docs site).
-// TS-side constants live in ./tokens.ts (for JS consumers such as antd themeConfig); the two must be kept in sync.
+// 本文件由 scripts/gen-tokens-scss.cjs 从 src/styles/tokens.json 生成，请勿手改。
+// 改令牌请改 tokens.json，然后跑 `yarn tokens`（build / prepublish 会自动跑并校验）。
+//
+// 暗色由 html[data-theme="dark"] 激活（消费方主题开关），
+// 或 html[data-prefers-color(-scheme)="dark"]（dumi 文档站）。
 // =============================================================
 
 :root {
-  // ---- Colors - neutral ----
-  --cf-canvas: #f6f7f9; // Page canvas
-  --cf-surface: #ffffff; // Card/panel background
-  --cf-subtle: #fafbfc; // Table header/secondary background
-  --cf-border: #e6e8eb; // Border
-  --cf-border-weak: #eceef1; // Lighter border
-  --cf-text: rgba(0, 0, 0, 0.88);
-  --cf-text-2: rgba(0, 0, 0, 0.45);
-  --cf-text-3: rgba(0, 0, 0, 0.35);
-  --cf-row-hover: #f6f7f9;
+  // ---- 品牌色 ----
+  // 兼容位：0.1.0 之前消费方就是通过覆盖 --primary-color 换主题色的，
+  // 所以真源反过来引用它，两种写法都生效。
+  --primary-color: #1677ff;
+  --vita-primary: var(--primary-color);
+  --vita-primary-foreground: #ffffff;
+  // focus ring：shadcn 的 2px 环，颜色取品牌色的低透明度
+  --vita-ring: color-mix(in srgb, var(--vita-primary) 40%, transparent);
+  --vita-ring-width: 2px;
 
-  // ---- Colors - brand & functional ----
-  --primary-color: #1677ff; // Default primary color (consuming projects may override at runtime)
-  --cf-success: #52c41a;
-  --cf-warning: #faad14;
-  --cf-error: #ff4d4f;
+  // ---- 中性色（浅色）----
+  --vita-background: #fafafa; // 页面画布
+  --vita-surface: #ffffff; // 卡片 / 面板背景
+  --vita-muted: #f4f4f5; // 次级背景（表头、只读区）
+  --vita-border: #e4e4e7; // 边框
+  --vita-border-weak: #f4f4f5; // 更浅的分隔线
+  --vita-foreground: #09090b; // 主文字
+  --vita-muted-foreground: #71717a; // 次级文字
+  --vita-subtle-foreground: #a1a1aa; // 占位 / 禁用文字
+  --vita-hover: #f4f4f5; // 行 / 项 hover 背景
+  --vita-success: #16a34a;
+  --vita-warning: #f59e0b;
+  --vita-error: #ef4444;
+  --vita-shadow-1: 0 1px 2px 0 rgba(9, 9, 11, 0.05); // 浮层阴影 - 弱
+  --vita-shadow-2: 0 4px 6px -1px rgba(9, 9, 11, 0.08), 0 2px 4px -2px rgba(9, 9, 11, 0.06); // 浮层阴影 - 中
+  --vita-shadow-3: 0 10px 15px -3px rgba(9, 9, 11, 0.1), 0 4px 6px -4px rgba(9, 9, 11, 0.08); // 浮层阴影 - 强
 
-  // ---- Fonts ----
-  --cf-font-family:
-    PingFangSC-Regular, "PingFang SC", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
-  --cf-font-size-sm: 12px;
-  --cf-font-size: 14px;
-  --cf-font-size-lg: 16px;
+  // ---- 字体 ----
+  --vita-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  --vita-font-size-sm: 12px;
+  --vita-font-size: 14px;
+  --vita-font-size-lg: 16px;
 
-  // ---- Border radius ----
-  --cf-radius-sm: 6px;
-  --cf-radius: 8px;
-  --cf-radius-lg: 12px;
+  // ---- 圆角 ----
+  --vita-radius-sm: 6px;
+  --vita-radius: 8px;
+  --vita-radius-lg: 12px;
 
-  // ---- Shadows (the CF look relies mainly on borders; shadows are for overlays only) ----
-  --cf-shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --cf-shadow-2: 0 4px 12px rgba(16, 24, 40, 0.08);
-  --cf-shadow-3: 0 8px 24px rgba(16, 24, 40, 0.12);
+  // ---- 控件高度 ----
+  --vita-control-height: 32px;
+  --vita-control-height-sm: 24px;
+  --vita-control-height-lg: 40px;
+
+  // ---- 兼容别名（0.1.0 前的 --cf-*，单向指向新名）----
+  --cf-canvas: var(--vita-background);
+  --cf-surface: var(--vita-surface);
+  --cf-subtle: var(--vita-muted);
+  --cf-border: var(--vita-border);
+  --cf-border-weak: var(--vita-border-weak);
+  --cf-text: var(--vita-foreground);
+  --cf-text-2: var(--vita-muted-foreground);
+  --cf-text-3: var(--vita-subtle-foreground);
+  --cf-row-hover: var(--vita-hover);
+  --cf-success: var(--vita-success);
+  --cf-warning: var(--vita-warning);
+  --cf-error: var(--vita-error);
+  --cf-font-family: var(--vita-font-family);
+  --cf-font-size-sm: var(--vita-font-size-sm);
+  --cf-font-size: var(--vita-font-size);
+  --cf-font-size-lg: var(--vita-font-size-lg);
+  --cf-radius-sm: var(--vita-radius-sm);
+  --cf-radius: var(--vita-radius);
+  --cf-radius-lg: var(--vita-radius-lg);
+  --cf-shadow-1: var(--vita-shadow-1);
+  --cf-shadow-2: var(--vita-shadow-2);
+  --cf-shadow-3: var(--vita-shadow-3);
 }
 
 html[data-theme="dark"],
 html[data-prefers-color="dark"],
 html[data-prefers-color-scheme="dark"] {
-  --cf-canvas: #131314;
-  --cf-surface: #1c1c1e;
-  --cf-subtle: #232325;
-  --cf-border: rgba(255, 255, 255, 0.12);
-  --cf-border-weak: rgba(255, 255, 255, 0.08);
-  --cf-text: rgba(255, 255, 255, 0.85);
-  --cf-text-2: rgba(255, 255, 255, 0.45);
-  --cf-text-3: rgba(255, 255, 255, 0.35);
-  --cf-row-hover: rgba(255, 255, 255, 0.04);
-
-  // Deeper shadows in dark mode (to distinguish overlays from the dark background)
-  --cf-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --cf-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --cf-shadow-3: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --vita-background: #09090b;
+  --vita-surface: #18181b;
+  --vita-muted: #27272a;
+  --vita-border: #27272a;
+  --vita-border-weak: #1f1f23;
+  --vita-foreground: #fafafa;
+  --vita-muted-foreground: #a1a1aa;
+  --vita-subtle-foreground: #71717a;
+  --vita-hover: #27272a;
+  --vita-success: #22c55e;
+  --vita-warning: #fbbf24;
+  --vita-error: #f87171;
+  --vita-shadow-1: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --vita-shadow-2: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --vita-shadow-3: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
 }

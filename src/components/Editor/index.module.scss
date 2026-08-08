@@ -7,14 +7,14 @@
 
   overflow: hidden;
 
-  border: 1px solid var(--cf-border);
+  border: 1px solid var(--vita-border);
   border-radius: 6px;
 
   .toolbar {
-    border-bottom: 1px solid var(--cf-border);
+    border-bottom: 1px solid var(--vita-border);
 
     .w-e-bar-item {
-      color: var(--cf-text-3);
+      color: var(--vita-subtle-foreground);
     }
   }
 
@@ -28,14 +28,14 @@
 
   &.disabled {
     .editor {
-      border-color: var(--cf-border);
+      border-color: var(--vita-border);
 
       cursor: not-allowed;
 
       .w-e-text-container {
-        background-color: var(--cf-subtle);
+        background-color: var(--vita-muted);
 
-        color: var(--cf-text-3);
+        color: var(--vita-subtle-foreground);
       }
     }
   }

@@ -120,7 +120,7 @@
         justify-content: flex-end;
         flex-basis: 100%;
 
-        color: var(--cf-text-2);
+        color: var(--vita-muted-foreground);
         font-size: 14px;
         white-space: pre-wrap;
       }
@@ -185,7 +185,7 @@
             margin-inline-start: 0px;
             margin-inline-end: 4px;
 
-            color: var(--cf-error);
+            color: var(--vita-error);
             font-size: 14px;
             font-family: SimSun, sans-serif;
             line-height: 1;
@@ -201,7 +201,7 @@
             margin-inline-start: 0px;
             margin-inline-end: 4px;
 
-            color: var(--cf-error);
+            color: var(--vita-error);
             font-size: 14px;
             font-family: SimSun, sans-serif;
             line-height: 1;
@@ -226,7 +226,7 @@
           margin-inline-start: 4px;
           margin-inline-end: 0px;
 
-          color: var(--cf-error);
+          color: var(--vita-error);
           font-size: 14px;
           font-family: SimSun, sans-serif;
           line-height: 1;
@@ -255,7 +255,7 @@
             margin-inline-start: 4px;
             margin-inline-end: 0px;
 
-            color: var(--cf-error);
+            color: var(--vita-error);
             font-size: 14px;
             font-family: SimSun, sans-serif;
             line-height: 1;

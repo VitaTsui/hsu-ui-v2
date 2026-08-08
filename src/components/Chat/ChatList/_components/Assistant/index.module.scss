@@ -15,7 +15,7 @@
 
         .time {
           font-size: 12px;
-          color: var(--cf-text-2);
+          color: var(--vita-muted-foreground);
           font-weight: normal;
         }
       }
@@ -45,7 +45,7 @@
       margin-top: 10px;
 
       font-size: 12px;
-      color: var(--cf-text-2);
+      color: var(--vita-muted-foreground);
 
       > div {
         display: flex;
@@ -63,7 +63,7 @@
         cursor: pointer;
 
         &.disabled {
-          color: var(--cf-text-3);
+          color: var(--vita-subtle-foreground);
 
           cursor: not-allowed;
         }

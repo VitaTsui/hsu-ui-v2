@@ -30,9 +30,9 @@ const FileCol: React.FC<UrlItemProps> = (props) => {
               {!hideNm && (
                 <Tooltip
                   title={file.name}
-                  color="var(--cf-subtle)"
+                  color="var(--vita-muted)"
                   styles={{
-                    container: { color: "var(--cf-text)", padding: "6px 16px" },
+                    container: { color: "var(--vita-foreground)", padding: "6px 16px" },
                   }}
                 >
                   <span className={styles.fileName}>{file.name}</span>

@@ -37,7 +37,7 @@ export default () => (
 
 ## 基础按钮
 
-`Button.Basic` 是本库自研的按钮，不经过 antd，样式直接由设计变量（`--primary-color`、`--cf-*`）驱动，因此跟随主题明暗切换。工具栏、搜索栏的按钮组用的就是它。
+`Button.Basic` 是本库自研的按钮，不经过 antd，样式直接由设计变量（`--vita-*`）驱动，因此跟随主题明暗切换。工具栏、搜索栏的按钮组用的就是它。
 
 > **0.1.0 破坏性变更**：它此前叫 `Button.Chakra`，底层是 Chakra UI。chakra 全家（`@chakra-ui/react` + `@emotion/*` + zag-js，约 560 KB）只服务这一个组件，已整体移除。
 >
@@ -94,7 +94,7 @@ export default () => (
 | --- | --- | --- | --- |
 | variant | 视觉形态 | `'solid' \| 'subtle' \| 'surface' \| 'outline' \| 'ghost' \| 'plain'` | `'solid'` |
 | size | 尺寸（高度 24 / 28 / 32 / 40） | `'xs' \| 'sm' \| 'md' \| 'lg'` | `'md'` |
-| colorPalette | 语义色；`gray` 跟随 `--cf-text`，自动适配明暗 | `'gray' \| 'blue' \| 'red' \| 'green' \| 'orange'` | `'gray'` |
+| colorPalette | 语义色；`gray` 跟随 `--vita-foreground`，自动适配明暗 | `'gray' \| 'blue' \| 'red' \| 'green' \| 'orange'` | `'gray'` |
 | hasPermi | 权限码；当前用户不具备时按钮不渲染 | `string[]` | - |
 | hidden | 是否隐藏（不渲染） | `boolean` | `false` |
 | icon | 图标 | `ReactNode` | - |

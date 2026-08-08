@@ -11,7 +11,7 @@
   height: 100%;
   min-height: 0px !important;
 
-  background: var(--cf-surface);
+  background: var(--vita-surface);
 
   border-radius: 8px;
 
@@ -58,11 +58,11 @@
 
     :global(.ant-tree-treenode) {
       &:hover {
-        background: var(--cf-subtle);
+        background: var(--vita-muted);
       }
 
       &:has(> :global(.ant-tree-node-selected)) {
-        background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+        background-color: color-mix(in srgb, var(--vita-primary) 12%, transparent);
 
         :global(.ant-tree-node-selected) {
           background-color: transparent;
@@ -131,7 +131,7 @@
   &.legacyHasSelectedNodeBackground {
     .treeContainer {
       :global(.ant-tree-treenode):global(.ant-tree-treenode-selected) {
-        background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+        background-color: color-mix(in srgb, var(--vita-primary) 12%, transparent);
 
         :global(.ant-tree-node-selected) {
           background-color: transparent;

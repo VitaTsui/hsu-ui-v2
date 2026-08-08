@@ -4,7 +4,7 @@
   padding: 12px;
   margin: 8px 0;
   background: #fff;
-  border: 1px solid var(--cf-border-weak);
+  border: 1px solid var(--vita-border-weak);
   border-radius: 8px;
   overflow-x: auto;
 
@@ -17,7 +17,7 @@
 .mermaidFallback {
   margin: 8px 0;
   padding: 12px;
-  background: var(--cf-subtle);
+  background: var(--vita-muted);
   border-radius: 8px;
   overflow-x: auto;
 
@@ -28,7 +28,7 @@
 
 .artifact {
   margin: 8px 0;
-  border: 1px solid var(--cf-border-weak);
+  border: 1px solid var(--vita-border-weak);
   border-radius: 10px;
   overflow: hidden;
 
@@ -37,14 +37,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 6px 12px;
-    background: var(--cf-subtle);
-    border-bottom: 1px solid var(--cf-border-weak);
+    background: var(--vita-muted);
+    border-bottom: 1px solid var(--vita-border-weak);
   }
 
   .artifactLang {
     font-size: 12px;
     font-weight: 600;
-    color: var(--cf-text-2);
+    color: var(--vita-muted-foreground);
   }
 
   .artifactTabs {
@@ -58,21 +58,21 @@
     border: none;
     border-radius: 999px;
     background: transparent;
-    color: var(--cf-text-2);
+    color: var(--vita-muted-foreground);
     cursor: pointer;
 
     &:hover {
-      background: var(--cf-row-hover);
+      background: var(--vita-hover);
     }
   }
 
   .artifactTabActive {
-    background: var(--cf-surface);
+    background: var(--vita-surface);
     color: #4f46e5;
-    box-shadow: var(--cf-shadow-1);
+    box-shadow: var(--vita-shadow-1);
 
     &:hover {
-      background: var(--cf-surface);
+      background: var(--vita-surface);
     }
   }
 

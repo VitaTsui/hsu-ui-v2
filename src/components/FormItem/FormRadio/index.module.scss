@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
 
-  color: var(--cf-text);
+  color: var(--vita-foreground);
   font-size: 14px;
 
   > label {
@@ -34,7 +34,7 @@
         // v6 draws the dot on `.ant-radio` itself (the old `.ant-radio-inner` span is gone),
         // so the fill-the-parent sizing is dropped.
         & {
-          border-color: var(--cf-border) !important;
+          border-color: var(--vita-border) !important;
 
           background: transparent !important;
 
@@ -80,7 +80,7 @@
             background: rgba(0, 0, 0, 0.04) !important;
 
             &::after {
-              border-color: var(--cf-border) !important;
+              border-color: var(--vita-border) !important;
             }
           }
 

@@ -73,7 +73,7 @@ const UploadButton: React.FC<UploadButtonProps> = (props) => {
                     : "heroicons-outline:paper-clip"
                 }
                 fontSize={22}
-                color="var(--cf-text-3)"
+                color="var(--vita-subtle-foreground)"
               />
             }
             onClick={

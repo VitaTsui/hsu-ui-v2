@@ -4,7 +4,7 @@
   &.outline {
     :global(.ant-checkbox) {
       & {
-        border-color: var(--cf-border) !important;
+        border-color: var(--vita-border) !important;
 
         background: transparent !important;
 
@@ -27,7 +27,7 @@
           background: rgba(0, 0, 0, 0.04) !important;
 
           &::after {
-            border-color: var(--cf-border) !important;
+            border-color: var(--vita-border) !important;
           }
         }
 

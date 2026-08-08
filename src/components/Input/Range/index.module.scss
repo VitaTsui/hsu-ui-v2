@@ -47,7 +47,7 @@
       }
 
       > span {
-        color: var(--cf-text-3);
+        color: var(--vita-subtle-foreground);
 
         user-select: none;
 
@@ -56,9 +56,9 @@
 
       &.focused,
       &:hover {
-        border-color: var(--primary-color);
+        border-color: var(--vita-primary);
 
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 10%, transparent);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-primary) 10%, transparent);
       }
     }
 
@@ -69,7 +69,7 @@
 
       transform: translateY(-50%);
 
-      color: var(--cf-text-3);
+      color: var(--vita-subtle-foreground);
 
       opacity: 0;
 

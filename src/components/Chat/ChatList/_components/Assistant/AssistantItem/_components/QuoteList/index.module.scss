@@ -13,7 +13,7 @@
 
     font-size: 14px;
     line-height: 14px;
-    color: var(--cf-text-2);
+    color: var(--vita-muted-foreground);
     white-space: nowrap;
 
     cursor: default;
@@ -26,7 +26,7 @@
       min-width: 0px;
       height: 1px;
 
-      background-color: var(--cf-border);
+      background-color: var(--vita-border);
     }
 
     .quoteIcon {
@@ -48,7 +48,7 @@
       transition: color 0.3s;
 
       &:hover {
-        color: var(--primary-color);
+        color: var(--vita-primary);
       }
     }
   }
@@ -79,7 +79,7 @@
 
         background: linear-gradient(
           transparent,
-          color-mix(in srgb, var(--cf-surface) 91%, transparent)
+          color-mix(in srgb, var(--vita-surface) 91%, transparent)
         );
       }
     }
@@ -103,14 +103,14 @@
 
       border-radius: 4px;
 
-      background-color: var(--cf-subtle);
+      background-color: var(--vita-muted);
 
       transition: background-color 0.3s, color 0.3s;
 
       &:hover {
         color: #fff;
 
-        background-color: var(--primary-color);
+        background-color: var(--vita-primary);
       }
 
       &.lastRowIndex {

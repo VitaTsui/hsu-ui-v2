@@ -34,12 +34,12 @@
     pointer-events: auto;
 
     cursor: pointer;
-    color: var(--cf-text-3);
+    color: var(--vita-subtle-foreground);
     font-size: 14px;
     transition: color 0.3s;
 
     &:hover {
-      color: var(--cf-text-2);
+      color: var(--vita-muted-foreground);
     }
   }
 }

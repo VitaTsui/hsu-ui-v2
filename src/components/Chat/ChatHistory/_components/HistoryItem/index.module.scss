@@ -26,7 +26,7 @@
   cursor: pointer;
 
   &:hover {
-    background: var(--cf-row-hover);
+    background: var(--vita-hover);
 
     .operation {
       display: flex;
@@ -34,9 +34,9 @@
   }
 
   &.active {
-    background: var(--cf-row-hover);
+    background: var(--vita-hover);
 
-    color: var(--primary-color);
+    color: var(--vita-primary);
   }
 
   .operation {
@@ -55,10 +55,10 @@
 
     background-color: transparent;
 
-    color: var(--cf-text);
+    color: var(--vita-foreground);
 
     &:hover {
-      color: var(--primary-color);
+      color: var(--vita-primary);
     }
   }
 }
@@ -69,6 +69,6 @@
   column-gap: 8px;
 
   &.delete {
-    color: var(--cf-error);
+    color: var(--vita-error);
   }
 }

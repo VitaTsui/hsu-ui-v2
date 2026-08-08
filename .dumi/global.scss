@@ -11,21 +11,11 @@
   box-sizing: border-box;
 }
 
-// 组件依赖一组主题 CSS 变量（真实项目由 Theme 组件注入），
-// 文档站需自行定义，否则组件描边 / 背景 / 文字色缺失，样式异常。
-:root {
-  --primary-color: #1677ff;
-  --text-color: rgba(0, 0, 0, 0.88);
-
-  --cf-canvas: #f6f7f9; // 页面画布
-  --cf-surface: #ffffff; // 卡片/面板底
-  --cf-subtle: #fafbfc; // 表头/次级底
-  --cf-border: #e6e8eb; // 描边
-  --cf-border-weak: #eceef1; // 更轻描边
-  --cf-text: rgba(0, 0, 0, 0.88);
-  --cf-text-2: rgba(0, 0, 0, 0.45);
-  --cf-text-3: rgba(0, 0, 0, 0.35);
-}
+// 令牌不在这里定义：上面 @import 的 antd-overload.scss 已经带进了 src/styles/tokens.scss
+// （由 tokens.json 生成的 --vita-* 全套，含暗色）。
+//
+// 0.1.0 之前这里有一份硬编码副本，值与库里的那份各写各的 —— 结果就是文档站看到的颜色
+// 并不是消费方看到的颜色。真源统一后这份副本必须删掉，否则它会反过来覆盖真源。
 
 // 收窄文档内容区与 Demo 预览区的默认留白，给宽组件（Panel.List / Search 等）更多展示宽度，
 // 避免在较窄视口下因外框内边距过大而被裁切。
@@ -76,16 +66,4 @@
   }
 }
 
-// dumi 暗色模式跟随
-:root[data-prefers-color-scheme="dark"] {
-  --text-color: rgba(255, 255, 255, 0.85);
-
-  --cf-canvas: #131314;
-  --cf-surface: #1c1c1e;
-  --cf-subtle: #232325;
-  --cf-border: rgba(255, 255, 255, 0.12);
-  --cf-border-weak: rgba(255, 255, 255, 0.08);
-  --cf-text: rgba(255, 255, 255, 0.85);
-  --cf-text-2: rgba(255, 255, 255, 0.45);
-  --cf-text-3: rgba(255, 255, 255, 0.35);
-}
+// 暗色同理：tokens.scss 自己就监听 html[data-prefers-color-scheme="dark"]。

@@ -114,8 +114,8 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
         <Tooltip
           arrow={false}
           placement="top"
-          color="var(--cf-subtle)"
-          styles={{ container: { color: "var(--cf-text)", padding: "6px 12px" } }}
+          color="var(--vita-muted)"
+          styles={{ container: { color: "var(--vita-foreground)", padding: "6px 12px" } }}
           {...tipsConfig}
         >
           {typeof icon === "string" ? (
@@ -126,7 +126,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
                 e.stopPropagation();
               }}
               fontSize={16}
-              color="var(--cf-text-3)"
+              color="var(--vita-subtle-foreground)"
             />
           ) : (
             <div

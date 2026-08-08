@@ -51,14 +51,14 @@
 
   &:hover {
     &::before {
-      background: color-mix(in srgb, var(--primary-color) 45%, transparent);
+      background: color-mix(in srgb, var(--vita-primary) 45%, transparent);
     }
   }
 }
 
 .resizing {
   &::before {
-    background: var(--primary-color);
+    background: var(--vita-primary);
   }
 }
 
@@ -89,11 +89,11 @@
     min-height: 0px;
     padding: 10px;
 
-    background: var(--cf-surface);
+    background: var(--vita-surface);
 
     // CF style: outlined white card + small border radius, no shadow
     border-radius: 8px;
-    border: 1px solid var(--cf-border);
+    border: 1px solid var(--vita-border);
     box-shadow: none;
   }
 
@@ -113,7 +113,7 @@
       margin-left: 0 !important;
       border-radius: 6px !important;
 
-      background: var(--cf-surface);
+      background: var(--vita-surface);
     }
   }
 

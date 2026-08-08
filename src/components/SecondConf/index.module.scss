@@ -13,7 +13,7 @@
 
     .icon {
       font-size: 50px;
-      color: var(--cf-warning);
+      color: var(--vita-warning);
     }
 
     .content {
@@ -24,12 +24,12 @@
       .title {
         font-size: 20px;
         font-weight: bold;
-        color: var(--cf-text-2);
+        color: var(--vita-muted-foreground);
       }
 
       .text {
         font-size: 16px;
-        color: var(--cf-text-3);
+        color: var(--vita-subtle-foreground);
       }
     }
   }

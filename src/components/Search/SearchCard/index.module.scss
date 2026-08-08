@@ -13,7 +13,7 @@
   .searchBox {
     width: 100%;
     padding: 20px;
-    background: var(--cf-surface);
+    background: var(--vita-surface);
     border-radius: 8px 8px 0 0;
 
     .searchInputContainer {
@@ -56,7 +56,7 @@
 
     border-radius: 8px;
 
-    background: var(--cf-surface);
+    background: var(--vita-surface);
 
     transition: all 0.3s, border-top 0s;
   }
@@ -177,9 +177,9 @@
 
           &.active,
           &:hover {
-            color: var(--primary-color);
+            color: var(--vita-primary);
 
-            background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+            background: color-mix(in srgb, var(--vita-primary) 12%, transparent);
           }
         }
 
@@ -195,7 +195,7 @@
         .help {
           margin-left: 2px;
 
-          color: var(--cf-text-2);
+          color: var(--vita-muted-foreground);
           font-size: 16px;
         }
       }
@@ -207,7 +207,7 @@
         height: max-content;
         padding: 3px 0px;
 
-        color: var(--cf-text-2);
+        color: var(--vita-muted-foreground);
         font-weight: 400;
         font-size: 16px;
         font-family: PingFangSC-Regular, PingFang SC;
@@ -220,7 +220,7 @@
         transition: color 0.3s;
 
         &:hover {
-          color: var(--primary-color);
+          color: var(--vita-primary);
         }
       }
     }
@@ -238,7 +238,7 @@
       > span {
         padding: 3px var(--searchCard-padding-left-right);
 
-        color: var(--cf-text);
+        color: var(--vita-foreground);
         font-weight: 400;
         font-size: 16px;
         font-family: PingFangSC-Regular, PingFang SC;
@@ -252,8 +252,8 @@
 
         &.active,
         &:hover {
-          color: var(--primary-color);
-          background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+          color: var(--vita-primary);
+          background: color-mix(in srgb, var(--vita-primary) 12%, transparent);
         }
       }
     }

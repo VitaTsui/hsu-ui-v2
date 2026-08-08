@@ -10,23 +10,23 @@
   height: max-content;
 
   // CF style: outlined input control that follows the appearance theme
-  background: var(--cf-surface);
+  background: var(--vita-surface);
 
   border-width: 1px;
   border-style: solid;
-  border-color: var(--cf-border);
+  border-color: var(--vita-border);
   border-radius: 6px;
 
-  color: var(--cf-text);
+  color: var(--vita-foreground);
 
   transition: border-color 0.3s, box-shadow 0.3s;
 
   &.disabled:not(.text) {
-    background-color: var(--cf-subtle);
+    background-color: var(--vita-muted);
 
-    border-color: var(--cf-border);
+    border-color: var(--vita-border);
 
-    color: var(--cf-text-3) !important;
+    color: var(--vita-subtle-foreground) !important;
 
     cursor: not-allowed;
   }
@@ -38,7 +38,7 @@
 
     > textarea,
     > span {
-      color: var(--cf-text);
+      color: var(--vita-foreground);
 
       cursor: default;
     }
@@ -86,7 +86,7 @@
           position: relative;
           bottom: auto;
 
-          color: var(--cf-text-2);
+          color: var(--vita-muted-foreground);
           font-size: 14px;
         }
 
@@ -111,15 +111,15 @@
   }
 
   &:not(.hasError).focused {
-    border-color: var(--primary-color);
+    border-color: var(--vita-primary);
 
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-primary) 12%, transparent);
   }
 
   &.hasError {
-    border-color: var(--cf-error);
+    border-color: var(--vita-error);
 
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--cf-error) 6%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-error) 6%, transparent);
 
     :global(.ant-input-status-error) {
       border: none !important;

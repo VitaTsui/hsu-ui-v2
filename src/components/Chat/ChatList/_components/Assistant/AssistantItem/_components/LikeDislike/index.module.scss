@@ -13,7 +13,7 @@
 
     font-size: 14px;
     line-height: 18px;
-    color: var(--cf-text-2);
+    color: var(--vita-muted-foreground);
 
     cursor: pointer;
 
@@ -21,20 +21,20 @@
 
     .likeIcon {
       font-size: 20px;
-      color: var(--cf-text-2);
+      color: var(--vita-muted-foreground);
 
       transition: color 0.3s;
     }
 
     &:hover {
-      color: var(--cf-text);
+      color: var(--vita-foreground);
 
-      background-color: var(--cf-row-hover);
+      background-color: var(--vita-hover);
 
       border-radius: 4px;
 
       .likeIcon {
-        color: var(--cf-text);
+        color: var(--vita-foreground);
       }
     }
   }

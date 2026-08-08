@@ -3,14 +3,14 @@
     cursor: default;
 
     > div:not(.tips) {
-      color: var(--cf-text-2);
+      color: var(--vita-muted-foreground);
     }
 
     .tips {
       font-size: 12px;
       font-weight: normal;
 
-      color: var(--cf-text-3);
+      color: var(--vita-subtle-foreground);
     }
   }
 

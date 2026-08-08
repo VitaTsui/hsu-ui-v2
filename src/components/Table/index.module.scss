@@ -25,10 +25,10 @@
         padding: var(--th-padding);
 
         &:global(.ant-table-column-has-sorters) {
-          background: var(--cf-subtle);
+          background: var(--vita-muted);
 
           &:hover {
-            background: var(--cf-subtle);
+            background: var(--vita-muted);
           }
         }
       }
@@ -61,11 +61,11 @@
 
         // 排序列：antd 会用 bodySortBg 单独给该列的单元格上底色，这里抹掉，
         // 让「哪一列在排序」只由表头的高亮与箭头表达。
-        // 只抹静止态——从前连悬浮态一起抹掉、再补一支 --cf-subtle 回来，
+        // 只抹静止态——从前连悬浮态一起抹掉、再补一支 --vita-muted 回来，
         // 而整行其余单元格走的是 antd 的 rowHoverBg，两支值并不相等（库自带调色板下
         // 是 #fafbfc vs #f6f7f9），悬浮一行时排序列会比其余列深一块、整行裂成两截。
         // 排除掉悬浮态后，该单元格自然落回 antd 的行悬浮规则，与整行始终同色，
-        // 且不依赖消费方是否同步设置了 --cf-subtle / rowHoverBg。
+        // 且不依赖消费方是否同步设置了 --vita-muted / rowHoverBg。
         &:global(.ant-table-column-sort):not(:global(.ant-table-cell-row-hover)) {
           background: transparent;
         }
@@ -74,10 +74,10 @@
       &:global(.ant-table-row-selected) {
         :global(.ant-table-cell) {
           &:global(.ant-table-column-sort) {
-            background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+            background: color-mix(in srgb, var(--vita-primary) 12%, transparent);
 
             &:global(.ant-table-cell-row-hover) {
-              background: color-mix(in srgb, var(--primary-color) 22%, transparent);
+              background: color-mix(in srgb, var(--vita-primary) 22%, transparent);
             }
           }
         }
@@ -145,7 +145,7 @@
 
   // Table
   .antdTable {
-    border-color: var(--cf-border-weak);
+    border-color: var(--vita-border-weak);
 
     *:not(:global(.ant-table-cell) *) {
       border-color: inherit !important;
@@ -174,7 +174,7 @@
         :global(.ant-table-container) {
           :global(.ant-table-content) {
             > table {
-              border-left: 1px solid var(--cf-border-weak);
+              border-left: 1px solid var(--vita-border-weak);
             }
           }
         }
@@ -240,22 +240,22 @@
           > :global(.ant-table-header) {
             > table {
               border-radius: 6px 6px 0 0;
-              border-left: 1px solid var(--cf-border-weak);
+              border-left: 1px solid var(--vita-border-weak);
             }
           }
 
           > :global(.ant-table-body) {
             > table {
               border-radius: 0px !important;
-              border-left: 1px solid var(--cf-border-weak);
+              border-left: 1px solid var(--vita-border-weak);
             }
           }
 
           > :global(.ant-table-summary) {
             > table {
               border-radius: 0px !important;
-              border-left: 1px solid var(--cf-border-weak);
-              border-top: 1px solid var(--cf-border-weak);
+              border-left: 1px solid var(--vita-border-weak);
+              border-top: 1px solid var(--vita-border-weak);
             }
           }
         }

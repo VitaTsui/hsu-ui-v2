@@ -31,7 +31,7 @@
     td {
       padding: 4px 8px;
 
-      border: 1px solid var(--cf-border);
+      border: 1px solid var(--vita-border);
     }
   }
 
@@ -70,7 +70,7 @@
       background: #212121;
 
       // Copy's root div (class is module-hashed, so it can only be reached as a child).
-      // It colors itself from theme tokens — in light mode --cf-text-2 is near-black,
+      // It colors itself from theme tokens — in light mode --vita-muted-foreground is near-black,
       // which disappears against this strip. The strip stays dark on purpose to match the
       // atom-one-dark code body, so the button is pinned to light-on-dark rather than
       // following the page theme.

@@ -1,10 +1,10 @@
 // Token-driven button. Every variant reads the same two custom properties, so adding a palette
 // means setting `--btn-accent` / `--btn-accent-contrast` and nothing else.
 .button {
-  // Neutral palette: on light themes `--cf-text` is near-black on a white surface, and the pair
+  // Neutral palette: on light themes `--vita-foreground` is near-black on a white surface, and the pair
   // inverts by itself in dark mode.
-  --btn-accent: var(--cf-text);
-  --btn-accent-contrast: var(--cf-surface);
+  --btn-accent: var(--vita-foreground);
+  --btn-accent-contrast: var(--vita-surface);
 
   display: inline-flex;
   align-items: center;
@@ -21,7 +21,7 @@
   white-space: nowrap;
 
   border: 1px solid transparent;
-  border-radius: var(--cf-radius-sm);
+  border-radius: var(--vita-radius-sm);
 
   background: transparent;
   color: var(--btn-accent);
@@ -59,22 +59,22 @@
 
 // ---- Palettes -------------------------------------------------------------
 .blue {
-  --btn-accent: var(--primary-color);
+  --btn-accent: var(--vita-primary);
   --btn-accent-contrast: #fff;
 }
 
 .red {
-  --btn-accent: var(--cf-error);
+  --btn-accent: var(--vita-error);
   --btn-accent-contrast: #fff;
 }
 
 .green {
-  --btn-accent: var(--cf-success);
+  --btn-accent: var(--vita-success);
   --btn-accent-contrast: #fff;
 }
 
 .orange {
-  --btn-accent: var(--cf-warning);
+  --btn-accent: var(--vita-warning);
   --btn-accent-contrast: #fff;
 }
 
@@ -84,11 +84,11 @@
   color: var(--btn-accent-contrast);
 
   &:not(:disabled):hover {
-    background: color-mix(in srgb, var(--btn-accent) 88%, var(--cf-surface));
+    background: color-mix(in srgb, var(--btn-accent) 88%, var(--vita-surface));
   }
 
   &:not(:disabled):active {
-    background: color-mix(in srgb, var(--btn-accent) 78%, var(--cf-surface));
+    background: color-mix(in srgb, var(--btn-accent) 78%, var(--vita-surface));
   }
 }
 
@@ -111,7 +111,7 @@
 }
 
 .outline {
-  border-color: color-mix(in srgb, var(--btn-accent) 30%, var(--cf-border));
+  border-color: color-mix(in srgb, var(--btn-accent) 30%, var(--vita-border));
 
   &:not(:disabled):hover {
     border-color: var(--btn-accent);

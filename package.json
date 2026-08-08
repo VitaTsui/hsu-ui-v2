@@ -41,9 +41,11 @@
     "dev": "dumi dev",
     "docs:build": "dumi build",
     "docs:preview": "dumi preview",
-    "build": "father build && node scripts/check-heavy-deps.cjs",
-    "prepublishOnly": "father build && node scripts/check-heavy-deps.cjs",
-    "check:deps": "node scripts/check-heavy-deps.cjs"
+    "build": "node scripts/gen-tokens-scss.cjs && father build && node scripts/check-heavy-deps.cjs",
+    "prepublishOnly": "node scripts/gen-tokens-scss.cjs --check && father build && node scripts/check-heavy-deps.cjs",
+    "check:deps": "node scripts/check-heavy-deps.cjs",
+    "tokens": "node scripts/gen-tokens-scss.cjs",
+    "check:tokens": "node scripts/gen-tokens-scss.cjs --check"
   },
   "dependencies": {
     "@ant-design/x": "^2.9.0",

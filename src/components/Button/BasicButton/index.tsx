@@ -16,7 +16,7 @@ export type BasicButtonVariant =
 export type BasicButtonSize = "xs" | "sm" | "md" | "lg";
 
 /**
- * Semantic colour of the button. `gray` is the neutral default and follows `--cf-text`, so it
+ * Semantic colour of the button. `gray` is the neutral default and follows `--vita-foreground`, so it
  * inverts with the theme on its own.
  */
 export type BasicButtonPalette = "gray" | "blue" | "red" | "green" | "orange";

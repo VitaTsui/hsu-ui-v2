@@ -20,13 +20,13 @@
     padding: 0px 15px;
 
     font-size: 14px;
-    color: var(--cf-text);
+    color: var(--vita-foreground);
 
     transition: all 0.3s;
 
     cursor: pointer;
 
-    border: 1px solid var(--cf-border);
+    border: 1px solid var(--vita-border);
 
     &:not(:first-child) {
       margin-left: -1px;
@@ -45,11 +45,11 @@
     }
 
     &:hover {
-      color: var(--primary-color);
+      color: var(--vita-primary);
     }
 
     &.active {
-      background: var(--primary-color);
+      background: var(--vita-primary);
 
       color: #fff;
 
@@ -78,12 +78,12 @@
       background: transparent !important;
 
       font-size: 16px !important;
-      color: var(--cf-text) !important;
+      color: var(--vita-foreground) !important;
 
       transition: all 0.2s;
 
       &:hover {
-        color: var(--primary-color) !important;
+        color: var(--vita-primary) !important;
       }
 
       &::after {
@@ -103,10 +103,10 @@
       &.active {
         font-weight: 500;
         font-size: 16px;
-        color: var(--primary-color) !important;
+        color: var(--vita-primary) !important;
 
         &::after {
-          background: var(--primary-color);
+          background: var(--vita-primary);
         }
       }
     }

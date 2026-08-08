@@ -38,7 +38,7 @@ export function getDepartmentRowSpan<T extends Record<string, unknown>>(
 export const HELP_TOOLTIP_CONFIG = {
   arrow: false,
   placement: "top" as const,
-  color: "var(--cf-subtle)",
+  color: "var(--vita-muted)",
   // antd v6 renamed Tooltip's `body` slot to `container`
-  styles: { container: { color: "var(--cf-text)", padding: "6px 16px" } },
+  styles: { container: { color: "var(--vita-foreground)", padding: "6px 16px" } },
 };

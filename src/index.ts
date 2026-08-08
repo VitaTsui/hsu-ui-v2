@@ -13,11 +13,21 @@ export {
 export type { RequestImpl, RequestConfig, ResType, ListRes, FileRes } from "./request";
 
 // hooks & utils
-export { usePermissions, PermissionsContent, useLabelWidth } from "./hooks";
+export { usePermissions, PermissionsContent, useLabelWidth, useIsDark } from "./hooks";
 export { getUUID, supportsHasSelector, isLegacyHasSelectorBrowser } from "./utils";
 
-// Design tokens (TS constants for JS-side consumers such as antd themeConfig; CSS-variable version lives in es/styles/tokens.scss)
-export { lightTokens, darkTokens, defaultPrimaryColor } from "./styles/tokens";
+// Design tokens. src/styles/tokens.json is the single source of truth: this module is its JS side
+// (including toAntdTheme, which ConfigProvider feeds to antd), and es/styles/tokens.scss is the
+// generated --vita-* CSS-variable side.
+export {
+  lightTokens,
+  darkTokens,
+  defaultPrimaryColor,
+  radius,
+  fontTokens,
+  controlTokens,
+  toAntdTheme,
+} from "./styles/tokens";
 export type { HsuThemeTokens } from "./styles/tokens";
 
 // Components

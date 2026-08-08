@@ -11,8 +11,8 @@
     column-gap: 5px;
     padding: 4px 10px;
     font-size: 14px;
-    color: var(--cf-text);
-    background: var(--cf-subtle);
+    color: var(--vita-foreground);
+    background: var(--vita-muted);
     border-radius: 3px;
     transition: box-shadow 0.3s, color 0.3s;
     cursor: pointer;
@@ -22,7 +22,7 @@
     }
     
     &:hover {
-      color: var(--primary-color);
+      color: var(--vita-primary);
     }
   }
 }
