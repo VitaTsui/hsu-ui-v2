@@ -8,6 +8,7 @@ import { CloseCircleFilled } from "@ant-design/icons";
 import classNames from "classnames";
 import styles from "./index.module.scss";
 import { useDebounceEffect } from "ahooks";
+import type { InputNumberRef } from "../../../types/antd";
 
 export interface InputNumberProps extends Omit<
   AntdInputNumberProps,
@@ -33,7 +34,9 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
     wrapperClassName,
     ...inputConfig
   } = props;
-  const ref = useRef<HTMLInputElement>(null);
+  // antd v6 types InputNumber's ref as `InputNumberRef`, which extends `HTMLInputElement` — so
+  // `getRef` keeps handing consumers an `HTMLInputElement` exactly as before.
+  const ref = useRef<InputNumberRef>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // On initialization, prefer value, then fall back to defaultValue

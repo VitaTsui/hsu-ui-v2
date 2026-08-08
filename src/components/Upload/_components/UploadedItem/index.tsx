@@ -96,7 +96,7 @@ export const UploadedItem: React.FC<UploadedItemProps> = ({
         title={name}
         color="var(--cf-subtle)"
         styles={{
-          body: { color: "var(--cf-text)", padding: "6px 16px" },
+          container: { color: "var(--cf-text)", padding: "6px 16px" },
         }}
       >
         <div className={classNames(styles.fileName, listProps?.itemName)}>

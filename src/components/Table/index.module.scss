@@ -130,7 +130,7 @@
 
     :global(.ant-checkbox) {
       &:global(.ant-checkbox-checked) {
-        :global(.ant-checkbox-inner) {
+        & {
           &::after {
             top: 45%;
             inset-inline-start: 25%;

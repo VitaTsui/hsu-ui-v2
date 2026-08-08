@@ -255,7 +255,9 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
           onChange,
           onSearch: handleSearch,
           open: mergedOpen,
-          onDropdownVisibleChange: (visible) => {
+          // v6 renamed `onDropdownVisibleChange` to `onOpenChange`; this component's own prop
+          // keeps the old name for consumers.
+          onOpenChange: (visible: boolean) => {
             setOpen(visible);
             onDropdownVisibleChange?.(visible);
           },
@@ -263,15 +265,19 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
             [styles.legacyHasArrowOrClear]:
               legacyHasSelector && legacyHasArrowOrClear,
           }),
-          popupClassName: `${cls} ${popupClassName ?? ""}`,
+          classNames: { popup: { root: `${cls} ${popupClassName ?? ""}` } },
           getPopupContainer: () => autoCompleteRef.current ?? document.body,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
-          dropdownStyle: {
-            left: autoCompleteRef.current
-              ? getElementLeft(autoCompleteRef.current)
-              : undefined,
-            right: "auto",
+          styles: {
+            popup: {
+              root: {
+                left: autoCompleteRef.current
+                  ? getElementLeft(autoCompleteRef.current)
+                  : undefined,
+                right: "auto",
+              },
+            },
           },
           placement,
           disabled,

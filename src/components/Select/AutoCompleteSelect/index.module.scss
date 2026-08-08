@@ -28,11 +28,15 @@
     .antdAutoComplete {
       cursor: not-allowed;
 
+      // v6 renders the single-mode value straight into `.ant-select-content` / `.ant-select-input`;
+      // `.ant-select-selection-item` only survives as the tag in multiple mode.
+      :global(.ant-select-content),
+      :global(.ant-select-input),
       :global(.ant-select-selection-item) {
         color: var(--cf-text-3);
       }
 
-      :global(.ant-select-arrow) {
+      :global(.ant-select-suffix) {
         cursor: not-allowed;
       }
     }
@@ -108,156 +112,93 @@
     font-weight: inherit;
     color: inherit !important;
 
-    &:has(> :global(.ant-select-arrow)),
-    &:has(> :global(.ant-select-clear)) {
-      :global(.ant-select-selector) {
-        padding-right: 20px;
-      }
-    }
-
-    &.legacyHasArrowOrClear {
-      :global(.ant-select-selector) {
-        padding-right: 20px;
-      }
-    }
-
+    // antd v6 flattened the Select DOM. The chrome that used to be drawn on the
+    // `.ant-select-selector` child — border, background, padding — now lives on the `.ant-select`
+    // root, so it is neutralised there instead of on a descendant. v6 also lays the root out with
+    // flexbox and keeps suffix / clear in the normal flow, so the old "reserve 20px on the right
+    // for the absolutely positioned arrow" rules (and their `:has()`-less `legacyHasArrowOrClear`
+    // fallback) are gone.
     &:global(.ant-select) {
       width: 100%;
       height: 100%;
+      padding: 0 !important;
 
-      :global(.ant-select-selector) {
-        width: 100%;
+      border: none !important;
+      background: transparent !important;
+
+      &::after {
+        content: none;
+      }
+
+      // v5's `.ant-select-selection-wrap` / `.ant-select-selection-search` collapsed into a single
+      // `.ant-select-content > input.ant-select-input`.
+      :global(.ant-select-content),
+      :global(.ant-select-input) {
         height: 100%;
-        padding: 0;
-
-        border: none !important;
 
         font-family: inherit;
         font-size: inherit;
         font-weight: inherit;
-        color: inherit !important;
-
-        background: transparent !important;
-
-        &::after {
-          content: none;
-        }
-
-        :global(.ant-select-selection-wrap) {
-          height: 100%;
-
-          font-family: inherit;
-          font-size: inherit;
-          font-weight: inherit;
-          color: inherit;
-        }
-
-        :global(.ant-select-selection-search) {
-          inset-inline-start: 0px;
-          inset-inline-end: 0px;
-
-          font-family: inherit;
-          font-size: inherit;
-          font-weight: inherit;
-          color: inherit;
-
-          input[type="search"] {
-            height: 100%;
-
-            font-family: inherit;
-            font-size: inherit;
-            font-weight: inherit;
-            color: inherit;
-          }
-        }
-
-        :global(.ant-select-selection-placeholder) {
-          display: inline-flex;
-          align-items: center;
-
-          height: 100%;
-
-          line-height: normal;
-          font-family: inherit;
-          font-size: inherit;
-          font-weight: inherit;
-        }
-
-        :global(.ant-select-selection-item) {
-          padding-inline-end: 0px;
-
-          font-family: inherit;
-          font-size: inherit;
-          font-weight: inherit;
-          color: inherit;
-        }
-
-        :global(.ant-select-selection-overflow-item) {
-          :global(.ant-select-selection-item) {
-            line-height: normal;
-
-            padding-inline-end: 4px;
-          }
-        }
+        color: inherit;
       }
 
-      &:global(.ant-select-focused) {
-        :global(.ant-select-selector) {
-          border: none !important;
+      :global(.ant-select-placeholder) {
+        display: inline-flex;
+        align-items: center;
 
-          box-shadow: none !important;
-        }
+        height: 100%;
+
+        line-height: normal;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+      }
+
+      // Multiple mode only: `.ant-select-selection-item` is the tag.
+      :global(.ant-select-selection-item) {
+        line-height: normal;
+
+        padding-inline-end: 4px;
+
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+      }
+
+      &:global(.ant-select-focused),
+      &:global(.ant-select-status-error) {
+        border: none !important;
+
+        box-shadow: none !important;
       }
 
       &:global(.ant-select-open) {
-        :global(.ant-select-arrow) {
-          transform: rotate(-180deg) translateY(50%);
+        :global(.ant-select-suffix) {
+          // No `translateY(-50%)` companion any more — the suffix sits in the flex flow.
+          transform: rotate(180deg);
         }
 
         &.noArrowAnimation {
-          :global(.ant-select-arrow) {
-            transform: translateY(-50%);
+          :global(.ant-select-suffix) {
+            transform: none;
             transition: none !important;
           }
         }
       }
 
-      &:global(.ant-select-status-error) {
-        :global(.ant-select-selector) {
-          border: none !important;
-        }
-      }
-
       &:global(.ant-select-multiple) {
-        > :global(.ant-select-selector) {
-          > :global(.ant-select-selection-overflow) {
-            :global(.ant-select-selection-search) {
-              width: 0px !important;
+        // Keep the search input from claiming a slot of its own between the tags.
+        :global(.ant-select-input) {
+          width: 0px !important;
 
-              margin-inline-start: 0px;
-            }
-          }
-
-          > :global(.ant-select-selection-placeholder) {
-            inset-inline-start: 0px;
-          }
+          margin-inline-start: 0px;
         }
       }
 
-      :global(.ant-select-arrow) {
-        width: 14px;
-        height: 14px;
-        margin-top: 0px;
-        inset-inline-end: 0px;
-
-        font-size: 14px;
-
-        transition: transform 0.3s;
-        transform: translateY(-50%);
-
-        pointer-events: all;
-      }
-
+      // Both icons are laid out by v6's flexbox root, so the absolute-position compensation
+      // (`inset-inline-end` / `translateY(-50%)`) that v5 needed is gone.
+      :global(.ant-select-suffix),
       :global(.ant-select-clear) {
         width: 14px;
         height: 14px;
@@ -265,9 +206,9 @@
 
         font-size: 14px;
 
-        transform: translateY(-50%);
+        transition: transform 0.3s;
 
-        inset-inline-end: 0px;
+        pointer-events: all;
       }
     }
   }

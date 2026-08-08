@@ -5,7 +5,7 @@ import {
 } from "antd";
 import React, { ReactNode, useMemo, useRef } from "react";
 
-import { BaseSelectRef } from "rc-select";
+import type { SelectRef } from "../../types/antd";
 import Icon from "../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
@@ -35,7 +35,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
     showTotal,
     align,
   } = props;
-  const selectRef = useRef<BaseSelectRef>(null);
+  const selectRef = useRef<SelectRef>(null);
   // Pass the raw values directly without defaults; let usePaginationSync handle them itself
   const { _pageNum, _pageSize, setPageNum, setPageSize } = usePaginationSync({
     current: props.current,

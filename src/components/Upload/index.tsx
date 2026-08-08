@@ -3,7 +3,7 @@ import {
   UploadProps as AntdUploadProps,
   UploadFile,
 } from "antd";
-import type { UploadRequestOption } from "rc-upload/lib/interface";
+import type { UploadRequestOption } from "../../types/antd";
 import React, { useCallback } from "react";
 import { Canceler } from "axios";
 import { RcFile } from "antd/es/upload";
@@ -86,6 +86,11 @@ const Upload: React.FC<UploadProps> = (props) => {
     ...uploadConfig
   } = props;
 
+  // antd v6 widened `accept` to `string | { format: string; filter?: ... }`. This component's own
+  // extension check (validateFile) only understands the comma-separated string, so read the format
+  // out of the object form; antd still applies the full config to the native file input.
+  const acceptFormat = typeof accept === "string" ? accept : accept.format;
+
   const {
     fileList: _fileList,
     setFileList,
@@ -131,7 +136,7 @@ const Upload: React.FC<UploadProps> = (props) => {
         chunkNum,
         data,
         headers,
-        accept,
+        accept: acceptFormat,
         size,
         en,
         uploadingList,
@@ -148,7 +153,7 @@ const Upload: React.FC<UploadProps> = (props) => {
       chunkNum,
       data,
       headers,
-      accept,
+      acceptFormat,
       size,
       en,
       uploadingList,
@@ -180,7 +185,7 @@ const Upload: React.FC<UploadProps> = (props) => {
         action,
         data,
         headers,
-        accept,
+        accept: acceptFormat,
         size,
         en,
         uploadingList,
@@ -195,7 +200,7 @@ const Upload: React.FC<UploadProps> = (props) => {
       action,
       data,
       headers,
-      accept,
+      acceptFormat,
       size,
       en,
       uploadingList,

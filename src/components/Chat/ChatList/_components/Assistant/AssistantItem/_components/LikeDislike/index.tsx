@@ -85,7 +85,7 @@ const LikeDislike: React.FC<LikeDislikeProps> = ({
           form.resetFields();
         }}
         width={"40%"}
-        maskClosable={false}
+        mask={{ closable: false }}
         formItems={[
           {
             type: "TEXTAREA",

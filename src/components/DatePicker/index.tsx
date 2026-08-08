@@ -4,7 +4,7 @@ import {
 } from "antd";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Select, { SelectOption, SelectProps } from "../Select";
-import { PickerRef } from "rc-picker";
+import type { PickerRef } from "../../types/antd";
 
 import classNames from "classnames";
 import styles from "./index.module.scss";
@@ -168,7 +168,11 @@ const DatePicker: DatePickerFC = (props) => {
       <AntdDatePicker
         {...datePickerProps}
         ref={ref}
-        popupClassName={classNames(styles.datePickerPopup, popupClassName)}
+        // v6 replaced `popupClassName` with the `popup.root` semantic slot; this component's own
+        // `popupClassName` prop is kept as-is for consumers.
+        classNames={{
+          popup: { root: classNames(styles.datePickerPopup, popupClassName) },
+        }}
         getPopupContainer={getPopupContainer ?? defaultModalPickerGetPopupContainer}
         value={value ? dayjs(value.toString()) : undefined}
         defaultValue={defaultValue ? dayjs(defaultValue.toString()) : undefined}
@@ -179,8 +183,12 @@ const DatePicker: DatePickerFC = (props) => {
         })}
         style={{ flex: 1, width: 0 }}
         showTime={showTime}
-        onChange={(v) => {
+        onChange={(value) => {
           let date = "";
+
+          // v6 widened the picker's onChange value to `Dayjs | Dayjs[]`; a non-range picker only
+          // ever hands back a single value.
+          const v = Array.isArray(value) ? value[0] : value;
 
           if (v) {
             if (picker === "date") {

@@ -31,7 +31,9 @@ const FileCol: React.FC<UrlItemProps> = (props) => {
                 <Tooltip
                   title={file.name}
                   color="var(--cf-subtle)"
-                  styles={{ body: { color: "var(--cf-text)", padding: "6px 16px" } }}
+                  styles={{
+                    container: { color: "var(--cf-text)", padding: "6px 16px" },
+                  }}
                 >
                   <span className={styles.fileName}>{file.name}</span>
                 </Tooltip>

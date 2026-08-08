@@ -14,6 +14,7 @@ import styles from "./index.module.scss";
 import useLabelWidth from "../../../hooks/useLabelWidth";
 import usePermissions from "../../../hooks/usePermissions";
 import Modal, { ModalProps } from "../../Modal";
+import { mergeSemantic } from "../../../utils/semantic";
 import { FileRes } from "../../../request";
 
 export interface ImportFormProps extends Omit<ModalProps, "onCancel" | "onOk"> {
@@ -43,7 +44,6 @@ const ImportForm: React.FC<ImportFormProps> = observer((props) => {
     uploadProps,
     ...modalConfig
   } = props;
-  const { header, body, footer, mask, content, wrapper } = classNames;
   const { permitted } = usePermissions(hasPermi);
 
   const onExport = () => {
@@ -94,15 +94,12 @@ const ImportForm: React.FC<ImportFormProps> = observer((props) => {
       centered
       className={`${styles.ImportForm} ${className ?? ""}`}
       width={600}
-      classNames={{
-        header: `${header ?? ""}`,
-        body: `${styles.body} ${body ?? ""}`,
-        footer: `${footer ?? ""}`,
-        mask: `${mask ?? ""}`,
-        content: `${content ?? ""}`,
-        wrapper: `${wrapper ?? ""}`,
-      }}
-      maskClosable={false}
+      classNames={mergeSemantic(classNames, (outer) => ({
+        ...outer,
+        body: `${styles.body} ${outer.body ?? ""}`,
+      }))}
+      // v6 folded `maskClosable` into the `mask` config object
+      mask={{ closable: false }}
       footer={false}
       {...modalConfig}
     >

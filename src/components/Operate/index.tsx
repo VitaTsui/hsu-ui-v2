@@ -267,7 +267,7 @@ const Operate: React.FC<OperateProps> = (props) => {
         })}
         {isOverflow && hiddenItems.length > 0 && (
           <Dropdown
-            overlayClassName={styles.menu}
+            classNames={{ root: styles.menu }}
             placement="bottom"
             menu={{ items: menuItems }}
           >

@@ -11,7 +11,8 @@ import { ItemContainerProps } from "../../FormItem/ItemContainer";
 import styles from "./index.module.scss";
 import usePermissions from "../../../hooks/usePermissions";
 import { useFormItems } from "./_hooks/useFormItems";
-import { FormRef } from "rc-field-form";
+import type { FormRef } from "../../../types/antd";
+import { mergeSemantic } from "../../../utils/semantic";
 import { useAdaptiveColumnNum } from "./_hooks/useAdaptiveColumnNum";
 
 export type ExtraFormItem = React.ReactElement<ItemContainerProps>;
@@ -68,7 +69,6 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
     formWrapperClassName,
     ...modalConfig
   } = props;
-  const { header, body, footer, mask, content, wrapper } = classNames;
   const [form] = Form.useForm(externalForm);
   const { permitted } = usePermissions(hasPermi);
   const formRef = useRef<FormRef | null>(null);
@@ -124,15 +124,12 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
       onCancel={_onCancel}
       onOk={_onOk}
       width={layout === "horizontal" ? "1200px" : "800px"}
-      classNames={{
-        header: `${header ?? ""}`,
-        body: `${styles.body} ${body ?? ""}`,
-        footer: `${footer ?? ""}`,
-        mask: `${mask ?? ""}`,
-        content: `${content ?? ""}`,
-        wrapper: `${wrapper ?? ""}`,
-      }}
-      maskClosable={false}
+      classNames={mergeSemantic(classNames, (outer) => ({
+        ...outer,
+        body: `${styles.body} ${outer.body ?? ""}`,
+      }))}
+      // v6 folded `maskClosable` into the `mask` config object
+      mask={{ closable: false }}
       {...modalConfig}
     >
       <div

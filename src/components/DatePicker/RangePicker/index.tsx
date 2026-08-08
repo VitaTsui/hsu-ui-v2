@@ -4,7 +4,7 @@ import { RangePickerProps as AntdRangePickerProps } from "antd/es/date-picker";
 import dayjs from "dayjs";
 import styles from "./index.module.scss";
 import classNames from "classnames";
-import { PickerRef } from "rc-picker";
+import type { RangePickerRef } from "../../../types/antd";
 import Select, { SelectOption, SelectProps } from "../../Select";
 import { defaultModalPickerGetPopupContainer } from "../defaultModalPickerGetPopupContainer";
 
@@ -49,7 +49,7 @@ const RangePicker: React.FC<RangePickerProps> = (props) => {
     getPopupContainer,
     ...rangePickerConfig
   } = props;
-  const ref = useRef<PickerRef>(null);
+  const ref = useRef<RangePickerRef>(null);
   const [picker, setPicker] = useState<Picker>(pickerProps ?? "date");
   const prevPickerRef = useRef<Picker | undefined>(pickerProps);
   const isInitializedRef = useRef(false);
@@ -157,7 +157,9 @@ const RangePicker: React.FC<RangePickerProps> = (props) => {
       <DatePicker.RangePicker
         {...rangePickerConfig}
         ref={ref}
-        popupClassName={classNames(styles.rangePickerPopup, popupClassName)}
+        classNames={{
+          popup: { root: classNames(styles.rangePickerPopup, popupClassName) },
+        }}
         getPopupContainer={getPopupContainer ?? defaultModalPickerGetPopupContainer}
         className={styles.RangePicker}
         picker={picker}

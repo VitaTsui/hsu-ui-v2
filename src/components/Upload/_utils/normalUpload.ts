@@ -3,7 +3,7 @@ import { RcFile } from "antd/es/upload";
 import { deepCopy } from "hsu-utils";
 import { validateFile, createFormData, isSuccessResponse } from ".";
 import { UploadingList } from "..";
-import type { UploadRequestOption } from "rc-upload/lib/interface";
+import type { UploadRequestOption } from "../../../types/antd";
 
 interface NormalUploadOptions {
   file: RcFile;

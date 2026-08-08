@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, forwardRef, useState } from "react";
 
 import Icon from "../Icon";
 import TurndownService from "turndown";
@@ -6,7 +6,8 @@ import classNames from "classnames";
 import { message } from "antd";
 import styles from "./index.module.scss";
 
-export interface CopyProps {
+export interface CopyProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "children"> {
   id: string;
   /** true (default): report via a global toast; false: swap the button for an inline "已复制！" state */
   isMessage?: boolean;
@@ -17,7 +18,13 @@ export interface CopyProps {
   hideIcon?: boolean;
 }
 
-const Copy: React.FC<CopyProps> = (props) => {
+/**
+ * Wrapped in `forwardRef` because antd v6's Trigger (Tooltip / Popover / Dropdown) hands its child
+ * a ref instead of falling back to `findDOMNode` the way v5 did — a plain function component makes
+ * it warn and lose the trigger. The remaining props are spread onto the rendered node for the same
+ * reason: Trigger injects its event handlers by cloning the child.
+ */
+const Copy = forwardRef<HTMLDivElement, CopyProps>((props, ref) => {
   const {
     id,
     isMessage = true,
@@ -26,6 +33,9 @@ const Copy: React.FC<CopyProps> = (props) => {
     copyIcon,
     copyedIcon,
     hideIcon = false,
+    className,
+    onClick,
+    ...rest
   } = props;
   const [copyed, setCopyed] = useState<boolean>(false);
 
@@ -115,27 +125,33 @@ const Copy: React.FC<CopyProps> = (props) => {
     }
   };
 
-  return (
-    <>
-      {copyed ? (
-        <div className={classNames(styles.Copyed)}>
-          {!hideIcon &&
-            (copyedIcon ?? (
-              <Icon icon="ci:check" className={classNames(styles.icon)} />
-            ))}
-          已复制！
-        </div>
-      ) : (
-        <div className={classNames(styles.Copy)} onClick={onCopy}>
-          {!hideIcon &&
-            (copyIcon ?? (
-              <Icon icon="ci:copy" className={classNames(styles.icon)} />
-            ))}
-          {text ?? "复制"}
-        </div>
-      )}
-    </>
+  return copyed ? (
+    <div ref={ref} {...rest} className={classNames(styles.Copyed, className)}>
+      {!hideIcon &&
+        (copyedIcon ?? (
+          <Icon icon="ci:check" className={classNames(styles.icon)} />
+        ))}
+      已复制！
+    </div>
+  ) : (
+    <div
+      ref={ref}
+      {...rest}
+      className={classNames(styles.Copy, className)}
+      onClick={(e) => {
+        onCopy();
+        onClick?.(e);
+      }}
+    >
+      {!hideIcon &&
+        (copyIcon ?? (
+          <Icon icon="ci:copy" className={classNames(styles.icon)} />
+        ))}
+      {text ?? "复制"}
+    </div>
   );
-};
+});
+
+Copy.displayName = "Copy";
 
 export default Copy;

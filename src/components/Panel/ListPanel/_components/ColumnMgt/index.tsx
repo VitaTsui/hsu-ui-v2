@@ -1,3 +1,4 @@
+import { mergeSemantic } from "../../../../../utils/semantic";
 import { message } from "antd";
 import React, { useEffect, useState } from "react";
 import Table, { ColumnsType, TableDrag } from "../../../../Table";
@@ -49,8 +50,7 @@ const ColumnMgt: React.FC<ColumnMgtProps> = (props) => {
     onSelectionChange,
   } = props;
   const { max, min = 1 } = columnCount;
-  const { classNames = {}, ...modalConfig } = modalProps;
-  const { header, body, footer, mask, content, wrapper } = classNames;
+  const { classNames, ...modalConfig } = modalProps;
   const [_dataSource, setDataSource] = useState<Array<DataSource>>([]);
   const { checkPermission } = usePermissions();
 
@@ -287,14 +287,10 @@ const ColumnMgt: React.FC<ColumnMgtProps> = (props) => {
       centered
       width={"40%"}
       className={`${styles.ColumnMgt} ${className ?? ""}`}
-      classNames={{
-        header: `${header ?? ""}`,
-        body: `${styles.body} ${body ?? ""}`,
-        footer: `${footer ?? ""}`,
-        mask: `${mask ?? ""}`,
-        content: `${content ?? ""}`,
-        wrapper: `${wrapper ?? ""}`,
-      }}
+      classNames={mergeSemantic(classNames, (outer) => ({
+        ...outer,
+        body: `${styles.body} ${outer.body ?? ""}`,
+      }))}
       title={
         <div className={styles.title}>
           <div>自定义显示列项</div>

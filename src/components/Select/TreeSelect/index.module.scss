@@ -6,57 +6,32 @@
   width: 100%;
   height: 100%;
 
-  // CF style: outlined input control that follows appearance switching
-  background: var(--cf-surface);
-  border: 1px solid var(--cf-border);
-  border-radius: 6px;
+  // CF style: outlined input control that follows appearance switching.
+  //
+  // antd v6 flattened the Select DOM: the box (border / background / padding) that used to be
+  // drawn on the `.ant-select-selector` child now sits on the `.ant-select` root — i.e. on this
+  // very element. So antd's own chrome is overridden here rather than neutralised on a descendant,
+  // and the old `.ant-select-selection-{wrap,search,item,placeholder}` rules are gone: v6 renders
+  // a single `.ant-select-content > input.ant-select-input` and lays it out with flexbox, so the
+  // font-inheritance plumbing collapses to two selectors.
+  &:global(.ant-select) {
+    background: var(--cf-surface) !important;
+    border: 1px solid var(--cf-border) !important;
+    border-radius: 6px !important;
+  }
 
-  :global(.ant-select-selector) {
+  :global(.ant-select-content),
+  :global(.ant-select-input),
+  :global(.ant-select-placeholder) {
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
     color: inherit;
-
-    background: transparent !important;
-    border: none !important;
-    border-radius: inherit !important;
-
-    :global(.ant-select-selection-wrap) {
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-      color: inherit;
-    }
-
-    :global(.ant-select-selection-search) {
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-      color: inherit;
-
-      input[type="search"] {
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        color: inherit;
-      }
-    }
-
-    :global(.ant-select-selection-placeholder) {
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-    }
-
-    :global(.ant-select-selection-item) {
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-      color: inherit;
-    }
   }
 
-  :global(.ant-select-arrow) {
+  // v5's arrow slot is v6's `.ant-select-suffix`, and it now sits in the flex flow instead of
+  // being absolutely positioned.
+  :global(.ant-select-suffix) {
     width: 14px;
     height: 14px;
 

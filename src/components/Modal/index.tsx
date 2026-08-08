@@ -3,6 +3,7 @@ import { Modal as AntdModal, ModalProps as AntdModalProps } from "antd";
 import styles from "./index.module.scss";
 import { useModalElements, useModalDrag } from "./_hooks";
 import Button, { ButtonProps } from "../Button";
+import { mergeSemantic } from "../../utils/semantic";
 
 export interface ModalProps extends AntdModalProps {
   moveable?: boolean;
@@ -22,7 +23,10 @@ const Modal: React.FC<ModalProps> = (props) => {
     afterClose,
     edgeDetection = true,
     full = false,
-    destroyOnClose = true,
+    // antd v6 renamed `destroyOnClose` to `destroyOnHidden`; keep honouring the old name so
+    // existing consumers keep working, and forward the new one.
+    destroyOnClose,
+    destroyOnHidden = destroyOnClose ?? true,
     footer,
     title,
     titleButtonGroup,
@@ -53,7 +57,9 @@ const Modal: React.FC<ModalProps> = (props) => {
     }
   };
 
-  const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCancel = (
+    e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLElement>
+  ) => {
     onCancel?.(e);
   };
 
@@ -79,27 +85,28 @@ const Modal: React.FC<ModalProps> = (props) => {
           title
         )
       }
-      destroyOnClose={destroyOnClose}
+      destroyOnHidden={destroyOnHidden}
       open={open}
       onCancel={handleCancel}
       onOk={handleOk}
       className={`${styles.Modal} ${className} ${full ? styles.full : ""}`}
-      classNames={{
-        ...classNames,
-        header: `${cls} ${styles.header} ${classNames?.header ?? ""} ${
+      classNames={mergeSemantic(classNames, (outer) => ({
+        ...outer,
+        header: `${cls} ${styles.header} ${outer.header ?? ""} ${
           moveable ? styles.moveable : ""
         }`,
-        content: `${styles.content} ${classNames?.content ?? ""}`,
-        body: `${styles.body} ${classNames?.body ?? ""}`,
-        footer: `${styles.footer} ${classNames?.footer ?? ""} ${
+        // v5 called this slot `content`; v6 renamed it to `container`
+        container: `${styles.content} ${outer.container ?? ""}`,
+        body: `${styles.body} ${outer.body ?? ""}`,
+        footer: `${styles.footer} ${outer.footer ?? ""} ${
           footer === false ? styles.noFooter : ""
         }`,
-      }}
+      }))}
       footer={footer}
       afterClose={() => {
         afterClose?.();
         resetModal();
-        if (destroyOnClose) {
+        if (destroyOnHidden) {
           setModal(null);
           setModalHeader(null);
           setOriginalStyle(null);

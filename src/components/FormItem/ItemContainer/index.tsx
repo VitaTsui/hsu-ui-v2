@@ -115,7 +115,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
           arrow={false}
           placement="top"
           color="var(--cf-subtle)"
-          styles={{ body: { color: "var(--cf-text)", padding: "6px 12px" } }}
+          styles={{ container: { color: "var(--cf-text)", padding: "6px 12px" } }}
           {...tipsConfig}
         >
           {typeof icon === "string" ? (

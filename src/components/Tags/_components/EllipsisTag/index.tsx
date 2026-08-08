@@ -39,7 +39,7 @@ const EllipsisTag: React.FC<EllipsisTagProps> = (props) => {
       }}
       color="#fff"
       styles={{
-        body: {
+        container: {
           padding: "6px",
           maxHeight: "300px",
           overflow: "auto",

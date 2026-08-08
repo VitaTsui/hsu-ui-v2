@@ -13,6 +13,7 @@ import classNames from "classnames";
 import styles from "./index.module.scss";
 import useLabelWidth from "../../../hooks/useLabelWidth";
 import usePermissions from "../../../hooks/usePermissions";
+import { mergeSemantic } from "../../../utils/semantic";
 
 export type ExtraFormItem = React.ReactElement<ItemContainerProps>;
 
@@ -40,10 +41,12 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     onClose,
     reset = true,
     title,
+    // Pulled out of `drawerConfig` on purpose: it is spread *after* the `classNames` prop below,
+    // so leaving it in there would let a caller-supplied `classNames` replace ours wholesale
+    // instead of merging with it.
+    classNames: drawerClassNames,
     ...drawerConfig
   } = props;
-  const { header, body, footer, mask, content, wrapper } =
-    drawerConfig.classNames ?? {};
   const [form] = Form.useForm(externalForm);
   const [labelWidth] = useLabelWidth(formItems);
   const { permitted } = usePermissions(hasPermi);
@@ -68,15 +71,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     <Drawer
       open={open}
       className={classNames(styles.DrawerForm, className)}
-      classNames={{
-        header: `${header ?? ""}`,
-        body: `${styles.body} ${body ?? ""}`,
-        footer: `${footer ?? ""}`,
-        mask: `${mask ?? ""}`,
-        content: `${content ?? ""}`,
-        wrapper: `${wrapper ?? ""}`,
-      }}
-      width={500}
+      classNames={mergeSemantic(drawerClassNames, (outer) => ({
+        ...outer,
+        body: `${styles.body} ${outer.body ?? ""}`,
+      }))}
+      size={500}
       closable={false}
       title={
         <>

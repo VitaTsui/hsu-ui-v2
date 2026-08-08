@@ -10,7 +10,7 @@ import React, {
   useEffect,
   CSSProperties,
 } from "react";
-import { BaseSelectRef } from "rc-select";
+import type { TreeSelectRef } from "../../../types/antd";
 import Icon from "../../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
@@ -62,7 +62,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     ...antdTreeSelectConfig
   } = props;
   const cls = useMemo(() => generateRandomStr(10), []);
-  const ref = useRef<BaseSelectRef>(null);
+  const ref = useRef<TreeSelectRef>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerElement, setContainerElement] =
     useState<HTMLDivElement | null>(null);
@@ -190,7 +190,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       treeData={treeData}
       {...(treeExpandedKeys !== undefined && { treeExpandedKeys })}
       onTreeExpand={handleTreeExpand}
-      onDropdownVisibleChange={setOpen}
+      onOpenChange={setOpen}
       className={classNames(styles.treeSelect, className)}
       onSearch={(value) => {
         if (!isComposing) {
@@ -213,16 +213,24 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
             }
       }
       getPopupContainer={getPopupContainer}
-      popupClassName={`${cls} ${popupClassName ?? ""}`}
+      // v6 replaced `popupClassName` / `dropdownStyle` with the `popup.root` semantic slot; this
+      // component's own props keep the old names for consumers.
+      classNames={{ popup: { root: `${cls} ${popupClassName ?? ""}` } }}
       style={style}
       popupMatchSelectWidth={
         popupMatchSelectWidth ??
         (containerElement ? containerElement.offsetWidth : undefined)
       }
-      dropdownStyle={{
-        ...dropdownStyle,
-        left: containerElement ? getElementLeft(containerElement) : undefined,
-        right: "auto",
+      styles={{
+        popup: {
+          root: {
+            ...dropdownStyle,
+            left: containerElement
+              ? getElementLeft(containerElement)
+              : undefined,
+            right: "auto",
+          },
+        },
       }}
       suffixIcon={<Icon icon="ep:arrow-down" />}
       ref={ref}

@@ -35,7 +35,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
   return (
     <Dropdown
       open={open}
-      overlayClassName={styles.filterDropdown}
+      classNames={{ root: styles.filterDropdown }}
       trigger={["click"]}
       placement="bottomRight"
       menu={{

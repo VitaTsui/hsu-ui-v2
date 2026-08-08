@@ -1,6 +1,6 @@
 import { Select as AntdSelect, SelectProps as AntdSelectProps } from "antd";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { BaseSelectRef } from "rc-select";
+import type { SelectRef } from "../../types/antd";
 import { DefaultOptionType } from "antd/es/select";
 import Icon from "../Icon";
 import classNames from "classnames";
@@ -62,7 +62,7 @@ const Select: React.FC<SelectProps> = (props) => {
     ...antdSelctConfig
   } = props;
   const [focused, setFocused] = useState<boolean>(false);
-  const ref = useRef<BaseSelectRef>(null);
+  const ref = useRef<SelectRef>(null);
   const selectRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [legacyHasErrorStatus, setLegacyHasErrorStatus] =
@@ -242,15 +242,21 @@ const Select: React.FC<SelectProps> = (props) => {
             [styles.legacyHasArrowOrClear]:
               legacyHasSelector && legacyHasArrowOrClear,
           }),
-          popupClassName: `${cls} ${popupClassName ?? ""}`,
+          // v6 replaced `popupClassName` / `dropdownStyle` with the `popup.root` semantic slot.
+          // The public `popupClassName` prop of this component is kept as-is for consumers.
+          classNames: { popup: { root: `${cls} ${popupClassName ?? ""}` } },
           getPopupContainer: () => selectRef.current ?? document.body,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
-          dropdownStyle: {
-            left: selectRef.current
-              ? getElementLeft(selectRef.current)
-              : undefined,
-            right: "auto",
+          styles: {
+            popup: {
+              root: {
+                left: selectRef.current
+                  ? getElementLeft(selectRef.current)
+                  : undefined,
+                right: "auto",
+              },
+            },
           },
           suffixIcon: customSuffixIcon ?? <Icon icon="ep:arrow-down" />,
           placement,

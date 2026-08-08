@@ -3,7 +3,7 @@
 
   &.outline {
     :global(.ant-checkbox) {
-      :global(.ant-checkbox-inner) {
+      & {
         border-color: var(--cf-border) !important;
 
         background: transparent !important;
@@ -15,7 +15,7 @@
       }
 
       &:global(.ant-checkbox-checked) {
-        :global(.ant-checkbox-inner) {
+        & {
           background: rgba(255, 255, 255, 1) !important;
         }
       }
@@ -23,7 +23,7 @@
 
     &:global(.ant-checkbox-wrapper-disabled) {
       :global(.ant-checkbox) {
-        :global(.ant-checkbox-inner) {
+        & {
           background: rgba(0, 0, 0, 0.04) !important;
 
           &::after {
@@ -32,7 +32,7 @@
         }
 
         &:global(.ant-checkbox-checked) {
-          :global(.ant-checkbox-inner) {
+          & {
             background: rgba(0, 0, 0, 0.04) !important;
           }
         }
@@ -53,33 +53,28 @@
       height: 100%;
     }
 
-    :global(.ant-checkbox-inner) {
-      width: 100%;
-      height: 100%;
+    // antd v6 dropped the `.ant-checkbox-inner` span — the box is drawn on `.ant-checkbox`
+    // itself, i.e. this very element. The old inner rule's `width/height: 100%` and
+    // `border-radius: inherit` only existed to make the span fill its parent, and would now
+    // resolve against the label instead, so they are gone; the sizing above already applies.
+    &::after {
+      inset-inline-start: revert;
+      left: 25%;
+      top: 45%;
 
-      border-radius: inherit;
-
-      &::after {
-        inset-inline-start: revert;
-        left: 25%;
-        top: 45%;
-
-        width: 33%;
-        height: 60%;
-      }
+      width: 33%;
+      height: 60%;
     }
   }
 
   :global(.ant-checkbox-indeterminate) {
-    :global(.ant-checkbox-inner) {
-      &::after {
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+    &::after {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
 
-        width: 50%;
-        height: 50%;
-      }
+      width: 50%;
+      height: 50%;
     }
   }
 

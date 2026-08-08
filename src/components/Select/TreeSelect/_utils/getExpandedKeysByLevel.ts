@@ -1,4 +1,7 @@
-import { DataNode, SafeKey } from "rc-tree-select/lib/interface";
+import type {
+  TreeSelectDataNode as DataNode,
+  SafeKey,
+} from "../../../../types/antd";
 
 /**
  * Compute the node keys that should be expanded based on the default expand level (for TreeSelect)

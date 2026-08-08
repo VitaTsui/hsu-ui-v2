@@ -57,7 +57,8 @@
           opacity: 0.8;
           width: 140px;
           height: 100%;
-          :global(.ant-select-selector) {
+          // v6 moved the Select box onto the `.ant-select` root
+          :global(.ant-select) {
             border: none;
             margin: 1px 0 0;
           }

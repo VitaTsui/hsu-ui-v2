@@ -1,3 +1,4 @@
+import { mergeSemantic } from "../../utils/semantic";
 import React, { ReactElement, ReactNode, cloneElement, useState } from "react";
 import styles from "./index.module.scss";
 import Icon from "../Icon";
@@ -66,12 +67,14 @@ const SecondConf: React.FC<SecondConfProps> = (props) => {
         onCancel={handleCancel}
         centered
         className={styles.SecondConf}
-        classNames={{
-          body: `${styles.body} ${classNames?.body || ""}`,
-          ...classNames,
-        }}
-        maskClosable={false}
-        mask={false}
+        classNames={mergeSemantic(classNames, (outer) => ({
+          ...outer,
+          // `...classNames` used to be spread *after* this line, so a caller-supplied `body`
+          // silently dropped `styles.body`. Merge the two instead.
+          body: `${styles.body} ${outer.body || ""}`,
+        }))}
+        // v6 folded `maskClosable` into the `mask` config object
+        mask={{ enabled: false, closable: false }}
         title=" "
       >
         <Icon icon="mingcute:question-line" className={styles.icon} />

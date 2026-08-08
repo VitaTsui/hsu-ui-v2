@@ -34,7 +34,7 @@ export const UploadingItem: React.FC<UploadingItemProps> = ({
           title={name}
           color="var(--cf-subtle)"
           styles={{
-            body: { color: "var(--cf-text)", padding: "6px 16px" },
+            container: { color: "var(--cf-text)", padding: "6px 16px" },
           }}
         >
           <div

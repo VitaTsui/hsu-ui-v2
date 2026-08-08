@@ -1,3 +1,4 @@
+import { mergeSemantic } from "../../utils/semantic";
 import React, { CSSProperties, ReactNode, useMemo } from "react";
 import {
   Descriptions as AntdDescriptions,
@@ -134,20 +135,19 @@ const Descriptions: React.FC<DescriptionsProps> = (props) => {
   return (
     <AntdDescriptions
       items={finalItems}
-      classNames={{
-        root: `${styles.Descriptions} ${classNames?.root || ""}`,
+      classNames={mergeSemantic(classNames, (outer) => ({
+        ...outer,
+        // `...classNames` used to be spread *after* these lines, so a caller-supplied slot
+        // silently dropped this component's own class. Merge the two instead.
+        root: `${styles.Descriptions} ${outer.root || ""}`,
         label: `${styles.label} ${
           layout === "horizontal" ? styles.horizontal : ""
-        } ${classNames?.label || ""}`,
-        content: `${styles.content} ${classNames?.content || ""}`,
-        ...classNames,
-      }}
-      styles={{
-        ..._styles,
-        label: {
-          ...(_styles?.label as CSSProperties),
-        } as CSSProperties,
-      }}
+        } ${outer.label || ""}`,
+        content: `${styles.content} ${outer.content || ""}`,
+      }))}
+      // Was `{ ..._styles, label: { ...(_styles?.label) } }` — a no-op that only re-copied `label`
+      // onto itself, and which no longer type-checks now that `styles` may also be a function.
+      styles={_styles}
       colon={colon}
       layout={layout}
       bordered={bordered}

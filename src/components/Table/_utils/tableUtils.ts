@@ -39,5 +39,6 @@ export const HELP_TOOLTIP_CONFIG = {
   arrow: false,
   placement: "top" as const,
   color: "var(--cf-subtle)",
-  styles: { body: { color: "var(--cf-text)", padding: "6px 16px" } },
+  // antd v6 renamed Tooltip's `body` slot to `container`
+  styles: { container: { color: "var(--cf-text)", padding: "6px 16px" } },
 };

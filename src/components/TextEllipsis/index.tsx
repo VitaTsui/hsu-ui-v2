@@ -1,6 +1,7 @@
 import { Tooltip, TooltipProps } from "antd";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import cssStyles from "./index.module.scss";
+import { mergeSemantic } from "../../utils/semantic";
 
 // Default Tooltip width
 const DEFAULT_TOOLTIP_WIDTH = 200;
@@ -201,15 +202,16 @@ const TextEllipsis: React.FC<TextEllipsisProps> = ({
       placement="bottomLeft"
       {...restTooltipConfig}
       title={isOverflow && !disabled ? tooltipTitle : undefined}
-      styles={{
-        body: {
+      styles={mergeSemantic(styles, (outer) => ({
+        // v5 called this slot `body`; v6 renamed it to `container`
+        container: {
           width: tooltipWidth,
           overflow: "auto",
           maxHeight: "300px",
           whiteSpace: "pre-wrap",
         },
-        ...styles,
-      }}
+        ...outer,
+      }))}
     >
       {content}
     </Tooltip>

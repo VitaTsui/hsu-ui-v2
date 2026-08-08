@@ -47,21 +47,22 @@
       }
 
       :global(.ant-pagination-options-size-changer) {
-        :global(.ant-select-selector) {
+        // antd v6 flattened Select: the box moved from the `.ant-select-selector` child onto the
+        // `.ant-select` root, and the value now lives in `.ant-select-content`.
+        :global(.ant-select) {
           height: 100% !important;
-
-          :global(.ant-select-selection-item) {
-            display: flex;
-            align-items: center;
-
-            line-height: normal !important;
-          }
         }
 
-        :global(.ant-select-arrow) {
-          margin-top: 0px;
+        :global(.ant-select-content) {
+          display: flex;
+          align-items: center;
 
-          transform: translateY(-50%);
+          line-height: normal !important;
+        }
+
+        // The suffix sits in the flex flow now, so it needs no vertical re-centring.
+        :global(.ant-select-suffix) {
+          margin-top: 0px;
         }
       }
 

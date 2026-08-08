@@ -99,19 +99,15 @@
 .ant-notification {
   top: 50px !important;
 
-  .ant-notification-notice-with-icon {
-    display: flex;
-    flex-direction: column;
-    row-gap: 8px;
+  // antd v6 dropped the `.ant-notification-notice-with-icon` wrapper; message and description are
+  // laid out by the notice itself now.
+  .ant-notification-notice-message {
+    margin-bottom: 0px !important;
+  }
 
-    .ant-notification-notice-message {
-      margin-bottom: 0px !important;
-    }
-
-    .ant-notification-notice-description {
-      &:empty {
-        display: none;
-      }
+  .ant-notification-notice-description {
+    &:empty {
+      display: none;
     }
   }
 }
@@ -120,17 +116,16 @@
   display: flex;
   flex-direction: column;
 
-  .ant-tabs-content-holder {
+  // antd v6 removed the `.ant-tabs-content-holder` wrapper — `.ant-tabs-content` is now a direct
+  // child of `.ant-tabs`, so it takes over the flex sizing.
+  .ant-tabs-content {
     flex: 1;
 
     min-height: 0px;
+    height: 100%;
 
-    .ant-tabs-content {
+    .ant-tabs-tabpanel {
       height: 100%;
-
-      .ant-tabs-tabpane {
-        height: 100%;
-      }
     }
   }
 }
