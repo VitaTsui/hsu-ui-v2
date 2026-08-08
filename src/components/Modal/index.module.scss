@@ -1,7 +1,17 @@
+@use "../../styles/responsive" as r;
+
 .Modal {
   > div {
     width: 100%;
     height: 100%;
+  }
+
+  // 弹窗宽度是按桌面写死的（modalWidth.sm/md/lg = 600/800/1200）。小屏上这些值远超视口，
+  // 会顶出横向滚动，所以在 md 以下改成按视口收缩并贴边。
+  @include r.down(md) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    margin: 12px auto;
   }
 
   &.full {

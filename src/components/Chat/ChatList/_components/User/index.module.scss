@@ -1,3 +1,5 @@
+@use "../../../../../styles/responsive" as r;
+
 .User {
   max-width: 100%;
 
@@ -135,7 +137,16 @@
       }
     }
 
-    &:hover {
+    // 仅悬停可见的操作在触屏上永远够不着，所以那里常驻显示。
+    @include r.hover {
+      &:hover {
+        .userTool {
+          opacity: 1;
+        }
+      }
+    }
+
+    @include r.touch {
       .userTool {
         opacity: 1;
       }

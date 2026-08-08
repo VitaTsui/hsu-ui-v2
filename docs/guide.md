@@ -140,6 +140,57 @@ CSS 变量自己监听 `html[data-theme="dark"]`；antd 的令牌是 JS 算的�
 
 此时封装过的组件仍跟随 `--vita-*`，未封装的 antd 组件回到 antd 原生观感。也可以用 `theme` 属性在生成的配置之上再叠加自己的 token。
 
+## 响应式与移动端
+
+### 断点
+
+断点与色彩、圆角同源，都出自 `tokens.json`。因为媒体查询的条件部分**不能用 CSS 变量**（`@media (max-width: var(--x))` 无效），断点会额外生成一份 SCSS mixin。
+
+| 断点 | 值 |
+| --- | --- |
+| sm / md / lg / xl / xxl | 640 / 768 / 1024 / 1280 / 1536 px |
+
+CSS 侧：
+
+```scss
+@use "@hsu-react/ui/es/styles/responsive" as r;
+
+.panel {
+  padding: 24px;
+  @include r.down(md) { padding: 12px; }   // 视口 < md
+  @include r.up(lg)   { padding: 32px; }   // 视口 >= lg
+}
+```
+
+JS 侧（只在**结构**要变时才用，比如小屏把表格换成卡片列表；能用 CSS 解决的别用它 —— 媒体查询不需要 JS 参与、没有首屏闪烁）：
+
+```tsx | pure
+const { isMobile, up, down, current } = useBreakpoint();
+```
+
+### 移动端点击：不需要把 onClick 换成 onTouch
+
+一个常见的做法是「移动端把 `onClick` 换成 `onTouchStart`」。**不要这么做**：触摸事件序列本来就会合成 click，`onClick` 在触屏上一直可用；换成 touch 会丢掉键盘可访问性、在滚动时误触发、并与合成的 click 重复触发。
+
+之所以有人觉得必须换，通常是撞上了下面这几个真实问题 —— 它们各有各的正确解法，本库已在 `antd-overload.scss` 里统一处理：
+
+| 现象 | 真正的原因 | 解法 |
+| --- | --- | --- |
+| 点击时元素上浮出一层「边框」，设 `border: none` 也没用 | `-webkit-tap-highlight-color` 默认是 `rgba(51,181,229,0.4)`，是 UA 在元素盒子上铺的覆盖层，与 border / background 无关 | `-webkit-tap-highlight-color: transparent` |
+| 点击要等约 300ms 才响应 | 浏览器在等双击缩放 | `touch-action: manipulation` |
+| 点完之后有一行/一项一直高亮，直到点别处 | 触屏上 `:hover` 会保持 | hover 样式包进 `@include r.hover`；antd 几处最显眼的悬停面已在 `@include r.touch` 里中和 |
+| 小图标按钮点不中 | 粗指针下 24px 太小 | 粗指针下给最小可点面积兜底 |
+
+焦点环不在此列：实测触摸点击后元素虽然会聚焦，但 `:focus-visible` 并不匹配，所以不会画出焦点环。
+
+确实需要按指针类型**改变结构或尺寸**时用：
+
+```tsx | pure
+const { isTouch, isCoarse, canHover } = usePointerType();
+```
+
+它走媒体查询而不是 UA 嗅探 —— 二合一设备会在触摸与鼠标之间来回切换，媒体查询跟得上，UA 跟不上。
+
 ## 引入全局样式（可选）
 
 库附带了对 antd 的全局观感覆盖，按需在入口引入（产物为 scss，宿主项目需安装 `sass` 并具备 scss 编译能力）：

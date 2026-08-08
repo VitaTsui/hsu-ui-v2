@@ -19,6 +19,7 @@ const path = require("path");
 
 const SRC = path.resolve(__dirname, "../src/styles/tokens.json");
 const OUT = path.resolve(__dirname, "../src/styles/tokens.scss");
+const OUT_RESPONSIVE = path.resolve(__dirname, "../src/styles/_responsive.scss");
 
 const tokens = JSON.parse(fs.readFileSync(SRC, "utf8"));
 
@@ -127,6 +128,12 @@ lines.push(`  --vita-control-height: ${tokens.control.height}px;`);
 lines.push(`  --vita-control-height-sm: ${tokens.control.heightSm}px;`);
 lines.push(`  --vita-control-height-lg: ${tokens.control.heightLg}px;`);
 lines.push("");
+lines.push("  // ---- 断点（媒体查询用不了 CSS 变量，这里只是让 JS 侧与文档能读到同一份值；");
+lines.push("  //      真正的断点判断走 styles/_responsive.scss 的 mixin 或 useBreakpoint）----");
+for (const [name, value] of Object.entries(tokens.breakpoint)) {
+  lines.push(`  --vita-screen-${name}: ${value}px;`);
+}
+lines.push("");
 lines.push("  // ---- 兼容别名（0.1.0 前的 --cf-*，单向指向新名）----");
 for (const [oldName, newName] of LEGACY) {
   lines.push(`  ${oldName}: var(${newName});`);
@@ -144,9 +151,74 @@ lines.push("");
 
 const output = lines.join("\n");
 
+// ---------------------------------------------------------------------------
+// _responsive.scss：断点与指针类型的 mixin
+//
+// 媒体查询的条件部分不能用 CSS 变量（`@media (max-width: var(--x))` 无效），所以断点必须
+// 以字面量进入 CSS。为了不让它变成第二份真源，这里同样由 tokens.json 生成。
+// ---------------------------------------------------------------------------
+const bp = tokens.breakpoint;
+const rLines = [];
+rLines.push("// =============================================================");
+rLines.push("// 本文件由 scripts/gen-tokens-scss.cjs 从 src/styles/tokens.json 生成，请勿手改。");
+rLines.push("//");
+rLines.push("// 用法：");
+rLines.push("//   @use \"../../styles/responsive\" as r;");
+rLines.push("//   .panel { padding: 24px; @include r.down(md) { padding: 12px; } }");
+rLines.push("//   .row   { &:hover { background: …; } }  // 触屏上 hover 会「粘住」");
+rLines.push("//   .row   { @include r.hover { &:hover { background: …; } } }  // 正确写法");
+rLines.push("// =============================================================");
+rLines.push("");
+rLines.push("$breakpoints: (");
+for (const [name, value] of Object.entries(bp)) {
+  rLines.push(`  ${name}: ${value}px,`);
+}
+rLines.push(");");
+rLines.push("");
+rLines.push("@function bp($name) {");
+rLines.push("  @if not map-has-key($breakpoints, $name) {");
+rLines.push("    @error \"未知断点 #{$name}，可用：#{map-keys($breakpoints)}\";");
+rLines.push("  }");
+rLines.push("  @return map-get($breakpoints, $name);");
+rLines.push("}");
+rLines.push("");
+rLines.push("/// 视口 < 断点（移动优先的「小屏覆盖」）");
+rLines.push("@mixin down($name) {");
+rLines.push("  @media (max-width: #{bp($name) - 0.02px}) {");
+rLines.push("    @content;");
+rLines.push("  }");
+rLines.push("}");
+rLines.push("");
+rLines.push("/// 视口 >= 断点");
+rLines.push("@mixin up($name) {");
+rLines.push("  @media (min-width: #{bp($name)}) {");
+rLines.push("    @content;");
+rLines.push("  }");
+rLines.push("}");
+rLines.push("");
+rLines.push("/// 真正有悬停能力的设备（鼠标 / 触控板）。");
+rLines.push("/// 触屏上 :hover 会在点击后「粘住」，直到点别处才消失 —— 所有 hover 态都该包在这里。");
+rLines.push("@mixin hover {");
+rLines.push("  @media (hover: hover) and (pointer: fine) {");
+rLines.push("    @content;");
+rLines.push("  }");
+rLines.push("}");
+rLines.push("");
+rLines.push("/// 触摸设备（粗指针、无悬停）。用于放大点按目标、去掉仅悬停可见的操作。");
+rLines.push("@mixin touch {");
+rLines.push("  @media (hover: none), (pointer: coarse) {");
+rLines.push("    @content;");
+rLines.push("  }");
+rLines.push("}");
+rLines.push("");
+const responsiveOutput = rLines.join("\n");
+
 if (process.argv.includes("--check")) {
   const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, "utf8") : "";
-  if (current !== output) {
+  const currentR = fs.existsSync(OUT_RESPONSIVE)
+    ? fs.readFileSync(OUT_RESPONSIVE, "utf8")
+    : "";
+  if (current !== output || currentR !== responsiveOutput) {
     console.error(
       "✗ tokens：src/styles/tokens.scss 与 tokens.json 不一致，请运行 `yarn tokens` 后重新提交"
     );
@@ -155,7 +227,9 @@ if (process.argv.includes("--check")) {
   console.log("✓ tokens：tokens.scss 与真源一致");
 } else {
   fs.writeFileSync(OUT, output);
+  fs.writeFileSync(OUT_RESPONSIVE, responsiveOutput);
   console.log(
-    `✓ tokens：已从 tokens.json 生成 tokens.scss（${THEMED.length} 个主题变量 + ${LEGACY.length} 个兼容别名）`
+    `✓ tokens：已生成 tokens.scss（${THEMED.length} 个主题变量 + ${LEGACY.length} 个兼容别名）` +
+      ` 与 _responsive.scss（${Object.keys(bp).length} 个断点）`
   );
 }

@@ -58,6 +58,11 @@ export const controlTokens = raw.control;
 export const modalWidth = raw.modalWidth;
 
 /**
+ * 断点。与 `styles/_responsive.scss` 的 mixin 同源，所以 JS 判断不会和 CSS 媒体查询错开。
+ */
+export const breakpoints = raw.breakpoint;
+
+/**
  * `#rgb` / `#rrggbb` → `rgba(...)`. Only used to keep antd's focus ring at the same opacity as
  * `--vita-ring`; anything it cannot parse is handed back untouched so antd falls back to deriving
  * the ring itself.

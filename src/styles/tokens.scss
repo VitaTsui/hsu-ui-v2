@@ -55,6 +55,14 @@
   --vita-control-height-sm: 24px;
   --vita-control-height-lg: 40px;
 
+  // ---- 断点（媒体查询用不了 CSS 变量，这里只是让 JS 侧与文档能读到同一份值；
+  //      真正的断点判断走 styles/_responsive.scss 的 mixin 或 useBreakpoint）----
+  --vita-screen-sm: 640px;
+  --vita-screen-md: 768px;
+  --vita-screen-lg: 1024px;
+  --vita-screen-xl: 1280px;
+  --vita-screen-xxl: 1536px;
+
   // ---- 兼容别名（0.1.0 前的 --cf-*，单向指向新名）----
   --cf-canvas: var(--vita-background);
   --cf-surface: var(--vita-surface);

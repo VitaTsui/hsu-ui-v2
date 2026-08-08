@@ -1,5 +1,66 @@
 // Design tokens (colors/fonts/radii/shadows, incl. dark theme) — importing this file brings in the full set of variables
 @use "./tokens";
+@use "./responsive" as r;
+
+// =============================================================
+// 触摸设备
+//
+// 常见的误解是「移动端要把 onClick 换成 onTouchStart」。不需要 —— 触摸事件序列本来就会
+// 合成 click，onClick 在触屏上一直可用；换成 touch 反而丢键盘可访问性、滚动时误触发、
+// 并与合成 click 重复触发。移动端真正要处理的是下面这几件。
+// =============================================================
+
+// 1) 点击延迟：浏览器为了等双击缩放，会把 click 推迟约 300ms。声明本元素不需要双击缩放
+//    即可立即触发。只加在交互元素上，不用 `*`（那会连带禁掉正文的双击缩放）。
+button,
+a,
+[role="button"],
+label,
+input,
+select,
+textarea,
+.ant-btn,
+.ant-select,
+.ant-picker,
+.ant-checkbox-wrapper,
+.ant-radio-wrapper,
+.ant-switch,
+.ant-pagination-item,
+.ant-table-column-has-sorters {
+  touch-action: manipulation;
+
+  // 2) 点击时浮出的那一层：移动浏览器默认 -webkit-tap-highlight-color 是
+  //    rgba(51, 181, 229, 0.4)，点按时会在元素盒子上铺一层半透明高亮。它是 UA 层的覆盖物，
+  //    与 border / background 无关，所以设 `border: none` 压根不起作用 —— 这也是「移动端
+  //    点击出现一层边框」这个现象的真正来源。
+  //
+  //    把它改成透明即可，不需要把 onClick 换成 onTouch。换事件之所以看起来也能消掉，是因为
+  //    绕过了合成 click 与聚焦，代价是丢键盘可访问性、滚动误触发、以及与合成 click 重复触发。
+  //    （聚焦本身不是问题：实测触摸点击后 :focus-visible 并不匹配，焦点环不会出现。）
+  -webkit-tap-highlight-color: transparent;
+}
+
+@include r.touch {
+  // 3) 粘住的 hover 态：触屏点完之后 :hover 会一直保持到点别处为止，导致「有一行永远高亮」。
+  //    这里把 antd 几处最显眼的悬停面中和掉；本库自己的组件用 responsive.scss 的 hover mixin。
+  .ant-table-tbody > tr:hover > td,
+  .ant-table-tbody > tr.ant-table-row:hover > td,
+  .ant-select-item-option:hover,
+  .ant-menu-item:hover,
+  .ant-dropdown-menu-item:hover {
+    background: inherit;
+  }
+
+  // 4) 点按目标：粗指针下 24px 的图标按钮很难点中。给最小可点面积兜底，
+  //    用 min-height 而不是 height，避免撑坏已有布局。
+  .ant-btn-sm,
+  .ant-pagination-item,
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: var(--vita-control-height);
+    min-height: var(--vita-control-height);
+  }
+}
 
 .ant-layout-sider-children {
   display: flex;

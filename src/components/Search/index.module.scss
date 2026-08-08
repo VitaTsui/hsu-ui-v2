@@ -1,5 +1,12 @@
+@use "../../styles/responsive" as r;
+
 .Search {
   --column-number: 4;
+
+  // 小屏一行放不下 4 列搜索项，收成单列
+  @include r.down(md) {
+    --column-number: 1;
+  }
   --column-offset-width: 0px;
   --column-compensate-width: 0px;
 
@@ -41,8 +48,23 @@
       align-items: center;
       justify-content: flex-end;
 
+      // min-width: max-content 让按钮组永不收缩，桌面上是为了别把按钮文字压断；
+      // 但在窄屏里它会把整行顶出视口（实测 390px 视口下溢出 131px）。
+      // 小屏改为允许换行收缩。
       min-width: max-content;
       height: var(--vita-control-height);
+
+      // 小屏：按钮组独占一行。父级 .option 本来就是 flex-wrap: wrap，给个 100% 的 basis
+      // 就会被挤到下一行；只写 min-width: 0 的话它会被兄弟项挤成 0 宽，按钮反而溢出到右边。
+      @include r.down(md) {
+        flex: 0 0 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+
+        min-width: 0;
+        height: auto;
+        row-gap: 5px;
+      }
 
       &.flexStart {
         justify-content: flex-start;
@@ -86,6 +108,12 @@
     .searchOption {
       .option {
         flex-wrap: nowrap;
+
+        // 高级筛选态刻意不换行（桌面上要保持单行紧凑），但窄屏放不下，
+        // 不换行就只能溢出。小屏放开。
+        @include r.down(md) {
+          flex-wrap: wrap;
+        }
       }
     }
   }

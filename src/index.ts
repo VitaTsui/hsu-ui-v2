@@ -13,7 +13,15 @@ export {
 export type { RequestImpl, RequestConfig, ResType, ListRes, FileRes } from "./request";
 
 // hooks & utils
-export { usePermissions, PermissionsContent, useLabelWidth, useIsDark } from "./hooks";
+export {
+  usePermissions,
+  PermissionsContent,
+  useLabelWidth,
+  useIsDark,
+  useBreakpoint,
+  usePointerType,
+} from "./hooks";
+export type { BreakpointName, BreakpointState, PointerType } from "./hooks";
 export { getUUID, supportsHasSelector, isLegacyHasSelectorBrowser } from "./utils";
 
 // Design tokens. src/styles/tokens.json is the single source of truth: this module is its JS side
@@ -27,6 +35,7 @@ export {
   fontTokens,
   controlTokens,
   modalWidth,
+  breakpoints,
   toAntdTheme,
 } from "./styles/tokens";
 export type { HsuThemeTokens } from "./styles/tokens";

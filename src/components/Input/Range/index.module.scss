@@ -1,3 +1,5 @@
+@use "../../../styles/responsive" as r;
+
 .RangeContainer {
   display: flex;
   align-items: center;
@@ -78,7 +80,16 @@
       transition: all 0.3s;
     }
 
-    &:hover {
+    // 同上：清除按钮在触屏上必须常驻，否则没有任何办法触发它。
+    @include r.hover {
+      &:hover {
+        .RangeClear {
+          opacity: 1;
+        }
+      }
+    }
+
+    @include r.touch {
       .RangeClear {
         opacity: 1;
       }

@@ -1,3 +1,5 @@
+@use "../../../../../styles/responsive" as r;
+
 .ToolBar {
   display: flex;
   justify-content: space-between;
@@ -5,6 +7,17 @@
   flex-wrap: nowrap;
 
   min-height: max-content;
+
+  // 标题与按钮组在窄屏里挤成一行会互相压扁（按钮文字被截断），改为换行分两排。
+  @include r.down(md) {
+    flex-wrap: wrap;
+    row-gap: 8px;
+
+    .title_tabBar,
+    .btns_tools {
+      width: 100%;
+    }
+  }
 
   .title_tabBar {
     display: flex;

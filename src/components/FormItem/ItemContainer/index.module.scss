@@ -1,3 +1,5 @@
+@use "../../../styles/responsive" as r;
+
 .formItem {
   --label-width: auto;
   --label-height: max-content;
@@ -301,6 +303,30 @@
         flex-grow: var(--input-horizontal-flex-grow) !important;
 
         min-width: var(--input-horizontal-min-width);
+      }
+    }
+
+    // 小屏改成标签在上：水平布局是「固定宽标签 + 有最小宽的输入框」，两者相加在窄视口里
+    // 放不下，nowrap 会把整行顶出屏幕。这是响应式表单的标准处理。
+    @include r.down(md) {
+      :global(.ant-form-item-row) {
+        flex-direction: column;
+        flex-wrap: wrap;
+        row-gap: 4px;
+
+        height: max-content;
+
+        :global(.ant-form-item-label) {
+          width: 100%;
+          text-align: start;
+          margin-right: 0px !important;
+          padding-bottom: 0px;
+        }
+
+        :global(.ant-form-item-control) {
+          width: 100%;
+          min-width: 0;
+        }
       }
     }
 
