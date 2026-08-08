@@ -8,7 +8,7 @@ import {
 import { PermissionsContent } from "../hooks/usePermissions";
 import useIsDark from "../hooks/useIsDark";
 import { configureRequest, RequestImpl } from "../request";
-import { toAntdTheme } from "../styles/tokens";
+import { toAntdComponents, toAntdTheme } from "../styles/tokens";
 
 export interface ConfigProviderProps {
   /** Current user's permission code list; when provided, usePermissions / hasPermi validate against it. If omitted, everything is allowed by default */
@@ -81,6 +81,7 @@ const ConfigProvider: React.FC<ConfigProviderProps> = ({
       algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
       ...theme,
       token: { ...toAntdTheme({ dark: isDark, primaryColor }), ...theme?.token },
+      components: { ...toAntdComponents(), ...theme?.components },
     }),
     [isDark, primaryColor, theme]
   );

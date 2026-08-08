@@ -9,10 +9,12 @@
   column-gap: 10px;
 
   .expandBtnItem {
-    width: 100px;
+    // 圆角走令牌，跟其余按钮一致。这里此前写死 2px，在全库统一到 8px 之后
+    // 只有关系图这两个按钮还是直角，很显眼。
+    min-width: 100px;
     height: var(--vita-control-height);
 
-    border-radius: 2px;
+    border-radius: var(--vita-radius);
   }
 }
 

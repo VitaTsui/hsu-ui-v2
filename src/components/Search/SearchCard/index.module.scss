@@ -169,7 +169,7 @@
           font-family: PingFangSC-Regular, PingFang SC;
           line-height: 26px;
 
-          border-radius: 2px;
+          border-radius: var(--vita-radius-sm);
 
           cursor: pointer;
 
@@ -244,7 +244,7 @@
         font-family: PingFangSC-Regular, PingFang SC;
         line-height: 22px;
 
-        border-radius: 2px;
+        border-radius: var(--vita-radius-sm);
 
         cursor: pointer;
 

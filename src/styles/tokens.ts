@@ -138,9 +138,13 @@ export const toAntdTheme = (options?: {
     // shadcn's focus treatment is a 2px ring rather than antd's soft glow. antd would otherwise
     // derive the ring colour itself at ~10% opacity, which reads visibly lighter than the
     // `--vita-ring` the wrapped components use — same control, two different focus states.
+    //
+    // 只动 controlOutline 与 colorErrorOutline 这两个「真的是 focus ring」的令牌。
+    // 不要碰 controlTmpOutline —— 它在 antd 里是 colorFillQuaternary（中性填充），
+    // 被 Button 拿去算默认按钮的底部阴影，把它设成错误色会让默认按钮长出一道红边。
     controlOutlineWidth: raw.control.ringWidth,
     controlOutline: withAlpha(primary, RING_ALPHA),
-    controlTmpOutline: withAlpha(t.error, RING_ALPHA),
+    colorErrorOutline: withAlpha(t.error, RING_ALPHA),
 
     boxShadow: t.shadow2,
     boxShadowSecondary: t.shadow3,
@@ -150,3 +154,17 @@ export const toAntdTheme = (options?: {
     wireframe: false,
   };
 };
+
+/**
+ * 组件级令牌覆盖，补 `toAntdTheme` 里全局令牌覆盖不到的地方。
+ */
+export const toAntdComponents = (): ThemeConfig["components"] => ({
+  Button: {
+    // antd 的按钮底部有一道 2px 的硬投影（`0 2px 0`），由 controlOutline / controlTmpOutline
+    // 推导而来。shadcn 的按钮没有这个东西；而且既然我们把 controlOutline 调深到 35% 用作
+    // focus ring，这道投影会跟着变成三倍重的一条色带。直接去掉，focus ring 不受影响。
+    defaultShadow: "none",
+    primaryShadow: "none",
+    dangerShadow: "none",
+  },
+});

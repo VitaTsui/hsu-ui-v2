@@ -21,20 +21,29 @@
 // 选择器要连 antd 的两个类一起写：antd 是在 `.ant-btn.ant-btn-variant-filled`（0,2,0）里把
 // --ant-btn-border-color 设成 transparent 的，单靠一个 CSS Module 类（0,1,0）压不过它。
 // 这里写成 (0,3,0)，与注入顺序无关，也就不需要 !important。
+//
+// 边框用满强度的 color-base，不要再乘一个透明度：默认色系下 color-base 本身就是标准边框色
+// #e4e4e7，再乘 25% 之后压在 #f4f4f5 的浅底上等于没有 —— 那样 surface 看起来就和 filled
+// 一模一样。满强度等于「filled 的底 + outlined 的边」，这正是这个形态的定义。
 .surface:global(.ant-btn.ant-btn-variant-filled) {
-  --ant-btn-border-color: color-mix(
-    in srgb,
-    var(--ant-btn-color-base) 25%,
-    transparent
-  );
-  --ant-btn-border-color-hover: color-mix(
-    in srgb,
-    var(--ant-btn-color-hover) 45%,
-    transparent
-  );
-  --ant-btn-border-color-active: color-mix(
-    in srgb,
-    var(--ant-btn-color-active) 55%,
-    transparent
-  );
+  --ant-btn-border-color: var(--ant-btn-color-base);
+  --ant-btn-border-color-hover: var(--ant-btn-color-hover);
+  --ant-btn-border-color-active: var(--ant-btn-color-active);
+
+  // 中性色系要单独抬一档：它的 color-base 就是边框色，而边框色与浅底色在暗色下恰好同值
+  // （--vita-border 与 --vita-muted 都是 #27272a），照抄就等于没有边框。
+  // 往文字色方向混一点即可 —— 浅色下变深、暗色下变浅，一条规则两个主题都成立。
+  &:global(.ant-btn-color-default) {
+    --ant-btn-border-color: color-mix(
+      in srgb,
+      var(--ant-btn-color-base) 62%,
+      var(--vita-foreground)
+    );
+    --ant-btn-border-color-hover: color-mix(
+      in srgb,
+      var(--ant-btn-color-base) 40%,
+      var(--vita-foreground)
+    );
+    --ant-btn-border-color-active: var(--ant-btn-border-color-hover);
+  }
 }
