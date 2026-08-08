@@ -56,6 +56,27 @@ export const controlTokens = raw.control;
  * this library has *not* wrapped still lands on the same palette, radii and type scale as one it
  * has. This is the lever that keeps the look consistent without wrapping all 75 antd components.
  */
+/**
+ * `#rgb` / `#rrggbb` → `rgba(...)`. Only used to keep antd's focus ring at the same opacity as
+ * `--vita-ring`; anything it cannot parse is handed back untouched so antd falls back to deriving
+ * the ring itself.
+ */
+const withAlpha = (color: string, alpha: number): string => {
+  const hex = color.trim();
+  const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(hex);
+  const long = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  if (!short && !long) return color;
+
+  const [r, g, b] = short
+    ? short.slice(1).map((c) => parseInt(c + c, 16))
+    : long!.slice(1).map((c) => parseInt(c, 16));
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+/** Opacity of the focus ring; mirrors `--vita-ring` in the generated tokens.scss */
+const RING_ALPHA = 0.35;
+
 export const toAntdTheme = (options?: {
   dark?: boolean;
   primaryColor?: string;
@@ -93,7 +114,7 @@ export const toAntdTheme = (options?: {
     borderRadius: raw.radius.base,
     borderRadiusSM: raw.radius.sm,
     borderRadiusLG: raw.radius.lg,
-    borderRadiusXS: raw.radius.sm,
+    borderRadiusXS: raw.radius.xs,
 
     fontFamily: raw.font.family,
     fontSize: raw.font.size,
@@ -103,8 +124,12 @@ export const toAntdTheme = (options?: {
     controlHeight: raw.control.height,
     controlHeightSM: raw.control.heightSm,
     controlHeightLG: raw.control.heightLg,
-    // shadcn's focus treatment is a 2px ring rather than antd's soft glow
+    // shadcn's focus treatment is a 2px ring rather than antd's soft glow. antd would otherwise
+    // derive the ring colour itself at ~10% opacity, which reads visibly lighter than the
+    // `--vita-ring` the wrapped components use — same control, two different focus states.
     controlOutlineWidth: raw.control.ringWidth,
+    controlOutline: withAlpha(primary, RING_ALPHA),
+    controlTmpOutline: withAlpha(t.error, RING_ALPHA),
 
     boxShadow: t.shadow2,
     boxShadowSecondary: t.shadow3,
