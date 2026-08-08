@@ -3,13 +3,13 @@ import classNames from "classnames";
 import styles from "../index.module.scss";
 import SearchBase from "../_components/SearchBase";
 import { CollapseToggle } from "./_components/CollapseToggle";
-import { BasicButtonProps } from "../../Button";
+import { ButtonProps as HsuButtonProps } from "../../Button";
 import { SearchPropsWithFilter } from "../_types";
 
 export interface SearchCollapsibleProps extends SearchPropsWithFilter {
   onCollapseToggle?: (collapse: boolean) => void;
-  beforeButtonGroup?: BasicButtonProps[];
-  affterButtonGroup?: BasicButtonProps[];
+  beforeButtonGroup?: HsuButtonProps[];
+  affterButtonGroup?: HsuButtonProps[];
 }
 
 /**

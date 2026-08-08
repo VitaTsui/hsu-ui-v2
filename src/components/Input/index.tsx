@@ -34,6 +34,8 @@ interface InputFC extends React.FC<InputProps> {
   Password: React.FC<PasswordProps>;
   Number: React.FC<InputNumberProps>;
   Range: React.FC<RangeInputProps>;
+  /** antd v6 新增的验证码输入框 */
+  OTP: typeof AntdInput.OTP;
 }
 
 const Input: InputFC = (props) => {
@@ -219,5 +221,7 @@ Input.TextArea = TextArea;
 Input.Password = Password;
 Input.Number = InputNumber;
 Input.Range = RangeInput;
+// antd v6 新增的验证码输入框，原样透出
+Input.OTP = AntdInput.OTP;
 
 export default Input;

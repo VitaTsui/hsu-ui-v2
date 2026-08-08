@@ -165,7 +165,7 @@
     justify-content: center;
     column-gap: 3px;
 
-    height: 24px;
+    height: var(--vita-control-height-sm);
     padding: 0px 5px;
 
     border-radius: var(--vita-radius-sm);

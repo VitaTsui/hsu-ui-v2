@@ -1,4 +1,5 @@
 import { Form, notification } from "antd";
+import { modalWidth } from "../../../styles/tokens";
 import FormItem, {
   PlaceholderDict,
   PlaceholderDictEn,
@@ -93,7 +94,7 @@ const ImportForm: React.FC<ImportFormProps> = observer((props) => {
       open={open}
       centered
       className={`${styles.ImportForm} ${className ?? ""}`}
-      width={600}
+      width={modalWidth.sm}
       classNames={mergeSemantic(classNames, (outer) => ({
         ...outer,
         body: `${styles.body} ${outer.body ?? ""}`,

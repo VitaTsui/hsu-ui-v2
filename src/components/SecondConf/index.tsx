@@ -1,4 +1,5 @@
 import { mergeSemantic } from "../../utils/semantic";
+import { modalWidth } from "../../styles/tokens";
 import React, { ReactElement, ReactNode, cloneElement, useState } from "react";
 import styles from "./index.module.scss";
 import Icon from "../Icon";
@@ -60,7 +61,7 @@ const SecondConf: React.FC<SecondConfProps> = (props) => {
     <>
       {trigger}
       <Modal
-        width={800}
+        width={modalWidth.md}
         {...modalConfig}
         open={visible}
         onOk={handleOk}

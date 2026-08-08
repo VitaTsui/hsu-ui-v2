@@ -26,6 +26,7 @@ export {
   radius,
   fontTokens,
   controlTokens,
+  modalWidth,
   toAntdTheme,
 } from "./styles/tokens";
 export type { HsuThemeTokens } from "./styles/tokens";

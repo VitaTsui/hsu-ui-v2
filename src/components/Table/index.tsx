@@ -128,7 +128,23 @@ export interface TableProps<RecordType = AnyObject>
 type TableFC = (<T extends AnyObject>(
   props: TableProps<T>
 ) => JSX.Element | null) &
-  React.FC<TableProps<AnyObject>>;
+  React.FC<TableProps<AnyObject>> & {
+    /** antd 的 `Table.Summary`，用来渲染合计行 */
+    Summary: typeof AntdTable.Summary;
+    /** antd 的 `Table.Column`，供 JSX 声明列（本库更推荐用 `columns` 属性） */
+    Column: typeof AntdTable.Column;
+    /** antd 的 `Table.ColumnGroup` */
+    ColumnGroup: typeof AntdTable.ColumnGroup;
+    /** 展开列的占位符，放进 `columns` 里可指定展开图标的位置 */
+    EXPAND_COLUMN: typeof AntdTable.EXPAND_COLUMN;
+    /** 选择列的占位符，同上 */
+    SELECTION_COLUMN: typeof AntdTable.SELECTION_COLUMN;
+    SELECTION_ALL: typeof AntdTable.SELECTION_ALL;
+    SELECTION_INVERT: typeof AntdTable.SELECTION_INVERT;
+    SELECTION_NONE: typeof AntdTable.SELECTION_NONE;
+    /** 拖拽排序：`Table.Drag.Handle` 作为拖拽手柄列 */
+    Drag: typeof Drag;
+  };
 
 const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
   const {
@@ -347,5 +363,15 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
     </Drag>
   );
 };
+
+Table.Summary = AntdTable.Summary;
+Table.Column = AntdTable.Column;
+Table.ColumnGroup = AntdTable.ColumnGroup;
+Table.EXPAND_COLUMN = AntdTable.EXPAND_COLUMN;
+Table.SELECTION_COLUMN = AntdTable.SELECTION_COLUMN;
+Table.SELECTION_ALL = AntdTable.SELECTION_ALL;
+Table.SELECTION_INVERT = AntdTable.SELECTION_INVERT;
+Table.SELECTION_NONE = AntdTable.SELECTION_NONE;
+Table.Drag = Drag;
 
 export default Table;

@@ -35,7 +35,7 @@
     }
 
     .search {
-      height: 32px;
+      height: var(--vita-control-height);
 
       .searchIcon {
         font-size: 16px;

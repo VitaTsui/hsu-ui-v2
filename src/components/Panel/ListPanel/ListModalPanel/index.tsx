@@ -5,7 +5,7 @@ import Search, {
 } from "../../../Search";
 import Table, { ColumnsType, TableProps } from "../../../Table";
 
-import { BasicButtonProps as BasicButtonProps } from "../../../Button";
+import { ButtonProps as HsuButtonProps } from "../../../Button";
 import { TabBarProps } from "../../../TabBar";
 import {
   FullscreenExitOutlined,
@@ -19,7 +19,7 @@ import Modal, { ModalProps } from "../../../Modal";
 import ToolBar from "../_components/ToolBar";
 import ColumnMgt from "../_components/ColumnMgt";
 
-interface ButtonProps extends Omit<BasicButtonProps, "children" | "title"> {
+interface ButtonProps extends Omit<HsuButtonProps, "children" | "title"> {
   title?: ReactNode;
   children?: ReactNode;
 }

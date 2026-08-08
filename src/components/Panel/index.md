@@ -74,7 +74,7 @@ export default () => {
             beforeButtonGroup: [
               {
                 title: "新增",
-                colorPalette: "blue",
+                color: "primary",
                 onClick: () => message.success("点击了新增"),
               },
             ],

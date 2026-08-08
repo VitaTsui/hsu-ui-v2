@@ -1,7 +1,7 @@
 import { FormInstance } from "antd";
 import { ReactNode } from "react";
 import { FormItemProps } from "../../FormItem";
-import { BasicButtonProps } from "../../Button";
+import { ButtonProps as HsuButtonProps } from "../../Button";
 
 /**
  * Base props interface for the Search component
@@ -16,8 +16,8 @@ export interface BaseSearchProps {
   hasPermi?: string[];
   /** Search item column count (excluding the button group; total column count is columnNum + 1) */
   columnNum?: number;
-  beforeButtonGroup?: BasicButtonProps[];
-  affterButtonGroup?: BasicButtonProps[];
+  beforeButtonGroup?: HsuButtonProps[];
+  affterButtonGroup?: HsuButtonProps[];
   searchData?: Record<string, unknown>;
   minLabelWidth?: boolean | number;
   /** Whether expanded by default */

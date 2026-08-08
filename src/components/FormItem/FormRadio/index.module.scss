@@ -21,8 +21,8 @@
       > span:global(.ant-radio) {
         width: 24px;
         min-width: 24px;
-        height: 24px;
-        min-height: 24px;
+        height: var(--vita-control-height-sm);
+        min-height: var(--vita-control-height-sm);
 
         border-radius: 2px;
 

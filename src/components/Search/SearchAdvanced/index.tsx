@@ -3,14 +3,14 @@ import classNames from "classnames";
 import styles from "../index.module.scss";
 import SearchBase from "../_components/SearchBase";
 import { AdvancedFiltersDrawer } from "./_components/AdvancedFiltersDrawer";
-import { BasicButtonProps } from "../../Button";
+import { ButtonProps as HsuButtonProps } from "../../Button";
 import { DrawerFormProps } from "../../Form/DrawerForm";
 import { SearchPropsWithFilter } from "../_types";
 
 export interface SearchAdvancedProps extends SearchPropsWithFilter {
   advancedFiltersProps?: DrawerFormProps;
-  beforeButtonGroup?: BasicButtonProps[];
-  affterButtonGroup?: BasicButtonProps[];
+  beforeButtonGroup?: HsuButtonProps[];
+  affterButtonGroup?: HsuButtonProps[];
 }
 
 /**

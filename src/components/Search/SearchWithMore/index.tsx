@@ -1,14 +1,14 @@
 import React from "react";
 import { FormItemProps } from "../../FormItem";
 import SearchBase from "../_components/SearchBase";
-import { BasicButtonProps } from "../../Button";
+import { ButtonProps as HsuButtonProps } from "../../Button";
 import { SearchPropsWithFilter } from "../_types";
 
 export interface SearchWithMoreProps
   extends Omit<SearchPropsWithFilter, "moreSearchItems"> {
   moreSearchItems: FormItemProps[];
-  beforeButtonGroup?: BasicButtonProps[];
-  affterButtonGroup?: BasicButtonProps[];
+  beforeButtonGroup?: HsuButtonProps[];
+  affterButtonGroup?: HsuButtonProps[];
 }
 
 /**

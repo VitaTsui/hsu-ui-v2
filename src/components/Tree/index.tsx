@@ -72,7 +72,14 @@ export interface TreeProps extends Omit<
   titleSearchBarClassName?: string;
 }
 
-const Tree: React.FC<TreeProps> = (props) => {
+interface TreeFC extends React.FC<TreeProps> {
+  /** antd 的目录树（带文件夹图标与目录态选中） */
+  DirectoryTree: typeof AntdTree.DirectoryTree;
+  /** antd 的 `Tree.TreeNode`，供 JSX 写法（本库更推荐用 `treeData`） */
+  TreeNode: typeof AntdTree.TreeNode;
+}
+
+const Tree = ((props: TreeProps) => {
   const {
     title,
     titleRender,
@@ -304,6 +311,9 @@ const Tree: React.FC<TreeProps> = (props) => {
       </div>
     </div>
   );
-};
+}) as TreeFC;
+
+Tree.DirectoryTree = AntdTree.DirectoryTree;
+Tree.TreeNode = AntdTree.TreeNode;
 
 export default Tree;

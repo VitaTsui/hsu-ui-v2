@@ -5,8 +5,8 @@
   }
 
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: var(--vita-control-height);
+  height: var(--vita-control-height);
   border: none;
   border-radius: var(--vita-radius-xs);
 

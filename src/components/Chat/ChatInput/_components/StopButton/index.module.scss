@@ -3,8 +3,8 @@
   align-items: center;
   justify-content: center;
 
-  width: 32px;
-  height: 32px;
+  width: var(--vita-control-height);
+  height: var(--vita-control-height);
 
   cursor: pointer;
 }

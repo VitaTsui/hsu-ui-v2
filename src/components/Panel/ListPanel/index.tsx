@@ -12,7 +12,7 @@ import Search, {
   SearchModePropsMap,
 } from "../../Search";
 import Table, { ColumnsType, TableProps } from "../../Table";
-import { BasicButtonProps as BasicButtonProps } from "../../Button";
+import { ButtonProps as HsuButtonProps } from "../../Button";
 import TabBar, { TabBarProps } from "../../TabBar";
 import classNames from "classnames";
 import { cloneDeep } from "lodash";
@@ -25,7 +25,7 @@ import ListModalPanel, { ListModalPanelProps } from "./ListModalPanel";
 import { Equal } from "hsu-utils";
 import { isLegacyHasSelectorBrowser } from "../../../utils/cssSupports";
 
-interface ButtonProps extends Omit<BasicButtonProps, "children" | "title"> {
+interface ButtonProps extends Omit<HsuButtonProps, "children" | "title"> {
   title?: ReactNode;
   children?: ReactNode;
 }

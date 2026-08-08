@@ -1,10 +1,10 @@
 .formItem {
   --label-width: auto;
   --label-height: max-content;
-  --label-min-height: 32px;
+  --label-min-height: var(--vita-control-height);
   --input-width: 100%;
   --input-height: max-content;
-  --input-min-height: 32px;
+  --input-min-height: var(--vita-control-height);
   --input-horizontal-min-width: 0px;
   --input-horizontal-flex-grow: 1;
 

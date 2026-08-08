@@ -9,3 +9,32 @@
     flex-direction: row-reverse;
   }
 }
+
+// `variant="surface"`：浅底 + 边框。
+//
+// antd v6 没有这个形态 —— `filled` 有底色但把 --ant-btn-border-color 显式设成了 transparent，
+// `outlined` 有边框但没底色。这里让它走 antd 的 `filled`（底色、文字色、hover / active、
+// disabled 全都照旧由 antd 那条色阶算），只把边框变量按同一条色阶调回来。
+//
+// 因为改的是 antd 自己的变量而不是写死颜色，16 个 color 预设（default / primary / danger /
+// blue / purple / … / gold）与明暗主题都自动跟着走，不必逐色枚举。
+// 选择器要连 antd 的两个类一起写：antd 是在 `.ant-btn.ant-btn-variant-filled`（0,2,0）里把
+// --ant-btn-border-color 设成 transparent 的，单靠一个 CSS Module 类（0,1,0）压不过它。
+// 这里写成 (0,3,0)，与注入顺序无关，也就不需要 !important。
+.surface:global(.ant-btn.ant-btn-variant-filled) {
+  --ant-btn-border-color: color-mix(
+    in srgb,
+    var(--ant-btn-color-base) 25%,
+    transparent
+  );
+  --ant-btn-border-color-hover: color-mix(
+    in srgb,
+    var(--ant-btn-color-hover) 45%,
+    transparent
+  );
+  --ant-btn-border-color-active: color-mix(
+    in srgb,
+    var(--ant-btn-color-active) 55%,
+    transparent
+  );
+}

@@ -11,6 +11,9 @@ import { getElementLeft, calculatePopupWidth, filterOption } from "./_utils";
 import { Prefix } from "./_components/Prefix";
 import { Suffix } from "./_components/Suffix";
 import { isLegacyHasSelectorBrowser } from "../../utils/cssSupports";
+import TreeSelect from "./TreeSelect";
+import AutoCompleteSelect from "./AutoCompleteSelect";
+import IconSelect from "./IconSelect";
 
 export interface SelectOption<T = number | string> {
   label: string;
@@ -35,7 +38,20 @@ export interface SelectProps extends Omit<
   valueInlabel?: "before" | "after";
 }
 
-const Select: React.FC<SelectProps> = (props) => {
+interface SelectFC extends React.FC<SelectProps> {
+  /** 树形选择器 */
+  Tree: typeof TreeSelect;
+  /** 自动补全选择器 */
+  AutoComplete: typeof AutoCompleteSelect;
+  /** 图标选择器 */
+  Icon: typeof IconSelect;
+  /** antd 的 `Select.Option`，供 JSX 写法（本库更推荐用 `options` 属性） */
+  Option: typeof AntdSelect.Option;
+  /** antd 的 `Select.OptGroup` */
+  OptGroup: typeof AntdSelect.OptGroup;
+}
+
+const Select = ((props: SelectProps) => {
   const {
     prefix,
     suffix,
@@ -267,6 +283,12 @@ const Select: React.FC<SelectProps> = (props) => {
       {suffix && <Suffix suffix={suffix} />}
     </div>
   );
-};
+}) as SelectFC;
+
+Select.Tree = TreeSelect;
+Select.AutoComplete = AutoCompleteSelect;
+Select.Icon = IconSelect;
+Select.Option = AntdSelect.Option;
+Select.OptGroup = AntdSelect.OptGroup;
 
 export default Select;

@@ -8,7 +8,7 @@
   height: 100%;
   // When the parent has no explicit height (height:100% resolves to auto), guarantee a min height
   // consistent with Input and other form controls, so it is neither squashed nor mis-sized in search rows.
-  min-height: 32px;
+  min-height: var(--vita-control-height);
   padding: 0px 11px;
 
   // CF style: outlined input control that follows appearance switching

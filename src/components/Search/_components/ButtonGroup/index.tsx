@@ -1,10 +1,10 @@
 import React from "react";
-import Button, { BasicButtonProps } from "../../../Button";
+import Button, { ButtonProps as HsuButtonProps } from "../../../Button";
 import { ReactNode } from "react";
 import styles from "../../index.module.scss";
 
 interface GroupButtonProps extends Omit<
-  BasicButtonProps,
+  HsuButtonProps,
   "children" | "title"
 > {
   title?: ReactNode;
@@ -39,18 +39,18 @@ export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
         {beforeButtonGroup?.map((button, idx) => {
           const { title, ...buttonProps } = button;
           return (
-            <Button.Basic key={idx} variant="surface" {...buttonProps}>
+            <Button key={idx} variant="surface" {...buttonProps}>
               {title}
-            </Button.Basic>
+            </Button>
           );
         })}
         {permitted && children}
         {affterButtonGroup?.map((button, idx) => {
           const { title, ...buttonProps } = button;
           return (
-            <Button.Basic key={idx} variant="surface" {...buttonProps}>
+            <Button key={idx} variant="surface" {...buttonProps}>
               {title}
-            </Button.Basic>
+            </Button>
           );
         })}
         {permitted && expandButton}

@@ -1,4 +1,5 @@
 import { Form, FormInstance } from "antd";
+import { modalWidth } from "../../../styles/tokens";
 import Modal, { ModalProps } from "../../Modal";
 import FormItem, {
   PlaceholderDict,
@@ -123,7 +124,7 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
       }`}
       onCancel={_onCancel}
       onOk={_onOk}
-      width={layout === "horizontal" ? "1200px" : "800px"}
+      width={layout === "horizontal" ? modalWidth.lg : modalWidth.md}
       classNames={mergeSemantic(classNames, (outer) => ({
         ...outer,
         body: `${styles.body} ${outer.body ?? ""}`,

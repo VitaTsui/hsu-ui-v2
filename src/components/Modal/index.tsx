@@ -12,7 +12,18 @@ export interface ModalProps extends AntdModalProps {
   titleButtonGroup?: ButtonProps[];
 }
 
-const Modal: React.FC<ModalProps> = (props) => {
+interface ModalFC extends React.FC<ModalProps> {
+  confirm: typeof AntdModal.confirm;
+  info: typeof AntdModal.info;
+  success: typeof AntdModal.success;
+  error: typeof AntdModal.error;
+  warning: typeof AntdModal.warning;
+  useModal: typeof AntdModal.useModal;
+  destroyAll: typeof AntdModal.destroyAll;
+  config: typeof AntdModal.config;
+}
+
+const Modal = ((props: ModalProps) => {
   const {
     moveable = true,
     className,
@@ -114,6 +125,22 @@ const Modal: React.FC<ModalProps> = (props) => {
       }}
     />
   );
-};
+}) as ModalFC;
+
+/**
+ * antd 的静态确认框与 hook 版本原样透出，此前消费方只能自己去 import antd。
+ *
+ * 注意：`Modal.confirm` 这类静态方法脱离 React 树调用，读不到 `ConfigProvider` 注入的主题
+ * （antd 一贯的限制）。要跟随主题就用 `Modal.useModal()` 拿 `modal` 实例并渲染它返回的
+ * `contextHolder`。
+ */
+Modal.confirm = AntdModal.confirm;
+Modal.info = AntdModal.info;
+Modal.success = AntdModal.success;
+Modal.error = AntdModal.error;
+Modal.warning = AntdModal.warning;
+Modal.useModal = AntdModal.useModal;
+Modal.destroyAll = AntdModal.destroyAll;
+Modal.config = AntdModal.config;
 
 export default Modal;

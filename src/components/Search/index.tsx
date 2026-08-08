@@ -6,11 +6,11 @@ import SearchWithFilter from "./SearchWithFilter";
 import SearchWithMore from "./SearchWithMore";
 import SearchBase from "./_components/SearchBase";
 import { BaseSearchProps } from "./_types";
-import { BasicButtonProps } from "../Button";
+import { ButtonProps as HsuButtonProps } from "../Button";
 
 export interface SearchProps extends BaseSearchProps {
-  beforeButtonGroup?: BasicButtonProps[];
-  affterButtonGroup?: BasicButtonProps[];
+  beforeButtonGroup?: HsuButtonProps[];
+  affterButtonGroup?: HsuButtonProps[];
 }
 
 interface SearchFC extends React.FC<SearchProps> {

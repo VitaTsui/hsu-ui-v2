@@ -52,10 +52,11 @@ export const fontTokens = raw.font;
 export const controlTokens = raw.control;
 
 /**
- * Build antd's `theme.token` from the same tokens the CSS variables come from, so a component
- * this library has *not* wrapped still lands on the same palette, radii and type scale as one it
- * has. This is the lever that keeps the look consistent without wrapping all 75 antd components.
+ * 弹窗宽度尺度。此前各弹窗自己写死（ImportForm 600、SecondConf 800、ModalForm 800/1200），
+ * 没有共同依据；收成一条尺度后至少有据可循。
  */
+export const modalWidth = raw.modalWidth;
+
 /**
  * `#rgb` / `#rrggbb` → `rgba(...)`. Only used to keep antd's focus ring at the same opacity as
  * `--vita-ring`; anything it cannot parse is handed back untouched so antd falls back to deriving
@@ -77,6 +78,11 @@ const withAlpha = (color: string, alpha: number): string => {
 /** Opacity of the focus ring; mirrors `--vita-ring` in the generated tokens.scss */
 const RING_ALPHA = 0.35;
 
+/**
+ * Build antd's `theme.token` from the same tokens the CSS variables come from, so a component
+ * this library has *not* wrapped still lands on the same palette, radii and type scale as one it
+ * has. This is the lever that keeps the look consistent without wrapping all 75 antd components.
+ */
 export const toAntdTheme = (options?: {
   dark?: boolean;
   primaryColor?: string;

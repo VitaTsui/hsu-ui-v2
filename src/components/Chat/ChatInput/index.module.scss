@@ -82,14 +82,14 @@
     }
 
     li {
-      height: 32px;
+      height: var(--vita-control-height);
     }
   }
 }
 
 .button {
-  width: 32px;
-  height: 32px;
+  width: var(--vita-control-height);
+  height: var(--vita-control-height);
 
   border-radius: var(--vita-radius-xs);
 

@@ -24,7 +24,12 @@ interface DescriptionsProps extends AntdDescriptionsProps {
 
 type ItemType = NonNullable<AntdDescriptionsProps["items"]>[number];
 
-const Descriptions: React.FC<DescriptionsProps> = (props) => {
+interface DescriptionsFC extends React.FC<DescriptionsProps> {
+  /** antd 的 `Descriptions.Item`，供 JSX 写法（本库更推荐用 `items` / `columns`） */
+  Item: typeof AntdDescriptions.Item;
+}
+
+const Descriptions = ((props: DescriptionsProps) => {
   const {
     columns,
     dataSource = {},
@@ -155,6 +160,8 @@ const Descriptions: React.FC<DescriptionsProps> = (props) => {
       {...escriptionsConfig}
     />
   );
-};
+}) as DescriptionsFC;
+
+Descriptions.Item = AntdDescriptions.Item;
 
 export default Descriptions;

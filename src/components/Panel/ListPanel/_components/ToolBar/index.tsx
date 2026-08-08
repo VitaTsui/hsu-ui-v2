@@ -71,9 +71,9 @@ const ToolBar: React.FC<ToolBarProps> = (props) => {
                   {buttonGroup?.map((button, idx) => {
                     const { title, children, ...buttonProps } = button;
                     return (
-                      <Button.Basic key={idx} {...buttonProps}>
+                      <Button key={idx} {...buttonProps}>
                         {title || children}
-                      </Button.Basic>
+                      </Button>
                     );
                   })}
                 </div>

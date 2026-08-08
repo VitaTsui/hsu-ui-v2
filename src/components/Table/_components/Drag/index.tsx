@@ -5,8 +5,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-import { Button } from "antd";
-import { ButtonProps } from "../../../Button";
+// 用本库的 Button 而不是 antd 原生的：props 类型本来就取的是本库的 ButtonProps，
+// 之前混用导致 variant="surface" 这类本库扩展传不进去。
+import Button, { ButtonProps } from "../../../Button";
 import { CSS } from "@dnd-kit/utilities";
 import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";

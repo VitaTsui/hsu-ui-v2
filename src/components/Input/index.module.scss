@@ -3,7 +3,7 @@
   height: 100%;
   // When the parent has no set height (height:100% resolves to auto), ensure a minimum height so the input is not squashed;
   // the inner .ant-input-wrapper / .ant-input inherit this value via min-height: inherit.
-  min-height: 32px;
+  min-height: var(--vita-control-height);
 
   :global(.ant-input-clear-icon) {
     font-size: 14px;

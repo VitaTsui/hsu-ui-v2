@@ -58,7 +58,14 @@ export interface UploadProps extends Omit<AntdUploadProps, "action" | "data"> {
   en?: boolean;
 }
 
-const Upload: React.FC<UploadProps> = (props) => {
+interface UploadFC extends React.FC<UploadProps> {
+  /** antd 的拖拽上传区 */
+  Dragger: typeof AntdUpload.Dragger;
+  /** `beforeUpload` 返回它表示「跳过这个文件且不进 fileList」 */
+  LIST_IGNORE: typeof AntdUpload.LIST_IGNORE;
+}
+
+const Upload = ((props: UploadProps) => {
   const {
     disabled = false,
     drop,
@@ -306,6 +313,9 @@ const Upload: React.FC<UploadProps> = (props) => {
       />
     </>
   );
-};
+}) as UploadFC;
+
+Upload.Dragger = AntdUpload.Dragger;
+Upload.LIST_IGNORE = AntdUpload.LIST_IGNORE;
 
 export default Upload;
