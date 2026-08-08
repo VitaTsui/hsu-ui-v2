@@ -16,7 +16,7 @@
   width: 100%;
   padding: 10px;
 
-  border-radius: 6px;
+  border-radius: var(--vita-radius-sm);
   border: 1px solid var(--vita-border);
   background: var(--vita-surface);
 
@@ -52,7 +52,7 @@
         .select {
           font-size: 14px;
           border: 1px solid var(--vita-border);
-          border-radius: 4px;
+          border-radius: var(--vita-radius-xs);
           box-shadow: none;
           opacity: 0.8;
           width: 140px;
@@ -91,7 +91,7 @@
   width: 32px;
   height: 32px;
 
-  border-radius: 4px;
+  border-radius: var(--vita-radius-xs);
 
   :global(.ant-btn-icon) {
     display: flex;

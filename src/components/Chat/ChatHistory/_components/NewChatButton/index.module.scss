@@ -20,7 +20,7 @@
 
     background-color: var(--vita-surface);
 
-    border-radius: 6px;
+    border-radius: var(--vita-radius-sm);
     border: 1px solid var(--vita-border-weak);
 
     cursor: pointer;

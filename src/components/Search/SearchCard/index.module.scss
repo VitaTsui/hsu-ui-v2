@@ -14,7 +14,7 @@
     width: 100%;
     padding: 20px;
     background: var(--vita-surface);
-    border-radius: 8px 8px 0 0;
+    border-radius: var(--vita-radius) var(--vita-radius) 0 0;
 
     .searchInputContainer {
       max-width: 600px;
@@ -54,7 +54,7 @@
     width: 100%;
     padding: 20px 20px 12px;
 
-    border-radius: 8px;
+    border-radius: var(--vita-radius);
 
     background: var(--vita-surface);
 

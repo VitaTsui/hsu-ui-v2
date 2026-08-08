@@ -93,7 +93,7 @@
 
 // ===== Cloudflare style: Tags use outlined style with a light background =====
 .ant-tag {
-  border-radius: 6px;
+  border-radius: var(--vita-radius-sm);
 }
 
 .ant-notification {

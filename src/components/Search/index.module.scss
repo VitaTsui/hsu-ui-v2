@@ -11,7 +11,7 @@
   // CF style: outlined white card (follows appearance switching), no shadow
   background: var(--vita-surface);
 
-  border-radius: 8px;
+  border-radius: var(--vita-radius);
   border: 1px solid var(--vita-border);
   box-shadow: none;
 

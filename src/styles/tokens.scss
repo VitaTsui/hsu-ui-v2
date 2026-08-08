@@ -13,9 +13,13 @@
   --primary-color: #1677ff;
   --vita-primary: var(--primary-color);
   --vita-primary-foreground: #ffffff;
-  // focus ring：shadcn 的 2px 环，颜色取品牌色的低透明度
-  --vita-ring: color-mix(in srgb, var(--vita-primary) 40%, transparent);
+  // focus ring：shadcn 的 2px 环。收成令牌之前各组件各写各的透明度
+  // （6% / 10% / 12% / 20% 都出现过），聚焦态在不同控件上深浅不一。
+  --vita-ring: color-mix(in srgb, var(--vita-primary) 35%, transparent);
+  --vita-ring-error: color-mix(in srgb, var(--vita-error) 30%, transparent);
   --vita-ring-width: 2px;
+  --vita-focus-ring: 0 0 0 var(--vita-ring-width) var(--vita-ring);
+  --vita-focus-ring-error: 0 0 0 var(--vita-ring-width) var(--vita-ring-error);
 
   // ---- 中性色（浅色）----
   --vita-background: #fafafa; // 页面画布
@@ -41,6 +45,7 @@
   --vita-font-size-lg: 16px;
 
   // ---- 圆角 ----
+  --vita-radius-xs: 4px;
   --vita-radius-sm: 6px;
   --vita-radius: 8px;
   --vita-radius-lg: 12px;

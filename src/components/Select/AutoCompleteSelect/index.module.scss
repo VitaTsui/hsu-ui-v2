@@ -10,7 +10,7 @@
 
   // CF style: outlined input control that follows appearance switching
   border: 1px solid var(--vita-border);
-  border-radius: 6px;
+  border-radius: var(--vita-radius-sm);
 
   background: var(--vita-surface);
 
@@ -53,7 +53,7 @@
   &.focused {
     border-color: var(--vita-primary);
 
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-primary) 12%, transparent);
+    box-shadow: var(--vita-focus-ring);
 
     outline: 0;
   }

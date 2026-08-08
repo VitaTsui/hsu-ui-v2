@@ -46,6 +46,6 @@
   background: var(--vita-surface);
 
   // CF style: outlined white card
-  border-radius: 8px;
+  border-radius: var(--vita-radius);
   border: 1px solid var(--vita-border);
 }

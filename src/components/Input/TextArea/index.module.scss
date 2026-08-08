@@ -15,7 +15,7 @@
   border-width: 1px;
   border-style: solid;
   border-color: var(--vita-border);
-  border-radius: 6px;
+  border-radius: var(--vita-radius-sm);
 
   color: var(--vita-foreground);
 
@@ -113,13 +113,13 @@
   &:not(.hasError).focused {
     border-color: var(--vita-primary);
 
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-primary) 12%, transparent);
+    box-shadow: var(--vita-focus-ring);
   }
 
   &.hasError {
     border-color: var(--vita-error);
 
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-error) 6%, transparent);
+    box-shadow: var(--vita-focus-ring-error);
 
     :global(.ant-input-status-error) {
       border: none !important;

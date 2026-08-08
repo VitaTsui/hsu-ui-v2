@@ -100,7 +100,7 @@
   &:global(.ant-upload-drag) {
     height: 180px;
 
-    border-radius: 8px;
+    border-radius: var(--vita-radius);
     border: 1px dashed color-mix(in srgb, var(--vita-primary) 60%, transparent);
     background: color-mix(in srgb, var(--vita-primary) 2%, transparent);
 

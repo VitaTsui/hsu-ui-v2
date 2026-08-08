@@ -13,7 +13,7 @@
 
   background: var(--vita-surface);
 
-  border-radius: 8px;
+  border-radius: var(--vita-radius);
 
   .title_search {
     display: flex;

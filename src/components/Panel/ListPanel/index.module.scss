@@ -92,7 +92,7 @@
     background: var(--vita-surface);
 
     // CF style: outlined white card + small border radius, no shadow
-    border-radius: 8px;
+    border-radius: var(--vita-radius);
     border: 1px solid var(--vita-border);
     box-shadow: none;
   }
@@ -111,7 +111,7 @@
 
     > div {
       margin-left: 0 !important;
-      border-radius: 6px !important;
+      border-radius: var(--vita-radius-sm) !important;
 
       background: var(--vita-surface);
     }
@@ -120,13 +120,13 @@
   &.hasHeaderTabBar {
     &:not(:has(.search)) {
       .headerTabBarContainer {
-        border-radius: 8px;
+        border-radius: var(--vita-radius);
       }
     }
 
     &.legacyNoSearch {
       .headerTabBarContainer {
-        border-radius: 8px;
+        border-radius: var(--vita-radius);
       }
     }
   }

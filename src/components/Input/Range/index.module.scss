@@ -58,7 +58,7 @@
       &:hover {
         border-color: var(--vita-primary);
 
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-primary) 10%, transparent);
+        box-shadow: var(--vita-focus-ring);
       }
     }
 

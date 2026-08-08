@@ -3,7 +3,7 @@
   height: 100%;
 
   border: 1px solid var(--vita-border);
-  border-radius: 6px;
+  border-radius: var(--vita-radius-sm);
 
   overflow: hidden;
 
@@ -30,7 +30,7 @@
 
     :global(.cm-focused) {
       border-color: var(--vita-error);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--vita-error) 20%, transparent);
+      box-shadow: var(--vita-focus-ring-error);
     }
   }
 }

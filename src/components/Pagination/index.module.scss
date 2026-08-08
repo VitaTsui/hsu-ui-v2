@@ -81,7 +81,7 @@
     > li {
       &:not(:global(.ant-pagination-options)):not(:global(.ant-pagination-total-text)) {
         border: 1px solid var(--vita-border);
-        border-radius: 4px;
+        border-radius: var(--vita-radius-xs);
       }
 
       &:global(.ant-pagination-item) {
@@ -168,7 +168,7 @@
     height: 24px;
     padding: 0px 5px;
 
-    border-radius: 6px;
+    border-radius: var(--vita-radius-sm);
 
     font-size: 12px;
     line-height: 16px;

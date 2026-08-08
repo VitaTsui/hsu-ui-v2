@@ -89,11 +89,21 @@ lines.push("  // 所以真源反过来引用它，两种写法都生效。");
 lines.push(`  --primary-color: ${tokens.primary};`);
 lines.push("  --vita-primary: var(--primary-color);");
 lines.push("  --vita-primary-foreground: #ffffff;");
-lines.push("  // focus ring：shadcn 的 2px 环，颜色取品牌色的低透明度");
+lines.push("  // focus ring：shadcn 的 2px 环。收成令牌之前各组件各写各的透明度");
+lines.push("  // （6% / 10% / 12% / 20% 都出现过），聚焦态在不同控件上深浅不一。");
 lines.push(
-  "  --vita-ring: color-mix(in srgb, var(--vita-primary) 40%, transparent);"
+  "  --vita-ring: color-mix(in srgb, var(--vita-primary) 35%, transparent);"
+);
+lines.push(
+  "  --vita-ring-error: color-mix(in srgb, var(--vita-error) 30%, transparent);"
 );
 lines.push(`  --vita-ring-width: ${tokens.control.ringWidth}px;`);
+lines.push(
+  "  --vita-focus-ring: 0 0 0 var(--vita-ring-width) var(--vita-ring);"
+);
+lines.push(
+  "  --vita-focus-ring-error: 0 0 0 var(--vita-ring-width) var(--vita-ring-error);"
+);
 lines.push("");
 lines.push("  // ---- 中性色（浅色）----");
 for (const [name, key, comment] of THEMED) {
@@ -107,6 +117,7 @@ lines.push(`  --vita-font-size: ${tokens.font.size}px;`);
 lines.push(`  --vita-font-size-lg: ${tokens.font.sizeLg}px;`);
 lines.push("");
 lines.push("  // ---- 圆角 ----");
+lines.push(`  --vita-radius-xs: ${tokens.radius.xs}px;`);
 lines.push(`  --vita-radius-sm: ${tokens.radius.sm}px;`);
 lines.push(`  --vita-radius: ${tokens.radius.base}px;`);
 lines.push(`  --vita-radius-lg: ${tokens.radius.lg}px;`);
