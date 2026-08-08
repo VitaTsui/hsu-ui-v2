@@ -10,7 +10,8 @@
     cursor: pointer;
   }
 
-  :global(.ant-input-group-addon) {
+  // v5's `.ant-input-group-addon` is v6's `Space.Addon`
+  :global(.ant-space-addon) {
     padding: 0;
   }
 }

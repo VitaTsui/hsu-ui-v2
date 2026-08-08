@@ -1,6 +1,7 @@
 import {
   InputNumber as AntdInputNumber,
   InputNumberProps as AntdInputNumberProps,
+  Space,
 } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { CloseCircleFilled } from "@ant-design/icons";
@@ -31,6 +32,7 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
     disabled,
     allowClear = true,
     addonAfter,
+    suffix,
     wrapperClassName,
     ...inputConfig
   } = props;
@@ -91,47 +93,6 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
     getRef?.(ref.current);
   }, [getRef]);
 
-  // Dynamically compute the width of addonAfter and set the CSS variable
-  useEffect(() => {
-    if (addonAfter && wrapperRef.current) {
-      const updateAddonWidth = () => {
-        const addonElement = wrapperRef.current?.querySelector(
-          ".ant-input-number-group-addon",
-        ) as HTMLElement | null;
-        if (addonElement && addonElement.offsetWidth > 0) {
-          wrapperRef.current?.style.setProperty(
-            "--addon-after-width",
-            `${addonElement.offsetWidth}px`,
-          );
-        }
-      };
-
-      // Use requestAnimationFrame to ensure the DOM has rendered before computing
-      const rafId = requestAnimationFrame(() => {
-        updateAddonWidth();
-      });
-
-      // Observe window and element size changes to recompute
-      const resizeObserver = new ResizeObserver(() => {
-        updateAddonWidth();
-      });
-
-      if (wrapperRef.current) {
-        const addonElement = wrapperRef.current.querySelector(
-          ".ant-input-number-group-addon",
-        ) as HTMLElement | null;
-        if (addonElement) {
-          resizeObserver.observe(addonElement);
-        }
-      }
-
-      return () => {
-        cancelAnimationFrame(rafId);
-        resizeObserver.disconnect();
-      };
-    }
-  }, [addonAfter]);
-
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     setValue("");
@@ -142,33 +103,53 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
   const showClear =
     allowClear && _value !== "" && _value !== undefined && !disabled;
 
+  const input = (
+    <AntdInputNumber
+      ref={ref}
+      value={_value}
+      onChange={(e) => {
+        const newValue =
+          e === null || e === undefined
+            ? ""
+            : (typeof e === "number" ? e : e || "").toString();
+        setValue(newValue);
+      }}
+      className={classNames(styles.antdInput, className)}
+      controls={false}
+      disabled={disabled}
+      // The clear button used to be absolutely positioned over the wrapper, which meant its offset
+      // had to be recomputed from the addon's measured width (a rAF + ResizeObserver dance writing
+      // `--addon-after-width`). Riding antd's own `suffix` slot instead puts it inside the input,
+      // so it can never collide with the addon and nothing needs measuring.
+      suffix={
+        <>
+          {showClear && (
+            <CloseCircleFilled
+              className={styles.clearIcon}
+              onClick={handleClear}
+            />
+          )}
+          {suffix}
+        </>
+      }
+      {...inputConfig}
+      stringMode
+    />
+  );
+
   return (
     <div
       ref={wrapperRef}
-      className={classNames(styles.inputNumberWrapper, wrapperClassName, {
-        [styles.inputNumberWrapperClear]: showClear,
-        [styles.hasAddonAfter]: !!addonAfter,
-      })}
+      className={classNames(styles.inputNumberWrapper, wrapperClassName)}
     >
-      <AntdInputNumber
-        ref={ref}
-        value={_value}
-        onChange={(e) => {
-          const newValue =
-            e === null || e === undefined
-              ? ""
-              : (typeof e === "number" ? e : e || "").toString();
-          setValue(newValue);
-        }}
-        className={classNames(styles.antdInput, className)}
-        controls={false}
-        disabled={disabled}
-        addonAfter={addonAfter}
-        {...inputConfig}
-        stringMode
-      />
-      {showClear && (
-        <CloseCircleFilled className={styles.clearIcon} onClick={handleClear} />
+      {addonAfter ? (
+        // antd v6 deprecated `addonAfter` in favour of Space.Compact + Space.Addon
+        <Space.Compact className={styles.compact}>
+          {input}
+          <Space.Addon>{addonAfter}</Space.Addon>
+        </Space.Compact>
+      ) : (
+        input
       )}
     </div>
   );

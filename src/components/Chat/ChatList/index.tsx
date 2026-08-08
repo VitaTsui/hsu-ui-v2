@@ -140,7 +140,10 @@ const ChatList: React.FC<ChatListProps> = (props) => {
       )}
       {list?.map((item, idx) => {
         return (
-          <>
+          // Prefer the message id so a turn keeps its identity when the list grows; streaming
+          // answers append to `list`, and an index-only key would make React re-key every
+          // existing turn on each append.
+          <React.Fragment key={item.query?.messageId ?? idx}>
             <User
               item={item.query}
               hideTool={hideTool}
@@ -169,7 +172,7 @@ const ChatList: React.FC<ChatListProps> = (props) => {
                 noAnswerTip={noAnswerTip}
               />
             )}
-          </>
+          </React.Fragment>
         );
       })}
     </div>

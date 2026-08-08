@@ -1,4 +1,4 @@
-import { Popover, Tabs, Tooltip } from "antd";
+import { Popover, Space, Tabs, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 
 import Icon from "../../Icon";
@@ -108,12 +108,10 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
   };
 
   return (
-    <Input
-      className={styles.iconSelect}
-      value={_value}
-      onChange={_onChange}
-      disabled={disabled}
-      addonAfter={
+    // antd v6 deprecated `addonAfter` in favour of Space.Compact + Space.Addon
+    <Space.Compact className={styles.iconSelect}>
+      <Input value={_value} onChange={_onChange} disabled={disabled} />
+      <Space.Addon>
         <Popover
           placement="bottom"
           trigger="click"
@@ -175,8 +173,8 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
             <Icon icon={_value} />
           </div>
         </Popover>
-      }
-    />
+      </Space.Addon>
+    </Space.Compact>
   );
 };
 

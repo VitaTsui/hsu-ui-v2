@@ -1,78 +1,45 @@
 .inputNumberWrapper {
-  position: relative;
-
   display: inline-flex;
 
   width: 100%;
   height: 100%;
 
+  .compact {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+  }
+
   .antdInput {
     width: 100%;
     height: 100%;
+    min-height: inherit;
 
-    :global(.ant-input-number-wrapper) {
+    // With `addonAfter` the input sits inside a Space.Compact cell, so it must still stretch.
+    flex: 1;
+
+    :global(.ant-input-number-input-wrap),
+    :global(.ant-input-number-input) {
       height: 100%;
       min-height: inherit;
-
-      > :global(.ant-input-number),
-      > :global(.ant-input-number-affix-wrapper) {
-        height: 100%;
-        min-height: inherit;
-      }
-
-      > :global(.ant-input-number) {
-        > :global(.ant-input-number-input-wrap) {
-          height: 100%;
-          min-height: inherit;
-
-          > :global(.ant-input-number-input) {
-            height: 100%;
-            min-height: inherit;
-          }
-        }
-      }
-    }
-
-    > :global(.ant-input-number-input-wrap) {
-      height: 100%;
-      min-height: inherit;
-
-      > :global(.ant-input-number-input) {
-        height: 100%;
-      }
     }
   }
 
-  &.inputNumberWrapperClear {
-    input {
-      padding-right: 33px;
-    }
-  }
-
+  // Rides antd's `suffix` slot, so it needs no positioning of its own — see index.tsx for why the
+  // previous absolute-positioned version had to measure the addon's width.
+  //
+  // antd sets `pointer-events: none` on `.ant-input-number-suffix` so decorative content (units,
+  // status icons) lets clicks fall through to the input. This one is a button, so it opts back in.
   .clearIcon {
-    position: absolute;
-    right: 11px;
-    top: 50%;
-    transform: translateY(-50%);
+    pointer-events: auto;
+
     cursor: pointer;
     color: var(--cf-text-3);
     font-size: 14px;
-    z-index: 1;
     transition: color 0.3s;
 
     &:hover {
       color: var(--cf-text-2);
-    }
-  }
-
-  // Adjust the clear icon position when addonAfter is present
-  // Ant Design's addonAfter generates :global(.ant-input-number-group-addon)
-  // The clear icon needs to shift left to avoid overlapping the addon
-  // Use a CSS variable to set the addon width dynamically; the default 60px is a reasonable estimate
-  // JS computes the actual width and sets the CSS variable to override it
-  &.hasAddonAfter {
-    .clearIcon {
-      right: calc(11px + var(--addon-after-width, 60px));
     }
   }
 }
