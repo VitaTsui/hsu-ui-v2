@@ -12,7 +12,7 @@
 ```bash
 yarn add @hsu-react/ui
 # peerDependencies
-yarn add react react-dom antd @ant-design/icons mobx mobx-react-lite
+yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
 ## 使用

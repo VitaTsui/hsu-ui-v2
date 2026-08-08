@@ -19,8 +19,44 @@ yarn add @hsu-react/ui
 同时确保宿主项目已安装 peerDependencies：
 
 ```bash
-yarn add react react-dom antd @ant-design/icons mobx mobx-react-lite
+yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
+
+## 从 0.0.x 升级到 0.1.0
+
+0.1.0 有两处破坏性变更，都需要宿主项目配合。
+
+### 1. antd 必须同时升到 v6
+
+peerDependencies 收紧为 `antd >=6` / `@ant-design/icons >=6`。**antd 5 与 6 无法同时兼容**，本库与宿主项目要同一批次升级。antd 官方迁移文档见 [v5 to v6](https://ant.design/docs/react/migration-v6-cn)。
+
+对宿主项目的直接影响：
+
+- `@ant-design/icons` 必须一并升到 v6（v6 与 antd 5 不兼容）
+- 如果你的项目里写过针对 antd 内部类名的样式覆盖，v6 重构了 **Select / Checkbox / Radio** 的 DOM，这些需要重写：
+
+  | v5 | v6 |
+  | --- | --- |
+  | `.ant-select-selector`（子节点承载边框/背景/内边距） | 移到 `.ant-select` 根节点，布局改为 flex |
+  | `.ant-select-selection-wrap` / `-selection-search` | 合并为 `.ant-select-content` > `input.ant-select-input` |
+  | `.ant-select-selection-item`（单选值） | 单选进 `.ant-select-content`；该类名仅在多选下作为 tag 保留 |
+  | `.ant-select-selection-placeholder` | `.ant-select-placeholder` |
+  | `.ant-select-arrow` | `.ant-select-suffix`（在 flex 流内，不再绝对定位） |
+  | `.ant-checkbox-inner` / `.ant-radio-inner` | 方框直接画在 `.ant-checkbox` / `.ant-radio` 上 |
+  | `.ant-tabs-tabpane` | `.ant-tabs-tabpanel` |
+  | `.ant-tabs-content-holder` | 已移除，`.ant-tabs-content` 直接接管 |
+
+- 若用 Tooltip / Popover / Dropdown 包裹自定义组件：v6 的 Trigger 直接给子节点传 ref（v5 有 `findDOMNode` 兜底），普通函数组件会告警且接不到 Trigger 注入的事件，需要改成 `forwardRef`
+
+本库自身的公开 props 名**未改**（`popupClassName`、`onDropdownVisibleChange`、`destroyOnClose` 等仍可用，内部已转发到 v6 的新 API）。
+
+### 2. Chakra UI 已移除
+
+`@chakra-ui/react` 与 `@emotion/*` 不再是依赖。
+
+- `Button.Chakra` → `Button.Basic`，`ChakraButtonProps` → `BasicButtonProps`。旧名保留为**已废弃别名**，源码可以先不改
+- **但 chakra 的样式属性（`px`、`bg`、`_hover` 等）不再支持** —— 它们来自 `@chakra-ui/react` 的 `ButtonProps`。升级前请在项目里搜一遍 `beforeButtonGroup` / `affterButtonGroup` / `buttonGroup` 的配置项，把这类属性换成 `className` 或 `variant` / `size` / `colorPalette`
+- 导出的 `ChakraRoot` 已删除；应用入口若还挂着 `ChakraProvider` / `CacheProvider`，可以一并去掉
 
 ## 注入请求与权限
 

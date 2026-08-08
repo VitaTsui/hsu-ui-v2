@@ -14,7 +14,7 @@ features:
     description: Panel / ListPanel / FormItem 等业务组件，列表 + 搜索 + 表单弹窗 + CRUD 一把梭
   - title: 基于 Ant Design
     emoji: 🐜
-    description: 在 antd 5 之上做业务封装，沿用熟悉的 API 与主题令牌，平滑接入存量项目
+    description: 在 antd 6 之上做业务封装，沿用熟悉的 API 与主题令牌，平滑接入存量项目
   - title: 请求层解耦
     emoji: 🔌
     description: 智能组件通过 ConfigProvider 注入请求实现，不绑定任何 HTTP 客户端
@@ -37,7 +37,7 @@ npm i @hsu-react/ui
 yarn add @hsu-react/ui
 ```
 
-> peerDependencies：`react >=18`、`react-dom >=18`、`antd >=5`、`@ant-design/icons >=5`、`mobx >=6`、`mobx-react-lite >=4`，请在宿主项目中安装。
+> peerDependencies：`react >=18`、`react-dom >=18`、`antd >=6`、`@ant-design/icons >=6`、`mobx >=6`、`mobx-react-lite >=4`，请在宿主项目中安装。
 
 ## 一分钟上手
 
