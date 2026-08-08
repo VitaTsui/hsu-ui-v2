@@ -1,3 +1,5 @@
+// 内部这几个按钮此前是 4px 圆角（0.1.0 之前就写死的 4px，改造时只是原样收进了 radius-xs）。
+// 全库按钮统一到 8px 之后，只有步进选择器这几个还是小圆角，并排时很明显。
 .StepPicker {
   display: flex;
   align-items: center;
@@ -10,7 +12,7 @@
       height: var(--vita-control-height);
     }
 
-    border-radius: var(--vita-radius-xs);
+    border-radius: var(--vita-radius);
 
     font-size: 16px;
   }
@@ -22,6 +24,6 @@
     padding: 0px 4px;
 
     font-size: 16px;
-    border-radius: var(--vita-radius-xs);
+    border-radius: var(--vita-radius);
   }
 }

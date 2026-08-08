@@ -52,7 +52,7 @@
         .select {
           font-size: 14px;
           border: 1px solid var(--vita-border);
-          border-radius: var(--vita-radius-xs);
+          border-radius: var(--vita-radius);
           box-shadow: none;
           opacity: 0.8;
           width: 140px;
@@ -91,7 +91,7 @@
   width: var(--vita-control-height);
   height: var(--vita-control-height);
 
-  border-radius: var(--vita-radius-xs);
+  border-radius: var(--vita-radius);
 
   :global(.ant-btn-icon) {
     display: flex;

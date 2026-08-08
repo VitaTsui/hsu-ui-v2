@@ -13,6 +13,8 @@
 }
 
 .RangePicker {
+  // 同 Input.Number：父级无确定高度时避免被内容撑成 33/35。
+  min-height: var(--vita-control-height);
   width: 0;
   flex: 1;
   height: 100%;
@@ -38,6 +40,13 @@
       font-weight: inherit;
       color: inherit;
       text-align: inherit;
+
+      // 字号是 inherit 的（刻意的，控件跟随容器排版）。但 antd 的行高是 1.57 倍字号，
+      // 容器字号一变大，行高 + 上下 padding + 边框就把整个控件顶高：在 16px 的页面里
+      // 实测 25.14 + 8 + 2 = 35，比其他控件高 3px。
+      // DatePicker 有外层 wrapper 兜底，RangePicker 的类直接落在 .ant-picker 上没人拦，
+      // 所以这里固定行高，让外层的 min-height 说了算。
+      line-height: normal;
     }
   }
 }

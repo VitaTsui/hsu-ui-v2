@@ -3,6 +3,10 @@
 
   width: 100%;
   height: 100%;
+  // 父级没有确定高度时 height:100% 退化成 auto，控件就变成内容撑高：
+  // 内层 32 的行高 + 1px 上下边框 = 34，比其他控件高 2px。给个下限兜住，
+  // 与 Select 外框的处理一致。
+  min-height: var(--vita-control-height);
 
   .compact {
     width: 100%;
@@ -18,10 +22,12 @@
     // With `addonAfter` the input sits inside a Space.Compact cell, so it must still stretch.
     flex: 1;
 
+    // 这里刻意不再往下传 min-height。传下去会把内层输入框的内容盒撑到 32，
+    // 外层 .ant-input-number 再加 1px 上下边框就变成 34，比其他控件高 2px。
+    // 高度下限由外层这个带边框的元素自己兜（border-box，正好 32）。
     :global(.ant-input-number-input-wrap),
     :global(.ant-input-number-input) {
       height: 100%;
-      min-height: inherit;
     }
   }
 

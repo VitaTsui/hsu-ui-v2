@@ -159,6 +159,11 @@ export const toAntdTheme = (options?: {
  * 组件级令牌覆盖，补 `toAntdTheme` 里全局令牌覆盖不到的地方。
  */
 export const toAntdComponents = (): ThemeConfig["components"] => ({
+  Table: {
+    // antd 的表格外框取 borderRadiusLG。我们把 LG 定到了 12px（给弹窗、卡片用），
+    // 落到数据表格上显得过圆，且与同屏的输入框 / 按钮（8px）不是一档。收回基准值。
+    borderRadiusLG: raw.radius.base,
+  },
   Button: {
     // antd 的按钮底部有一道 2px 的硬投影（`0 2px 0`），由 controlOutline / controlTmpOutline
     // 推导而来。shadcn 的按钮没有这个东西；而且既然我们把 controlOutline 调深到 35% 用作
