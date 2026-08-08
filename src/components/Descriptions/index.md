@@ -40,6 +40,14 @@ export default () => (
 );
 ```
 
+## 子组件
+
+```tsx | pure
+Descriptions.Item  // antd 的 Descriptions.Item
+```
+
+供 JSX 写法，本库更推荐用 `items` 或 `columns`（`columns` 还带权限过滤与排序）。
+
 ## API
 
 在 [antd DescriptionsProps](https://ant.design/components/descriptions-cn) 基础上扩展：

@@ -64,6 +64,15 @@ export default () => {
 };
 ```
 
+## 子组件
+
+```tsx | pure
+Upload.Dragger      // antd 的拖拽上传区
+Upload.LIST_IGNORE  // beforeUpload 返回它表示「跳过该文件且不进 fileList」
+```
+
+本库的 `Upload` 传 `drop` 属性即可切成拖拽形态；`Upload.Dragger` 是 antd 原生的那个，两者不要混用。
+
 ## API
 
 继承 antd [UploadProps](https://ant.design/components/upload-cn)（移除原 `action`、`data` 后重新定义），新增/重写属性如下：

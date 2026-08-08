@@ -39,6 +39,22 @@ export default () => (
 );
 ```
 
+## 子组件
+
+```tsx | pure
+Table.Drag              // 拖拽排序：Table.Drag.Handle 作为拖拽手柄列
+Table.Summary           // antd 的合计行
+Table.Column            // antd 的 JSX 声明列
+Table.ColumnGroup
+Table.EXPAND_COLUMN     // 展开列占位符，放进 columns 可指定展开图标位置
+Table.SELECTION_COLUMN  // 选择列占位符，同上
+Table.SELECTION_ALL
+Table.SELECTION_INVERT
+Table.SELECTION_NONE
+```
+
+`Summary` 最常用（渲染合计行）。`Column` / `ColumnGroup` 是 antd 的 JSX 列声明写法，与本库的 `columns` 属性是两条路子，混用会绕过本库的列处理管线（权限过滤、宽度分档、省略 tooltip 等），一般不建议。
+
 ## API
 
 在 [antd TableProps](https://ant.design/components/table-cn) 基础上扩展（`scroll`、`pagination`、`columns` 被重写），常用新增/重写属性如下：

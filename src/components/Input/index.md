@@ -148,6 +148,20 @@ export default () => {
 };
 ```
 
+## 验证码输入框
+
+`Input.OTP` 是 antd v6 新增的分格验证码输入框，原样透出。
+
+```tsx
+import React from "react";
+import { Input } from "@hsu-react/ui";
+
+export default () => <Input.OTP length={6} onChange={(v) => console.log(v)} />;
+```
+
+> 子组件一览：`Input.Search`、`Input.TextArea`、`Input.Password`、`Input.Number`、`Input.Range`、`Input.OTP`。
+> 前五个是本库封装（`Number` / `Range` 为本库独有），`OTP` 为 antd 原样透出。
+
 ## API
 
 在 [antd InputProps](https://ant.design/components/input-cn) 基础上扩展（并移除了 `onCompositionStart`、`onCompositionEnd`、`ref`，重写了 `onChange`）：

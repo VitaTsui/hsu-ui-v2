@@ -55,6 +55,15 @@ export default () => (
 );
 ```
 
+## 子组件
+
+```tsx | pure
+Tree.DirectoryTree  // antd 的目录树（文件夹图标 + 目录态选中）
+Tree.TreeNode       // antd 的 JSX 节点声明
+```
+
+`TreeNode` 供 JSX 写法，本库更推荐用 `treeData`。
+
 ## API
 
 在 [antd TreeProps](https://ant.design/components/tree-cn)（已 `Omit` 掉 `treeData`、`loadData`、`loadedKeys`、`titleRender`）基础上扩展：

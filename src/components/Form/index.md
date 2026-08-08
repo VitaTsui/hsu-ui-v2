@@ -157,6 +157,24 @@ export default () => {
 };
 ```
 
+## antd 原生成员
+
+除了上面三个本库封装的表单形态，`Form` 还原样透出了 antd 的成员，省得再单独 `import { Form } from "antd"`：
+
+```tsx | pure
+Form.Item          // antd 的 Form.Item
+Form.List
+Form.ErrorList
+Form.Provider
+Form.useForm
+Form.useWatch
+Form.useFormInstance
+```
+
+> **`Form.Item` 与顶层导出的 `FormItem` 不是一个东西。** `Form.Item` 是 antd 原生的，保持 antd 语义；
+> `FormItem` 是本库的增强版（label 宽度计算、tips 气泡、`hasPermi` 权限、按 `type` 自动生成 placeholder 等）。
+> 刻意不让 `Form.Item` 指向增强版，否则同名不同 API，出问题时很难排查。
+
 ## API
 
 `Form` 是一个对象，包含以下成员：
