@@ -15,7 +15,7 @@ import {
   shouldDisplayExtraItem,
 } from "../_utils";
 import styles from "../index.module.scss";
-import { ChakraButtonProps } from "../../Button";
+import { BasicButtonProps } from "../../Button";
 
 export interface UseSearchCommonParams {
   form: FormInstance;
@@ -23,8 +23,8 @@ export interface UseSearchCommonParams {
   moreSearchItems?: FormItemProps[];
   searchData?: Record<string, unknown>;
   hasPermi?: string[];
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: BasicButtonProps[];
+  affterButtonGroup?: BasicButtonProps[];
   columnNum: number;
   autoAdaptWidth: boolean;
   defaultExpanded: boolean;
@@ -284,7 +284,7 @@ export const useSearchCommon = (
 
   // Check whether the button group contains any permitted button
   const hasPermittedButtons = useCallback(
-    (buttonGroup?: ChakraButtonProps[]) => {
+    (buttonGroup?: BasicButtonProps[]) => {
       if (!buttonGroup?.length) return false;
 
       return buttonGroup.some((button) => checkPermission(button.hasPermi));

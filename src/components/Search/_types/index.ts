@@ -1,7 +1,7 @@
 import { FormInstance } from "antd";
 import { ReactNode } from "react";
 import { FormItemProps } from "../../FormItem";
-import { ChakraButtonProps } from "../../Button";
+import { BasicButtonProps } from "../../Button";
 
 /**
  * Base props interface for the Search component
@@ -16,8 +16,8 @@ export interface BaseSearchProps {
   hasPermi?: string[];
   /** Search item column count (excluding the button group; total column count is columnNum + 1) */
   columnNum?: number;
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: BasicButtonProps[];
+  affterButtonGroup?: BasicButtonProps[];
   searchData?: Record<string, unknown>;
   minLabelWidth?: boolean | number;
   /** Whether expanded by default */

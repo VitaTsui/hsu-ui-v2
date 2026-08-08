@@ -3,10 +3,9 @@ import { ConfigProvider, theme as antdTheme } from "antd";
 
 import { configureRequest } from "../src/request";
 
-// 文档站运行时（umi rootContainer）：与真实项目入口一致，**不**再全局提供 Chakra +
-// emotion cache——那两层已经收进 ChakraButton 自带的 ChakraRoot 里，chakra 因此只
-// 存在于它的异步 chunk。这里保持和消费方入口同构，顺便让「不挂全局 Provider 也能
-// 正常工作」在文档站每次跑 Demo 时都被验证一次。
+// 文档站运行时（umi rootContainer）：与真实项目入口一致，只挂 antd 的 ConfigProvider。
+// 0.1.0 起按钮改为自研（Button.Basic），chakra 与 emotion cache 已整体移除，这里不再需要
+// 任何额外 Provider。
 
 // 给依赖 request 的智能组件（如 ImportForm 下载模板）注入 Demo 用的假请求，避免未注入报错。
 configureRequest({

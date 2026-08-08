@@ -26,7 +26,11 @@ const IframePanel: React.FC<IframePanelProps> = (props) => {
           {children}
         </div>
       ) : (
-        <Spin spinning={spinning} wrapperClassName={styles.spin} size="large">
+        <Spin
+          spinning={spinning}
+          classNames={{ root: styles.spin }}
+          size="large"
+        >
           <iframe {...coreProps} ref={ref} onLoad={() => setSpinning(false)} />
         </Spin>
       )}

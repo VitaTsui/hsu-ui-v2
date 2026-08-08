@@ -5,7 +5,7 @@ import Search, {
 } from "../../../Search";
 import Table, { ColumnsType, TableProps } from "../../../Table";
 
-import { ChakraButtonProps as BasicButtonProps } from "../../../Button";
+import { BasicButtonProps as BasicButtonProps } from "../../../Button";
 import { TabBarProps } from "../../../TabBar";
 import {
   FullscreenExitOutlined,

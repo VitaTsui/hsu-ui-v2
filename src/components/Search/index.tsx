@@ -6,11 +6,11 @@ import SearchWithFilter from "./SearchWithFilter";
 import SearchWithMore from "./SearchWithMore";
 import SearchBase from "./_components/SearchBase";
 import { BaseSearchProps } from "./_types";
-import { ChakraButtonProps } from "../Button";
+import { BasicButtonProps } from "../Button";
 
 export interface SearchProps extends BaseSearchProps {
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: BasicButtonProps[];
+  affterButtonGroup?: BasicButtonProps[];
 }
 
 interface SearchFC extends React.FC<SearchProps> {

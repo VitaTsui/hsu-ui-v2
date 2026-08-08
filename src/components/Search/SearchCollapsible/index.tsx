@@ -3,13 +3,13 @@ import classNames from "classnames";
 import styles from "../index.module.scss";
 import SearchBase from "../_components/SearchBase";
 import { CollapseToggle } from "./_components/CollapseToggle";
-import { ChakraButtonProps } from "../../Button";
+import { BasicButtonProps } from "../../Button";
 import { SearchPropsWithFilter } from "../_types";
 
 export interface SearchCollapsibleProps extends SearchPropsWithFilter {
   onCollapseToggle?: (collapse: boolean) => void;
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: BasicButtonProps[];
+  affterButtonGroup?: BasicButtonProps[];
 }
 
 /**

@@ -12,7 +12,7 @@ import Search, {
   SearchModePropsMap,
 } from "../../Search";
 import Table, { ColumnsType, TableProps } from "../../Table";
-import { ChakraButtonProps as BasicButtonProps } from "../../Button";
+import { BasicButtonProps as BasicButtonProps } from "../../Button";
 import TabBar, { TabBarProps } from "../../TabBar";
 import classNames from "classnames";
 import { cloneDeep } from "lodash";

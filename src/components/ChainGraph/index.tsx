@@ -155,7 +155,7 @@ const ChainGraph: React.FC<ChainGraphProps> = observer((props) => {
   return (
     <Spin
       spinning={loading || (isLayouting && !!data?.children?.length)}
-      wrapperClassName={classNames(styles.spinWrapper, wrapperClassName)}
+      classNames={{ root: classNames(styles.spinWrapper, wrapperClassName) }}
     >
       <div
         className={`${styles.ChainGraph} ${className}`}

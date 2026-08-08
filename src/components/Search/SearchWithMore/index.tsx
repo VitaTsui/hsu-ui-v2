@@ -1,14 +1,14 @@
 import React from "react";
 import { FormItemProps } from "../../FormItem";
 import SearchBase from "../_components/SearchBase";
-import { ChakraButtonProps } from "../../Button";
+import { BasicButtonProps } from "../../Button";
 import { SearchPropsWithFilter } from "../_types";
 
 export interface SearchWithMoreProps
   extends Omit<SearchPropsWithFilter, "moreSearchItems"> {
   moreSearchItems: FormItemProps[];
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: BasicButtonProps[];
+  affterButtonGroup?: BasicButtonProps[];
 }
 
 /**

@@ -246,8 +246,8 @@ export default () => (
 | externalForm | 外部传入的表单实例 | `FormInstance` | - |
 | hasPermi | 权限码；无权限时不渲染 | `string[]` | - |
 | columnNum | 搜索项列数（按钮组额外占一列） | `number` | `4` |
-| beforeButtonGroup | 查询 / 重置按钮前的附加按钮 | `ChakraButtonProps[]` | - |
-| affterButtonGroup | 查询 / 重置按钮后的附加按钮 | `ChakraButtonProps[]` | - |
+| beforeButtonGroup | 查询 / 重置按钮前的附加按钮 | `BasicButtonProps[]` | - |
+| affterButtonGroup | 查询 / 重置按钮后的附加按钮 | `BasicButtonProps[]` | - |
 | searchData | 搜索项的初始值 | `Record<string, unknown>` | - |
 | minLabelWidth | 标签最小宽度，或是否启用最小宽度 | `boolean \| number` | - |
 | defaultExpanded | 默认是否展开 | `boolean` | `false` |

@@ -1,11 +1,9 @@
 import React from "react";
-import Button, {
-  ChakraButtonProps as BasicButtonProps,
-} from "../../../Button";
+import Button, { BasicButtonProps } from "../../../Button";
 import { ReactNode } from "react";
 import styles from "../../index.module.scss";
 
-interface ChakraButtonProps extends Omit<
+interface GroupButtonProps extends Omit<
   BasicButtonProps,
   "children" | "title"
 > {
@@ -13,8 +11,8 @@ interface ChakraButtonProps extends Omit<
 }
 
 interface ButtonGroupProps {
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: GroupButtonProps[];
+  affterButtonGroup?: GroupButtonProps[];
   expandButton?: ReactNode;
   children?: ReactNode;
   permitted?: boolean;
@@ -41,18 +39,18 @@ export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
         {beforeButtonGroup?.map((button, idx) => {
           const { title, ...buttonProps } = button;
           return (
-            <Button.Chakra key={idx} variant="surface" {...buttonProps}>
+            <Button.Basic key={idx} variant="surface" {...buttonProps}>
               {title}
-            </Button.Chakra>
+            </Button.Basic>
           );
         })}
         {permitted && children}
         {affterButtonGroup?.map((button, idx) => {
           const { title, ...buttonProps } = button;
           return (
-            <Button.Chakra key={idx} variant="surface" {...buttonProps}>
+            <Button.Basic key={idx} variant="surface" {...buttonProps}>
               {title}
-            </Button.Chakra>
+            </Button.Basic>
           );
         })}
         {permitted && expandButton}

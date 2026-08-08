@@ -3,14 +3,14 @@ import classNames from "classnames";
 import styles from "../index.module.scss";
 import SearchBase from "../_components/SearchBase";
 import { AdvancedFiltersDrawer } from "./_components/AdvancedFiltersDrawer";
-import { ChakraButtonProps } from "../../Button";
+import { BasicButtonProps } from "../../Button";
 import { DrawerFormProps } from "../../Form/DrawerForm";
 import { SearchPropsWithFilter } from "../_types";
 
 export interface SearchAdvancedProps extends SearchPropsWithFilter {
   advancedFiltersProps?: DrawerFormProps;
-  beforeButtonGroup?: ChakraButtonProps[];
-  affterButtonGroup?: ChakraButtonProps[];
+  beforeButtonGroup?: BasicButtonProps[];
+  affterButtonGroup?: BasicButtonProps[];
 }
 
 /**

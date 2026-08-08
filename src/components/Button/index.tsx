@@ -1,26 +1,27 @@
 import { Button as AntdButton, ButtonProps as AntdButtonProps } from "antd";
 
-import React, { Suspense, lazy } from "react";
+import React from "react";
 import usePermissions from "../../hooks/usePermissions";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import type { ChakraButtonProps } from "./ChakraButton";
+import BasicButton from "./BasicButton";
+import type { BasicButtonProps } from "./BasicButton";
 
-export type { ChakraButtonProps };
+export type {
+  BasicButtonProps,
+  BasicButtonVariant,
+  BasicButtonSize,
+  BasicButtonPalette,
+} from "./BasicButton";
 
 /**
- * The chakra family weighs about 560 KB and serves only the Button.Chakra variant, yet it
- * lands in every consumer's initial bundle because it hangs off the base Button. Switched to
- * on-demand loading: the type goes through `import type` (erased at compile time), and the
- * chunk is only fetched at runtime once Button.Chakra is actually rendered.
+ * @deprecated renamed to `BasicButtonProps` — the button is no longer backed by Chakra.
+ *
+ * The shape is nearly identical, but Chakra's style props (`px`, `bg`, `_hover`, …) are gone:
+ * they came from `@chakra-ui/react`'s `ButtonProps`, which this library no longer depends on.
+ * Use `className` or the `variant` / `size` / `colorPalette` props instead.
  */
-const InternalChakraButton = lazy(() => import("./ChakraButton"));
-
-const ChakraButton: React.FC<ChakraButtonProps> = (props) => (
-  <Suspense fallback={null}>
-    <InternalChakraButton {...props} />
-  </Suspense>
-);
+export type ChakraButtonProps = BasicButtonProps;
 
 export interface ButtonProps extends AntdButtonProps {
   hasPermi?: string[];
@@ -32,7 +33,10 @@ interface ButtonFC
   extends React.ForwardRefExoticComponent<
     ButtonProps & React.RefAttributes<HTMLButtonElement>
   > {
-  Chakra: React.FC<ChakraButtonProps>;
+  /** The library's own button — antd-free, styled from the design tokens */
+  Basic: typeof BasicButton;
+  /** @deprecated use `Button.Basic`; this is the same component, kept for source compatibility */
+  Chakra: typeof BasicButton;
 }
 
 // forwardRef: when wrapped by overlay components like Tooltip / Popconfirm, the button DOM can be accessed directly,
@@ -69,6 +73,7 @@ const InternalButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 const Button = InternalButton as ButtonFC;
 
-Button.Chakra = ChakraButton;
+Button.Basic = BasicButton;
+Button.Chakra = BasicButton;
 
 export default Button;
