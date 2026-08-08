@@ -10,7 +10,21 @@ const loadMermaid = () => {
     mermaidPromise = import("mermaid").then((m) => {
       m.default.initialize({
         startOnLoad: false,
-        securityLevel: "loose",
+        // mermaid 默认就是 strict，这里此前改成了 loose。改回来的原因：
+        //
+        // Markdown 渲染的是不可信内容 —— Chat 的用户消息、AI 回复、以及 FilePreview 打开的
+        // .md 文件，任何一处都能塞一段 ```mermaid。而 loose 恰好放开了两个交互面
+        // （mermaid 源码 chunk-ICXQ74PX / chunk-V7JOEXUC）：
+        //
+        //   formatUrl:    if (securityLevel !== "loose") return sanitizeUrl(url);
+        //   setClickFunc: if (securityLevel !== "loose") return;
+        //
+        // 即 loose 下 `click A "javascript:..."` 的 URL 不过 sanitizeUrl，
+        // `click A call fn()` 还能经 runFunc 沿 window[...] 调到任意全局函数。
+        // 图本身的标签文本倒是不受影响 —— 那条路径无论哪个 level 都会过 DOMPurify。
+        //
+        // strict 下这两条都关掉，图形渲染不受影响；本库也从未对外暴露过 mermaid 的交互能力。
+        securityLevel: "strict",
         theme: "neutral",
       });
       return m.default;

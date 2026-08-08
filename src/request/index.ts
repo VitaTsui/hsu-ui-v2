@@ -41,7 +41,14 @@ let impl: RequestImpl = {
 
 /** Inject the real request implementation (only the methods you use need to be provided) */
 export const configureRequest = (request: Partial<RequestImpl>): void => {
-  impl = { ...impl, ...request } as RequestImpl;
+  // 过滤 undefined：`configureRequest({ get: undefined })` 会把键写进去、值为 undefined，
+  // 从而覆盖掉上面那个抛错兜底 —— 调用时报的就成了 "impl.get is not a function"，
+  // 而不是那句告诉你「忘了注入 request」的提示。
+  const provided = Object.fromEntries(
+    Object.entries(request).filter(([, fn]) => typeof fn === "function")
+  ) as Partial<RequestImpl>;
+
+  impl = { ...impl, ...provided } as RequestImpl;
 };
 
 export const get: RequestImpl["get"] = (url, config) => impl.get(url, config);

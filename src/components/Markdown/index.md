@@ -64,6 +64,28 @@ export default () => {
 };
 ```
 
+## Mermaid 图表
+
+代码块语言标为 `mermaid` 时会渲染成图。语法不完整时（比如流式输出到一半）静默回退成代码块展示。
+
+> 出于安全考虑用的是 mermaid 的默认 `securityLevel: "strict"`：Markdown 渲染的往往是不可信内容（聊天消息、AI 回复、上传的 .md），而 `loose` 会放开 `click` 交互 —— 链接 URL 不过 `sanitizeUrl`，且能经 `runFunc` 调到任意全局函数。图形渲染本身不受影响。
+
+```tsx
+import React from "react";
+import { Markdown } from "@hsu-react/ui";
+
+const content = `\`\`\`mermaid
+flowchart LR
+  A[开始] --> B{判断}
+  B -->|是| C[处理]
+  B -->|否| D[跳过]
+  C --> E[结束]
+  D --> E
+\`\`\``;
+
+export default () => <Markdown.Views>{content}</Markdown.Views>;
+```
+
 ## API
 
 ### Markdown.Views

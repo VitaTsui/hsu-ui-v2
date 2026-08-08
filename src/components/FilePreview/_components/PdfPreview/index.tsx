@@ -198,8 +198,11 @@ const PdfPreview: React.FC<PdfPreviewProps> = (props) => {
                 [styles.disabled]: loading || !fileUrl || full,
               })}
               onClick={() => {
-                if (fileUrl && !full) {
-                  window.open(fileUrl, "_blank");
+                // 只放行可导航的协议。fileUrl 通常来自后端，但 FilePreview 展示的本就是
+                // 用户上传的文件，若这个值一路从用户数据流下来，javascript: 会在
+                // 本站源里执行。noopener 同时切断被打开页对 window.opener 的访问。
+                if (fileUrl && !full && /^(https?:|blob:|\/)/i.test(fileUrl)) {
+                  window.open(fileUrl, "_blank", "noopener,noreferrer");
                 }
               }}
             >
