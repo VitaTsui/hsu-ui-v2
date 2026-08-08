@@ -92,6 +92,6 @@ export default () => (
 | contentText | 标题下方的补充说明文案 | `ReactNode` | - |
 | children | 触发元素；不传 `open` 时弹窗自持开关状态 | `ReactElement` | - |
 
-> 其余属性（`open`、`onOk`、`onCancel`、`width`、`confirmLoading` 等）与 `Modal` 一致；组件内部默认 `width={800}`、`centered`、`maskClosable={false}`、`mask={false}`。
+> 其余属性（`open`、`onOk`、`onCancel`、`width`、`confirmLoading` 等）与 `Modal` 一致；组件内部默认 `width={800}`、`centered`，并关掉遮罩（antd v6 把 `mask` / `maskClosable` 合并成了一个配置对象，这里传的是 `mask={{ enabled: false, closable: false }}`）。
 >
 > `open` 传了就是受控（含 `undefined` 以外的任何值），`onOk` / `onCancel` 里需自行关闭；不传则由组件自行开关，`onOk` 只写业务动作即可。

@@ -56,4 +56,6 @@ export default () => {
 | full | 是否以全屏方式展示 | `boolean` | `false` |
 | titleButtonGroup | 标题区右侧的按钮组配置 | `ButtonProps[]` | - |
 
-> 其余属性（`open`、`onOk`、`onCancel`、`footer`、`width` 等）与 antd `Modal` 一致；`destroyOnClose` 默认为 `true`。
+> 其余属性（`open`、`onOk`、`onCancel`、`footer`、`width` 等）与 antd `Modal` 一致。
+>
+> 关闭时销毁内容默认开启。antd v6 把 `destroyOnClose` 改名为 `destroyOnHidden`，两个名字本组件都认（传了 `destroyOnHidden` 以它为准），所以 0.0.x 时期的写法不用改。
