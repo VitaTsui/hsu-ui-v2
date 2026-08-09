@@ -39,7 +39,7 @@ export default () => (
 
 `variant` 与 `color` 直接用 antd v6 的原生能力：6 种形态 × 16 个预设色。
 
-> **0.1.0 破坏性变更**：`Button.Chakra`（后改名 `Button.Basic`）这个子组件**已删除**。
+> **2.0 破坏性变更**：`Button.Chakra`（后改名 `Button.Basic`）这个子组件**已删除**。
 >
 > 它当初存在是因为 antd v5 的 Button 只有 `type`，表达不了 outline / subtle / ghost 这些形态，于是引了 Chakra UI 来补。antd v6 原生加了 `color` + `variant`，正好就是它存在的理由，所以整个删掉、`Button` 重新成为唯一的按钮，chakra 全家（约 560 KB）也一并移除。
 >

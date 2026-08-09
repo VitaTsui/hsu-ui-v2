@@ -22,6 +22,15 @@ yarn add @hsu-react/ui
 yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
+### 两条版本线
+
+| 版本线 | 依赖 | 说明 |
+| --- | --- | --- |
+| **2.x** | antd v6 | 当前线。`npm i @hsu-react/ui` 默认装到这条 |
+| **1.x** | antd v5 | 维持 antd v5 的项目留在这条：`npm i @hsu-react/ui@1` |
+
+1.x 与 2.x 的差异见下面的[升级说明](#从-1x-升级到-20)。两条线的 API 大体一致，2.0 的破坏性变更集中在 antd 大版本、Chakra 移除与设计变量改名这三处。
+
 ## 浏览器支持
 
 **Chrome / Edge ≥ 111、Safari ≥ 16.4、Firefox ≥ 121**，即 2023 年底之后的版本。与 [antd v6 的口径](https://ant.design/docs/react/introduce-cn#%E7%8E%AF%E5%A2%83%E6%94%AF%E6%8C%81)（现代浏览器 / last 2 versions）一致，不支持 IE。
@@ -35,15 +44,15 @@ yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 | `@container style()` | antd v6 的 Descriptions | 111 | 18 | 尚不支持 | 该组件的自适应宽度退化 |
 | `overflow: clip` | Slider 等 | 90 | 16 | 81 | 溢出内容裁切位置不对 |
 
-`:has()` 的下限由 antd v6 决定，本库降不下去；`color-mix()` 则是本库自己的令牌层引入的（0.0.x 没有用到）。
+`:has()` 的下限由 antd v6 决定，本库降不下去；`color-mix()` 则是本库自己的令牌层引入的（1.x 没有用到）。
 
 > 本库仍导出 `supportsHasSelector` / `isLegacyHasSelectorBrowser` 两个运行时探测函数，早期用来给不支持 `:has()` 的浏览器兜底。**antd v6 之后它们已经买不到兼容性**——底下的 antd 组件同样在用 `:has()` 且没有降级。保留导出只为兼容既有调用方，新代码不必再用。
 
-如果项目必须支持更老的浏览器（Firefox 115 ESR、Safari 15 之类），只能停留在 0.0.x + antd v5。
+如果项目必须支持更老的浏览器（Firefox 115 ESR、Safari 15 之类），只能停留在 1.x + antd v5。
 
-## 从 0.0.x 升级到 0.1.0
+## 从 1.x 升级到 2.0
 
-0.1.0 有三处破坏性变更，都需要宿主项目配合。
+2.0.0 有三处破坏性变更，都需要宿主项目配合。
 
 ### 1. antd 必须同时升到 v6
 
@@ -80,7 +89,7 @@ peerDependencies 收紧为 `antd >=6` / `@ant-design/icons >=6`。**antd 5 与 6
 ### 3. 设计变量改名，且 ConfigProvider 开始接管 antd 主题
 
 - CSS 变量 `--cf-*` 改为语义化的 `--vita-*`（见下方「设计令牌与主题」）。旧名**全部保留为兼容别名**，样式里既有的覆盖不会失效
-- JS 侧 `lightTokens` / `darkTokens` 的**字段名**也一并改了（`canvas` → `background`、`text` → `foreground` 等）。旧字段同样保留，但标记为 deprecated，建议改用新名。其中 `headerBg` 在新命名里没有对应项，别名指向 `surface`（0.1.0 之前两者取值本就一致）
+- JS 侧 `lightTokens` / `darkTokens` 的**字段名**也一并改了（`canvas` → `background`、`text` → `foreground` 等）。旧字段同样保留，但标记为 deprecated，建议改用新名。其中 `headerBg` 在新命名里没有对应项，别名指向 `surface`（2.0 之前两者取值本就一致）
 - `ConfigProvider` 现在默认会把令牌喂给 antd 的 `theme.token`。若你的应用入口已经自己包了一层 antd `ConfigProvider` 做主题，两者会按 antd 的规则就近合并（内层胜）；不希望本库插手就传 `antdTheme={false}`
 - 换品牌色请改用 `<ConfigProvider primaryColor="...">`，它会同时设置 CSS 变量与 antd 的 `colorPrimary`；只覆盖 `--primary-color` 的老写法仍然有效，但**只影响 CSS 侧**，antd 组件不会跟着变
 - 观感整体向 shadcn/ui 靠拢：中性色改为 zinc 色阶、圆角基准从 6px 调到 8px、阴影收薄。页面里若有依赖旧视觉的像素级微调，需要复核
@@ -131,7 +140,7 @@ import { get, post, del, put } from "@/services/Axios";
 
 这一个属性会同时设置 CSS 变量与 antd 的 `colorPrimary`。**不要只覆盖 CSS 变量** —— 那样 antd 组件不会跟着变。
 
-（`--primary-color` 仍然有效：`--vita-primary` 反过来引用它，所以 0.0.x 时期的覆盖写法不会失效，只是同样只影响 CSS 侧。）
+（`--primary-color` 仍然有效：`--vita-primary` 反过来引用它，所以 1.x 时期的覆盖写法不会失效，只是同样只影响 CSS 侧。）
 
 ### 明暗
 
@@ -150,7 +159,7 @@ CSS 变量自己监听 `html[data-theme="dark"]`；antd 的令牌是 JS 算的�
 --vita-focus-ring / --vita-focus-ring-error
 ```
 
-> 0.1.0 之前这套变量叫 `--cf-*`，全部保留为指向新名的兼容别名，既有覆盖不会失效。
+> 2.0 之前这套变量叫 `--cf-*`，全部保留为指向新名的兼容别名，既有覆盖不会失效。
 
 ### 不想让本库管 antd 主题
 

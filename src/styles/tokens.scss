@@ -8,7 +8,7 @@
 
 :root {
   // ---- 品牌色 ----
-  // 兼容位：0.1.0 之前消费方就是通过覆盖 --primary-color 换主题色的，
+  // 兼容位：2.0 之前消费方就是通过覆盖 --primary-color 换主题色的，
   // 所以真源反过来引用它，两种写法都生效。
   --primary-color: #1677ff;
   --vita-primary: var(--primary-color);
@@ -63,7 +63,7 @@
   --vita-screen-xl: 1280px;
   --vita-screen-xxl: 1536px;
 
-  // ---- 兼容别名（0.1.0 前的 --cf-*，单向指向新名）----
+  // ---- 兼容别名（2.0 前的 --cf-*，单向指向新名）----
   --cf-canvas: var(--vita-background);
   --cf-surface: var(--vita-surface);
   --cf-subtle: var(--vita-muted);

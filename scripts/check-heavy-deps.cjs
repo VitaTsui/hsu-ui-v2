@@ -28,7 +28,7 @@ const GUARDED_ENTRIES = [
   // Panel.List 会经 Search 用到 FormItem，同属高频入口
   "components/Panel/index.js",
   // 全库最基础的组件，页面/弹窗/工具栏无处不引。0.0.23 时 Button.Chakra 曾把 chakra 全家
-  // （chakra-ui + zag-js + floating-ui + emotion，实测约 560 KB）带进每个首屏；0.1.0 起
+  // （chakra-ui + zag-js + floating-ui + emotion，实测约 560 KB）带进每个首屏；2.0 起
   // 按钮改为自研、chakra 已整体移除，但这个入口的高频属性没变，守卫继续保留
   "components/Button/index.js",
 ];
@@ -64,7 +64,7 @@ const HEAVY = [
   // 图标集数据（四套约 1.9 MB）。注意只拉黑数据包 @iconify/json，
   // 渲染用的 @iconify/react 很小且被 Icon 组件正常静态引入
   "@iconify/json",
-  // 0.1.0 起已不是依赖（按钮改自研）；留在黑名单里作为回归护栏，防止有人再引回来
+  // 2.0 起已不是依赖（按钮改自研）；留在黑名单里作为回归护栏，防止有人再引回来
   "@chakra-ui/react",
   // 布局组件专用，且是**可选** peerDependency。它们一旦从高频入口静态可达，没装
   // react-router 的项目连 import Button 都会构建失败 —— 可选就失去意义了。

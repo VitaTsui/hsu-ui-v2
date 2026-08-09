@@ -18,7 +18,7 @@ export interface ConfigProviderProps {
   request?: Partial<RequestImpl>;
   /**
    * Brand colour. Sets both halves of the token layer at once: the `--vita-primary` CSS variable
-   * (via `--primary-color`, so pre-0.1.0 overrides keep working) and antd's `colorPrimary`.
+   * (via `--primary-color`, so pre-2.0 overrides keep working) and antd's `colorPrimary`.
    *
    * Setting the CSS variable by hand only moves this library's own styles — antd derives a
    * 10-step palette from the JS token and cannot read a `var()`. Going through this prop is what

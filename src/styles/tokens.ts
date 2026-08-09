@@ -42,10 +42,10 @@ export interface HsuThemeTokens {
 }
 
 /**
- * 0.1.0 之前的字段名。CSS 变量那侧留了 `--cf-*` 别名，但这里的 TS 字段是直接改名的 ——
+ * 2.0 之前的字段名。CSS 变量那侧留了 `--cf-*` 别名，但这里的 TS 字段是直接改名的 ——
  * 消费方写 `lightTokens.canvas` 会直接拿到 undefined，且没有任何提示。补上映射。
  *
- * `headerBg` 在重命名时被整个删掉了（没有对应的新名），这里指回 `surface`：0.1.0 之前
+ * `headerBg` 在重命名时被整个删掉了（没有对应的新名），这里指回 `surface`：2.0 之前
  * 两者在浅色下同为 #ffffff、暗色下同为卡片底色，语义上就是「顶栏用的面」。
  */
 export interface LegacyThemeTokens {

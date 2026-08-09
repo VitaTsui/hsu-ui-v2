@@ -10,7 +10,7 @@ title: Pagination 分页
 
 在 antd `Pagination` 之上封装：`pageSizeOptions` 收成数字数组、页数与每页条数可以完全不受控、外加一套用于「不知道总数」场景的简洁模式。
 
-0.0.25 起从 `Table` 内部提升为公开组件 —— `Table` 的内置分页用的就是它。
+1.0.0 起从 `Table` 内部提升为公开组件 —— `Table` 的内置分页用的就是它。
 
 ## 引入
 

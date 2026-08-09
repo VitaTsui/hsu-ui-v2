@@ -53,7 +53,7 @@ Select.Option        // antd 的 Select.Option
 Select.OptGroup      // antd 的 Select.OptGroup
 ```
 
-前三个是本库自己的封装，0.1.0 之前只在库内部使用、并未对外导出。`Option` / `OptGroup` 是 antd 原样透出，供 JSX 写法 —— 本库更推荐用 `options` 属性，选项多时性能也更好。
+前三个是本库自己的封装，2.0 之前只在库内部使用、并未对外导出。`Option` / `OptGroup` 是 antd 原样透出，供 JSX 写法 —— 本库更推荐用 `options` 属性，选项多时性能也更好。
 
 ## API
 

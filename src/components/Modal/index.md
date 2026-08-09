@@ -54,7 +54,7 @@ Modal.destroyAll
 Modal.config
 ```
 
-0.1.0 之前这些没有透出，消费方只能自己去 `import { Modal } from "antd"`。
+2.0 之前这些没有透出，消费方只能自己去 `import { Modal } from "antd"`。
 
 > **这里的 `Modal.confirm` 会跟随主题**，与 antd 的同名静态方法不同。
 >
@@ -77,4 +77,4 @@ Modal.config
 
 > 其余属性（`open`、`onOk`、`onCancel`、`footer`、`width` 等）与 antd `Modal` 一致。
 >
-> 关闭时销毁内容默认开启。antd v6 把 `destroyOnClose` 改名为 `destroyOnHidden`，两个名字本组件都认（传了 `destroyOnHidden` 以它为准），所以 0.0.x 时期的写法不用改。
+> 关闭时销毁内容默认开启。antd v6 把 `destroyOnClose` 改名为 `destroyOnHidden`，两个名字本组件都认（传了 `destroyOnHidden` 以它为准），所以 1.x 时期的写法不用改。

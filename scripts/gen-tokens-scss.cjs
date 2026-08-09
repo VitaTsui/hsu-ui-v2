@@ -43,7 +43,7 @@ const THEMED = [
 ];
 
 /**
- * 旧变量名 -> 新变量名。0.1.0 之前的 --cf-* 全部保留为单向别名，
+ * 旧变量名 -> 新变量名。2.0 之前的 --cf-* 全部保留为单向别名，
  * 消费方项目里既有的覆盖不会一夜失效。
  */
 const LEGACY = [
@@ -85,7 +85,7 @@ lines.push("// =============================================================");
 lines.push("");
 lines.push(":root {");
 lines.push("  // ---- 品牌色 ----");
-lines.push("  // 兼容位：0.1.0 之前消费方就是通过覆盖 --primary-color 换主题色的，");
+lines.push("  // 兼容位：2.0 之前消费方就是通过覆盖 --primary-color 换主题色的，");
 lines.push("  // 所以真源反过来引用它，两种写法都生效。");
 lines.push(`  --primary-color: ${tokens.primary};`);
 lines.push("  --vita-primary: var(--primary-color);");
@@ -134,7 +134,7 @@ for (const [name, value] of Object.entries(tokens.breakpoint)) {
   lines.push(`  --vita-screen-${name}: ${value}px;`);
 }
 lines.push("");
-lines.push("  // ---- 兼容别名（0.1.0 前的 --cf-*，单向指向新名）----");
+lines.push("  // ---- 兼容别名（2.0 前的 --cf-*，单向指向新名）----");
 for (const [oldName, newName] of LEGACY) {
   lines.push(`  ${oldName}: var(${newName});`);
 }
