@@ -1,7 +1,13 @@
 name: release
 on:
   push:
-    branches: [main]
+    # main = 当前大版本；<major>.x = 旧大版本的长期维护分支（如 1.x）
+    #
+    # 注意：push 触发的 workflow 用的是**被推分支上的那份文件**。所以这个文件必须同时
+    # 存在于每一条维护分支上，否则往 1.x 推什么都不会发生。
+    branches:
+      - main
+      - "[0-9]+.x"
 
 jobs:
   release:
@@ -13,11 +19,33 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 读取版本号并检查 tag
+      - name: 读取版本号、决定 dist-tag 并检查 tag
         id: ver
+        env:
+          BRANCH: ${{ github.ref_name }}
         run: |
-          TAG="v$(node -p "require('./package.json').version")"
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          MAJOR=${VERSION%%.*}
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+          # dist-tag：main 发 latest；维护分支发 v<major>，绝不能抢走 latest，
+          # 否则一次 1.x 的补丁发布会让所有人的 `npm i` 退回旧大版本。
+          # 装 1.x 本身不依赖这个 dist-tag —— `npm i @hsu-react/ui@1` 走的是 semver。
+          if [ "$BRANCH" = "main" ]; then
+            echo "dist_tag=latest" >> "$GITHUB_OUTPUT"
+            echo "latest_flag=--latest" >> "$GITHUB_OUTPUT"
+          else
+            BRANCH_MAJOR=${BRANCH%%.x}
+            if [ "$MAJOR" != "$BRANCH_MAJOR" ]; then
+              echo "::error::分支 $BRANCH 上的版本号是 $VERSION，大版本对不上。维护分支只能发 ${BRANCH_MAJOR}.x.x"
+              exit 1
+            fi
+            echo "dist_tag=v$MAJOR" >> "$GITHUB_OUTPUT"
+            # 维护分支的 Release 不该顶掉仓库首页显示的 "Latest"
+            echo "latest_flag=--latest=false" >> "$GITHUB_OUTPUT"
+          fi
+
           if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "tag $TAG 已存在，跳过发布"
@@ -46,12 +74,16 @@ jobs:
 
       - name: 发布 npm
         if: steps.ver.outputs.skip != 'true' && steps.npmver.outputs.published != 'true'
-        run: npm publish --access public
+        run: npm publish --access public --tag "${{ steps.ver.outputs.dist_tag }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 打 tag 并生成 Release
         if: steps.ver.outputs.skip != 'true'
-        run: gh release create "${{ steps.ver.outputs.tag }}" --generate-notes --target main
+        run: |
+          gh release create "${{ steps.ver.outputs.tag }}" \
+            --generate-notes \
+            --target "${{ github.ref_name }}" \
+            "${{ steps.ver.outputs.latest_flag }}"
         env:
           GH_TOKEN: ${{ github.token }}

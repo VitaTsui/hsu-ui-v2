@@ -7,17 +7,27 @@ jobs:
   branch-flow:
     runs-on: ubuntu-latest
     steps:
+      # 分支布局：
+      #   main            当前大版本，合并即发布 latest
+      #   develop         当前大版本的集成分支，功能分支都合到这里
+      #   <major>.x       旧大版本的长期维护分支（如 1.x），只收 bugfix，独立发布
       - name: 校验合并流向
         env:
           BASE: ${{ github.base_ref }}
           HEAD: ${{ github.head_ref }}
         run: |
+          # 维护分支：既可以作为目标（bugfix 合进来），也可以作为来源（回合到 main 之外的地方不限制）
+          if echo "$BASE" | grep -qE '^[0-9]+\.x$'; then
+            echo "合并流向合法（维护分支）：$HEAD -> $BASE"
+            exit 0
+          fi
+
           if [ "$BASE" = "main" ] && [ "$HEAD" != "develop" ]; then
             echo "::error::main 只允许从 develop 合并，当前来源分支：$HEAD"
             exit 1
           fi
           if [ "$BASE" != "main" ] && [ "$BASE" != "develop" ]; then
-            echo "::error::功能分支只允许合并到 develop，当前目标分支：$BASE"
+            echo "::error::目标分支只能是 main、develop 或维护分支（如 1.x），当前：$BASE"
             exit 1
           fi
           echo "合并流向合法：$HEAD -> $BASE"

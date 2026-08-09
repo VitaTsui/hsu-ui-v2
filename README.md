@@ -66,7 +66,9 @@ yarn docs:build  # 构建文档站静态产物
 
 ## 贡献
 
-日常开发在 `develop` 分支进行（feature 分支合入 `develop`），`main` 只接受来自 `develop` 的 PR；合入 `main` 后按 `package.json` 版本自动打 tag 并发布 npm。PR 标题遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
+日常开发在 `develop` 分支进行（feature 分支合入 `develop`），`main` 只接受来自 `develop` 的 PR；合入 `main` 后按 `package.json` 版本自动打 tag 并发布 npm（dist-tag 为 `latest`）。PR 标题遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
+
+旧大版本走 `<major>.x` 维护分支（如 `1.x`），bugfix 直接合进去，push 后同样自动发布，但 dist-tag 是 `v<major>`（如 `v1`）而**不是** `latest` —— 否则一次维护版发布会把所有人的 `npm i` 拽回旧大版本。安装旧线用 `npm i @hsu-react/ui@1` 即可，走的是 semver，与 dist-tag 无关。
 
 ## License
 
