@@ -294,3 +294,73 @@ import "@hsu-react/ui/es/styles/utils.scss";
 ```ts
 import { Button, Panel, FormItem } from "@hsu-react/ui";
 ```
+
+## 中后台布局（可选）
+
+库里另带一套路由驱动的中后台布局：顶栏、菜单、面包屑、多页签栏，以及外观与国际化两个 Provider。文档见 [布局](/layouts/header)。
+
+它**不从包根导出**，要走子路径引入：
+
+```ts
+import Layout from "@hsu-react/ui/es/layout";
+import type { RouteType, MetaType } from "@hsu-react/ui/es/layout";
+```
+
+### 为什么单独一条路径
+
+菜单、面包屑、页签都要读当前地址、要能跳转，因此依赖 `react-router`；语言切换依赖 `react-intl`。这两个是**可选 peerDependency**：
+
+```json
+"peerDependenciesMeta": {
+  "react-router": { "optional": true },
+  "react-intl": { "optional": true }
+}
+```
+
+只用 `Button`、`Table` 这些的项目不用装它们。但如果布局也从包根导出，`import { Button } from "@hsu-react/ui"` 就会连带解析到 `react-router`，没装的项目直接构建失败 —— 那"可选"就名存实亡了。子路径把这条依赖链隔在需要它的人那边。
+
+用到布局的项目需要自行安装这两个（版本要求 `react-router@6`、`react-intl@>=6`）：
+
+```bash
+npm i react-router@6 react-intl
+```
+
+> 应用侧通常还会用到 `react-router-dom` 提供的 `BrowserRouter`，那是应用自己的装配，与本库无关。
+>
+> 页签缓存用的 `react-activation` 已是本库的直接依赖，不用另装，但 `<AliveScope>` 需要由应用挂在路由出口外层。
+
+### 路由配置的形状
+
+三个路由驱动的组件都只认识 `RouteType` —— 就是 react-router 的 `RouteObject` 加了一个 `meta`，通常现有的路由配置不用改结构，补上 `meta` 即可：
+
+```ts
+import type { RouteType } from "@hsu-react/ui/es/layout";
+
+const router: RouteType[] = [
+  {
+    path: "/system",
+    meta: { name: "系统管理", menu: true, icon: <SettingOutlined /> },
+    children: [
+      { path: "/system/user", meta: { name: "用户", menu: true } },
+      // 不写 menu：可访问，但不在菜单里
+      { path: "/system/user/:id", meta: { name: "用户详情" } },
+    ],
+  },
+];
+```
+
+`meta` 里哪些字段由布局组件读、哪些只是搭车给消费方自己用，见 [Header 的说明](/layouts/header#与路由的关系)。
+
+### 装配顺序
+
+```tsx | pure
+<ConfigProvider permissions={perms} request={request}>
+  <Layout.I18n defaultLocale="zh-CN">
+    <Layout.Theme>
+      <BrowserRouter>{/* Header / Menu / NavTabBar 与页面 */}</BrowserRouter>
+    </Layout.Theme>
+  </Layout.I18n>
+</ConfigProvider>
+```
+
+`ConfigProvider` 在最外层提供全站主题，`Layout.Theme` 在内层只管外观三态与导航配色，两者不重复也不冲突（antd 嵌套主题内层胜）。

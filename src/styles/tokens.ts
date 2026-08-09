@@ -102,7 +102,11 @@ export const breakpoints = raw.breakpoint;
  * `--vita-ring`; anything it cannot parse is handed back untouched so antd falls back to deriving
  * the ring itself.
  */
-const withAlpha = (color: string, alpha: number): string => {
+/**
+ * 把 hex 颜色加上透明度。传入不是 hex（例如已经是 rgba / CSS 变量）时原样返回，
+ * 让调用方的值照常生效而不是变成 `NaN`。
+ */
+export const withAlpha = (color: string, alpha: number): string => {
   const hex = color.trim();
   const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(hex);
   const long = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);

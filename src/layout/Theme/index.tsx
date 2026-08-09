@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo } from "react";
-import { ConfigProvider as AntdConfigProvider } from "antd";
+import { ConfigProvider as AntdConfigProvider, theme as antdTheme } from "antd";
 import { observer } from "mobx-react-lite";
 import classNames from "classnames";
 
 import styles from "./index.module.scss";
 import ThemeStore from "./ThemeStore";
-import { lightTokens, darkTokens } from "../../styles/tokens";
+import { lightTokens, darkTokens, withAlpha } from "../../styles/tokens";
 
 export interface ThemeProps {
   children?: React.ReactNode;
@@ -27,27 +27,26 @@ export interface ThemeProps {
  * 移植时去掉的（本库已有，留着会重复甚至打架）：
  * - 自己包一层 antd ConfigProvider 做全局主题、切 darkAlgorithm  -> ConfigProvider
  * - hexToRgba                                                   -> styles/tokens 的 withAlpha
+ * - 自存一份主题色（原来固定是青色）                                -> antd useToken 里当前生效的 colorPrimary
  * - matchMedia 监听系统深色                                       -> useIsDark
  * - borderRadius / colorBorder / Table / Card / Button / Input 等成套 token 覆盖 -> toAntdTheme
  * - 在包裹元素上内联重定义 --cf-*：那会盖掉 tokens.scss 生成的值，属于主动帮倒忙
  */
 const Theme: React.FC<ThemeProps> = observer((props) => {
   const { children, navDarkColors } = props;
-  const { isDark, primaryColor } = ThemeStore;
+  const { isDark } = ThemeStore;
 
   const t = isDark ? darkTokens : lightTokens;
+
+  // 主色取**当前生效**的那个，而不是自己再存一份 —— 消费方在 ConfigProvider 上换了
+  // primaryColor，导航的选中态要跟着换，否则菜单会是一个和全站无关的颜色。
+  const { token } = antdTheme.useToken();
+  const primaryColor = token.colorPrimary;
 
   // 写 data-theme：CSS 变量与 useIsDark 都看它。
   useEffect(() => {
     document.documentElement.dataset.theme = isDark ? "dark" : "light";
   }, [isDark]);
-
-  const withAlpha = (hex: string, alpha: number) => {
-    const m = hex.replace("#", "");
-    if (m.length < 6) return hex;
-    const [r, g, b] = [0, 2, 4].map((i) => parseInt(m.substring(i, i + 2), 16));
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
 
   const themeConfig = useMemo(
     () => ({

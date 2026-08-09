@@ -41,11 +41,6 @@ class ThemeStore {
     return this.isDark ? "dark" : "light";
   }
 
-  // Fixed teal primary color
-  get primaryColor() {
-    return "#13C2C2";
-  }
-
   constructor() {
     makeAutoObservable(this);
 

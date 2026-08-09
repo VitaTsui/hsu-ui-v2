@@ -52,6 +52,14 @@ class I18n {
     this.setLocale(readStorage(STORAGE_KEY.LANG) || "zh-CN");
   }
 
+  /**
+   * 应用默认语言：只在本地从未缓存过语言时生效，不覆盖用户已经做过的选择。
+   * 由 `<Layout.I18n defaultLocale>` 调用。
+   */
+  public applyDefaultLocale = (locale: string) => {
+    if (!readStorage(STORAGE_KEY.LANG)) this.setLocale(locale);
+  };
+
   public setLocale = (locale: string = "zh-CN") => {
     this._locale = locale;
 
