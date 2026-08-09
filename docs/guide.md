@@ -218,20 +218,48 @@ export default () => (
 
 覆盖到的是令牌层：品牌色与语义色、中性色阶、圆角、字号、控件高度、阴影、focus ring、明暗切换。
 
-### 三处覆盖不到的
+### 两处覆盖不到的
 
-1. **脱离 React 树的命令式 API**。`Modal.confirm`、`message.info`、`notification.open` 这类静态方法不在组件树里，读不到 context（antd 一贯的限制），换过品牌色或暗色下会与页面不一致。用它们的 hook 版本代替：
+1. **DOM 层面的观感微调**。本库对 antd 内部结构做的调整（菜单选中态、通知布局、Tabs 高度分配、移动端的点击高亮与 hover 处理等）在 `antd-overload.scss` 里，需要你在入口显式引入 —— 见下一节。
 
-   ```tsx | pure
-   const [modal, contextHolder] = Modal.useModal();
-   // 别忘了把 contextHolder 渲染进树里
-   ```
+2. **本库自己扩展的能力**。比如 `Button` 的 `variant="surface"`（浅底 + 边框）是本库在 antd 之上加的，antd 原生的 `Button` 没有。
 
-   `message.useMessage()` / `notification.useNotification()` 同理，或者在应用根部用 antd 的 `<App />` 包一层。
+### 命令式反馈：message / notification / Modal.confirm
 
-2. **DOM 层面的观感微调**。本库对 antd 内部结构做的调整（菜单选中态、通知布局、Tabs 高度分配、移动端的点击高亮与 hover 处理等）在 `antd-overload.scss` 里，需要你在入口显式引入 —— 见下一节。
+`message.success()`、`Modal.confirm()` 这类是命令式调用，触发时不在 React 树里，因此读不到 `ConfigProvider` 的主题 —— 这是 antd 一直以来的限制，官方给的解法是改用 `Modal.useModal()` / `message.useMessage()` 并把 `contextHolder` 渲染进树，代价是每个调用点都得先拿到实例，命令式的写法就没了。
 
-3. **本库自己扩展的能力**。比如 `Button` 的 `variant="surface"`（浅底 + 边框）是本库在 antd 之上加的，antd 原生的 `Button` 没有。
+本库把这层做掉了：`ConfigProvider` 内部挂了一个持有者组件，捕获那几个 hook 实例并渲染它们的 contextHolder，导出的同名函数只是转发。**调用写法不变，输出跟随主题。**
+
+```tsx
+import React from "react";
+// 注意这里是从本库引入，不是从 antd
+import { Button, Modal, message, notification } from "@hsu-react/ui";
+
+export default () => (
+  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+    <Button onClick={() => message.success("保存成功")}>message</Button>
+    <Button onClick={() => notification.info({ message: "通知", description: "跟随主题" })}>
+      notification
+    </Button>
+    <Button
+      onClick={() => Modal.confirm({ title: "确认删除？", content: "此操作不可撤销" })}
+    >
+      Modal.confirm
+    </Button>
+  </div>
+);
+```
+
+迁移就是把 import 来源从 `antd` 换成 `@hsu-react/ui`，其余不动：
+
+```diff
+- import { message, notification } from "antd";
++ import { message, notification } from "@hsu-react/ui";
+```
+
+`Modal.confirm` / `info` / `success` / `error` / `warning` 用本库的 `Modal` 即可，已经指向这一层。
+
+没有挂 `ConfigProvider` 时会自动回退到 antd 的静态方法 —— 功能正常，只是不跟随主题，并在开发环境提示一次。
 
 ### 想让某个 antd 组件不跟随
 

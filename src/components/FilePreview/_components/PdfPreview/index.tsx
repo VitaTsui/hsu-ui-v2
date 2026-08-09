@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Spin, notification } from "antd";
+// 这里用的是 notification 的 hook 版本（useNotification + contextHolder），本来就在 React
+// 树里、能读到主题，不需要换成 ../../../../feedback 那层代理 —— 那层解决的是**静态方法**
+// 读不到 context 的问题。
 
 import Icon from "../../../Icon";
 import { RenderPDF } from "hsu-utils";

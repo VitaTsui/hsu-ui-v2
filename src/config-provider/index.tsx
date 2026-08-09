@@ -9,6 +9,7 @@ import { PermissionsContent } from "../hooks/usePermissions";
 import useIsDark from "../hooks/useIsDark";
 import { configureRequest, RequestImpl } from "../request";
 import { toAntdComponents, toAntdTheme } from "../styles/tokens";
+import { FeedbackHolder } from "../feedback";
 
 export interface ConfigProviderProps {
   /** Current user's permission code list; when provided, usePermissions / hasPermi validate against it. If omitted, everything is allowed by default */
@@ -105,6 +106,9 @@ const ConfigProvider: React.FC<ConfigProviderProps> = ({
 
   const tree = (
     <PermissionsContent.Provider value={permissionsValue}>
+      {/* 让 message / notification / Modal.confirm 这类命令式 API 的输出落在树内，
+          从而能读到下面注入的主题。见 ../feedback。 */}
+      <FeedbackHolder />
       {children}
     </PermissionsContent.Provider>
   );

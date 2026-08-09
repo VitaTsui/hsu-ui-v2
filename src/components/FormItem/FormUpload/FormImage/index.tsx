@@ -1,4 +1,5 @@
-import { UploadFile, notification } from "antd";
+import { UploadFile } from "antd";
+import { notification } from "../../../../feedback";
 import ItemContainer, { ItemContainerProps } from "../../ItemContainer";
 import React, { ReactNode, useState } from "react";
 import Upload, { UploadProps as BasicUploadProps } from "../../../Upload";

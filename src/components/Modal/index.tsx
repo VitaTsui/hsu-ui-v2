@@ -4,6 +4,7 @@ import styles from "./index.module.scss";
 import { useModalElements, useModalDrag } from "./_hooks";
 import Button, { ButtonProps } from "../Button";
 import { mergeSemantic } from "../../utils/semantic";
+import { modalFuncs } from "../../feedback";
 
 export interface ModalProps extends AntdModalProps {
   moveable?: boolean;
@@ -128,17 +129,15 @@ const Modal = ((props: ModalProps) => {
 }) as ModalFC;
 
 /**
- * antd 的静态确认框与 hook 版本原样透出，此前消费方只能自己去 import antd。
- *
- * 注意：`Modal.confirm` 这类静态方法脱离 React 树调用，读不到 `ConfigProvider` 注入的主题
- * （antd 一贯的限制）。要跟随主题就用 `Modal.useModal()` 拿 `modal` 实例并渲染它返回的
- * `contextHolder`。
+ * 确认框。签名与 antd 一致，但**会跟随主题** —— 指向的是 ../feedback 里的代理，
+ * 输出渲染在 ConfigProvider 内的 holder 里，而不是 antd 那个脱离 React 树的静态方法。
+ * 没挂 ConfigProvider 时自动回退到 antd 静态方法（功能正常，不跟随主题）。
  */
-Modal.confirm = AntdModal.confirm;
-Modal.info = AntdModal.info;
-Modal.success = AntdModal.success;
-Modal.error = AntdModal.error;
-Modal.warning = AntdModal.warning;
+Modal.confirm = modalFuncs.confirm;
+Modal.info = modalFuncs.info;
+Modal.success = modalFuncs.success;
+Modal.error = modalFuncs.error;
+Modal.warning = modalFuncs.warning;
 Modal.useModal = AntdModal.useModal;
 Modal.destroyAll = AntdModal.destroyAll;
 Modal.config = AntdModal.config;

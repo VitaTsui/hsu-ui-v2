@@ -2,7 +2,7 @@ import React from "react";
 
 import Icon from "../../../../../../../Icon";
 import classNames from "classnames";
-import { message } from "antd";
+import { message } from "../../../../../../../../feedback";
 import styles from "./index.module.scss";
 import clipboard from "copy-to-clipboard";
 import MarkdownIt from "markdown-it";

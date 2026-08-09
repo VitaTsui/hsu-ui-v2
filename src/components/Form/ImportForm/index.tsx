@@ -1,4 +1,5 @@
-import { Form, notification } from "antd";
+import { Form } from "antd";
+import { notification } from "../../../feedback";
 import { modalWidth } from "../../../styles/tokens";
 import FormItem, {
   PlaceholderDict,

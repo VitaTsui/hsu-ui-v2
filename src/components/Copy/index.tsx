@@ -3,7 +3,7 @@ import React, { ReactNode, forwardRef, useState } from "react";
 import Icon from "../Icon";
 import TurndownService from "turndown";
 import classNames from "classnames";
-import { message } from "antd";
+import { message } from "../../feedback";
 import styles from "./index.module.scss";
 
 export interface CopyProps

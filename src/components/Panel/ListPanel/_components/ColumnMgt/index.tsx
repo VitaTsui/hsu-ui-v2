@@ -1,5 +1,5 @@
 import { mergeSemantic } from "../../../../../utils/semantic";
-import { message } from "antd";
+import { message } from "../../../../../feedback";
 import React, { useEffect, useState } from "react";
 import Table, { ColumnsType, TableDrag } from "../../../../Table";
 

@@ -1,4 +1,5 @@
-import { Button, UploadFile, notification } from "antd";
+import { Button, UploadFile } from "antd";
+import { notification } from "../../../feedback";
 import FormImage, { FormImageProps } from "./FormImage";
 import ItemContainer, { ItemContainerProps } from "../ItemContainer";
 import Upload, {

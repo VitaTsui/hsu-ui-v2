@@ -40,6 +40,10 @@ export {
 } from "./styles/tokens";
 export type { HsuThemeTokens } from "./styles/tokens";
 
+// 主题化的命令式反馈 API。与 antd 的 message / notification 同名同签名，区别是输出落在
+// ConfigProvider 内，会跟随注入的主题；把 `from "antd"` 换成 `from "@hsu-react/ui"` 即可。
+export { message, notification } from "./feedback";
+
 // Components
 export { default as Button } from "./components/Button";
 export * from "./components/Button";

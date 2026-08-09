@@ -1,5 +1,5 @@
 import { UploadFile } from "antd";
-import { notification } from "antd";
+import { notification } from "../../../../feedback";
 
 /**
  * Handle the file upload response
