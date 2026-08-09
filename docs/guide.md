@@ -191,6 +191,62 @@ const { isTouch, isCoarse, canHover } = usePointerType();
 
 它走媒体查询而不是 UA 嗅探 —— 二合一设备会在触摸与鼠标之间来回切换，媒体查询跟得上，UA 跟不上。
 
+## 与 antd 混用
+
+项目里同时引入本库和 antd 是常态 —— 本库只封装了业务高频的那十几个组件，`Steps`、`Card`、`Alert`、`Result` 这些你会直接从 `antd` 引。
+
+**这些直接引入的 antd 组件会自动跟随本库的样式**，不需要额外配置：`ConfigProvider` 把同一份令牌喂给了 antd 的 `theme.token`，而 antd 的主题是走 React context 的，所以只要组件在 Provider 之内，无论从哪里 import 都吃同一套色板、圆角、字号与控件高度。
+
+```tsx
+import React from "react";
+import { Alert, Card, Steps, Tag, Progress } from "antd";
+
+export default () => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <Steps
+      size="small"
+      current={1}
+      items={[{ title: "已完成" }, { title: "进行中" }, { title: "待开始" }]}
+    />
+    <Alert type="info" showIcon title="这些组件全部直接 import from 'antd'" />
+    <Card size="small" title="卡片">
+      <Tag color="blue">标签</Tag> <Progress percent={60} size="small" />
+    </Card>
+  </div>
+);
+```
+
+覆盖到的是令牌层：品牌色与语义色、中性色阶、圆角、字号、控件高度、阴影、focus ring、明暗切换。
+
+### 三处覆盖不到的
+
+1. **脱离 React 树的命令式 API**。`Modal.confirm`、`message.info`、`notification.open` 这类静态方法不在组件树里，读不到 context（antd 一贯的限制），换过品牌色或暗色下会与页面不一致。用它们的 hook 版本代替：
+
+   ```tsx | pure
+   const [modal, contextHolder] = Modal.useModal();
+   // 别忘了把 contextHolder 渲染进树里
+   ```
+
+   `message.useMessage()` / `notification.useNotification()` 同理，或者在应用根部用 antd 的 `<App />` 包一层。
+
+2. **DOM 层面的观感微调**。本库对 antd 内部结构做的调整（菜单选中态、通知布局、Tabs 高度分配、移动端的点击高亮与 hover 处理等）在 `antd-overload.scss` 里，需要你在入口显式引入 —— 见下一节。
+
+3. **本库自己扩展的能力**。比如 `Button` 的 `variant="surface"`（浅底 + 边框）是本库在 antd 之上加的，antd 原生的 `Button` 没有。
+
+### 想让某个 antd 组件不跟随
+
+`ConfigProvider` 可以就近嵌套，内层覆盖外层，这是 antd 自己的规则：
+
+```tsx | pure
+import { ConfigProvider as AntdConfigProvider } from "antd";
+
+<AntdConfigProvider theme={{ token: { borderRadius: 2 } }}>
+  <SomeAntdComponent />
+</AntdConfigProvider>
+```
+
+整个应用都不想让本库插手，传 `<ConfigProvider antdTheme={false}>`。
+
 ## 引入全局样式（可选）
 
 库附带了对 antd 的全局观感覆盖，按需在入口引入（产物为 scss，宿主项目需安装 `sass` 并具备 scss 编译能力）：
