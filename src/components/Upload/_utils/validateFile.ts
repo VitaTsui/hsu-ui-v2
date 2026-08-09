@@ -9,43 +9,57 @@ interface ValidateFileOptions {
 }
 
 /**
- * 文件名是否命中 accept。
+ * 文件是否命中 accept —— 与 antd 保持一致的语义。
  *
- * 此前是把 accept 直接拼进正则：`new RegExp(`(${accept.replace(/,/g, "|")})$`)`。有两个问题：
+ * 此前是把 accept 拼进正则：`new RegExp(`(${accept.replace(/,/g, "|")})$`)`，有两个问题：
+ * 字符没转义（`.png` 里的 `.` 是「任意字符」，实测放行了 `axpng`），且 HTML 允许的 MIME
+ * 形式里 `image/*` 的 `*` 会被当成量词（实测把 photo.png 判成了格式错误）。把外部字符串
+ * 拼进正则本身也是 ReDoS 入口。
  *
- * 1. accept 里的字符没转义。扩展名里的 `.` 在正则里是「任意字符」，更要紧的是 HTML 标准
- *    允许 accept 写成 MIME 形式（`image/*`、`application/pdf`）—— 那个 `*` 会被当成量词，
- *    整条规则的含义就变了，合法文件反而被判为格式错误。
- * 2. 把外部字符串拼进正则本身就是可回溯爆炸（ReDoS）的入口。
- *
- * 改成按后缀逐项比对，不再构造正则。MIME 形式的条目本地无法从文件名判断，
- * 交给 antd 的原生 accept 与服务端去管，这里跳过而不是误判。
+ * 这里照抄 @rc-component/upload 的 attr-accept 语义，而不是另写一套：这个函数是上传前的
+ * 预校验，antd 自己的 accept 过滤也在跑，两边规则一旦不一致，就会出现「antd 放行、我们拦下」
+ * 或反过来的割裂。逐条 some()，任一命中即通过，全不命中即拒绝 —— 不做额外兜底。
  */
-const matchesAccept = (file: { name: string; type?: string }, accept: string) => {
-  const items = accept
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  if (!items.length) return true;
+const matchesAccept = (
+  file: { name: string; type?: string },
+  accept: string
+): boolean => {
+  const items = accept.split(",");
+  const fileName = file.name || "";
+  const mimeType = file.type || "";
+  const baseMimeType = mimeType.replace(/\/.*$/, "");
 
-  const name = file.name.toLowerCase();
-  const type = (file.type || "").toLowerCase();
+  return items.some((item) => {
+    const validType = item.trim();
+    if (!validType) return false;
 
-  // 只要有一条 MIME 规则，就说明调用方是按 MIME 约束的，本地不做后缀判断。
-  const extensions = items.filter((i) => i.startsWith("."));
-  const mimes = items.filter((i) => !i.startsWith("."));
+    // `*` / `*​/*`：全部放行
+    if (/^\*(\/\*)?$/.test(validType)) return true;
 
-  if (mimes.some((m) =>
-    m.endsWith("/*") ? type.startsWith(m.slice(0, -1)) : type === m
-  )) {
-    return true;
-  }
+    // 扩展名。jpg 与 jpeg 互认，与 attr-accept 一致
+    if (validType.charAt(0) === ".") {
+      const lowerName = fileName.toLowerCase();
+      const lowerType = validType.toLowerCase();
+      const affixes =
+        lowerType === ".jpg" || lowerType === ".jpeg"
+          ? [".jpg", ".jpeg"]
+          : [lowerType];
+      return affixes.some((affix) => lowerName.endsWith(affix));
+    }
 
-  if (extensions.some((ext) => name.endsWith(ext))) return true;
+    // `image/*` 这类通配
+    if (/\/\*$/.test(validType)) {
+      return baseMimeType === validType.replace(/\/.*$/, "");
+    }
 
-  // 只给了 MIME 规则、且文件没带 type（部分浏览器对少见后缀会留空）时不拦，
-  // 避免把合法文件误判掉；真正的把关在服务端。
-  return extensions.length === 0 && !type;
+    // MIME 全等
+    if (mimeType === validType) return true;
+
+    // `png` 这种没有点也没有斜杠的写法是无效 accept，attr-accept 选择跳过而不是拦下
+    if (/^\w+$/.test(validType)) return true;
+
+    return false;
+  });
 };
 
 /**
