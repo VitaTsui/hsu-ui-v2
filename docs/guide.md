@@ -22,6 +22,25 @@ yarn add @hsu-react/ui
 yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
+## 浏览器支持
+
+**Chrome / Edge ≥ 111、Safari ≥ 16.4、Firefox ≥ 121**，即 2023 年底之后的版本。与 [antd v6 的口径](https://ant.design/docs/react/introduce-cn#%E7%8E%AF%E5%A2%83%E6%94%AF%E6%8C%81)（现代浏览器 / last 2 versions）一致，不支持 IE。
+
+低于这个范围**不会白屏**——产物是 ES5 语法，运行时用到的最"新"的 API 是 `ResizeObserver`（Chrome 64 / Safari 13.1 / Firefox 69）。会出问题的是样式，而且是「整条声明作废」式的消失，不是回退到别的值：
+
+| 特性 | 谁在用 | Chrome/Edge | Safari | Firefox | 不支持时 |
+| --- | --- | --- | --- | --- | --- |
+| `color-mix()` | 令牌层的 focus ring、表格选中行、树选中项、上传拖拽区等 | 111 | 16.2 | 113 | 焦点环与这些浅底色**消失** |
+| `:has()` | antd v6 自身（输入框焦点环、Card、Tree 拖放指示器…）与本库若干处 | 105 | 15.4 | 121 | 相关的焦点环 / 间距不生效 |
+| `@container style()` | antd v6 的 Descriptions | 111 | 18 | 尚不支持 | 该组件的自适应宽度退化 |
+| `overflow: clip` | Slider 等 | 90 | 16 | 81 | 溢出内容裁切位置不对 |
+
+`:has()` 的下限由 antd v6 决定，本库降不下去；`color-mix()` 则是本库自己的令牌层引入的（0.0.x 没有用到）。
+
+> 本库仍导出 `supportsHasSelector` / `isLegacyHasSelectorBrowser` 两个运行时探测函数，早期用来给不支持 `:has()` 的浏览器兜底。**antd v6 之后它们已经买不到兼容性**——底下的 antd 组件同样在用 `:has()` 且没有降级。保留导出只为兼容既有调用方，新代码不必再用。
+
+如果项目必须支持更老的浏览器（Firefox 115 ESR、Safari 15 之类），只能停留在 0.0.x + antd v5。
+
 ## 从 0.0.x 升级到 0.1.0
 
 0.1.0 有三处破坏性变更，都需要宿主项目配合。

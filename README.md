@@ -15,6 +15,10 @@ yarn add @hsu-react/ui
 yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
+## 浏览器支持
+
+Chrome / Edge ≥ 111、Safari ≥ 16.4、Firefox ≥ 121（现代浏览器，不支持 IE），与 antd v6 的口径一致。更老的浏览器不会白屏，但焦点环、选中底色等依赖 `color-mix()` / `:has()` 的样式会失效，详见[文档](https://vitatsui.github.io/hsu-ui/guide#%E6%B5%8F%E8%A7%88%E5%99%A8%E6%94%AF%E6%8C%81)。
+
 ## 使用
 
 ```tsx

@@ -6,7 +6,7 @@
     height: 0px;
   }
 
-  scrollbar-width: 0px;
+  scrollbar-width: none;
 
   // 顶部横向菜单：占满剩余宽度，背景交给外层的导航渐变
   &:global(.ant-menu-horizontal) {
