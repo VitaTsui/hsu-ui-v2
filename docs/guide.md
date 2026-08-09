@@ -60,7 +60,8 @@ peerDependencies 收紧为 `antd >=6` / `@ant-design/icons >=6`。**antd 5 与 6
 
 ### 3. 设计变量改名，且 ConfigProvider 开始接管 antd 主题
 
-- CSS 变量 `--cf-*` 改为语义化的 `--vita-*`（见下方「设计令牌与主题」）。旧名**全部保留为兼容别名**，既有覆盖不会失效
+- CSS 变量 `--cf-*` 改为语义化的 `--vita-*`（见下方「设计令牌与主题」）。旧名**全部保留为兼容别名**，样式里既有的覆盖不会失效
+- JS 侧 `lightTokens` / `darkTokens` 的**字段名**也一并改了（`canvas` → `background`、`text` → `foreground` 等）。旧字段同样保留，但标记为 deprecated，建议改用新名。其中 `headerBg` 在新命名里没有对应项，别名指向 `surface`（0.1.0 之前两者取值本就一致）
 - `ConfigProvider` 现在默认会把令牌喂给 antd 的 `theme.token`。若你的应用入口已经自己包了一层 antd `ConfigProvider` 做主题，两者会按 antd 的规则就近合并（内层胜）；不希望本库插手就传 `antdTheme={false}`
 - 换品牌色请改用 `<ConfigProvider primaryColor="...">`，它会同时设置 CSS 变量与 antd 的 `colorPrimary`；只覆盖 `--primary-color` 的老写法仍然有效，但**只影响 CSS 侧**，antd 组件不会跟着变
 - 观感整体向 shadcn/ui 靠拢：中性色改为 zinc 色阶、圆角基准从 6px 调到 8px、阴影收薄。页面里若有依赖旧视觉的像素级微调，需要复核

@@ -41,8 +41,43 @@ export interface HsuThemeTokens {
   shadow3: string;
 }
 
-export const lightTokens: HsuThemeTokens = raw.light;
-export const darkTokens: HsuThemeTokens = raw.dark;
+/**
+ * 0.1.0 之前的字段名。CSS 变量那侧留了 `--cf-*` 别名，但这里的 TS 字段是直接改名的 ——
+ * 消费方写 `lightTokens.canvas` 会直接拿到 undefined，且没有任何提示。补上映射。
+ *
+ * `headerBg` 在重命名时被整个删掉了（没有对应的新名），这里指回 `surface`：0.1.0 之前
+ * 两者在浅色下同为 #ffffff、暗色下同为卡片底色，语义上就是「顶栏用的面」。
+ */
+export interface LegacyThemeTokens {
+  /** @deprecated 用 `background` */
+  canvas: string;
+  /** @deprecated 用 `muted` */
+  subtle: string;
+  /** @deprecated 用 `surface` */
+  headerBg: string;
+  /** @deprecated 用 `foreground` */
+  text: string;
+  /** @deprecated 用 `mutedForeground` */
+  text2: string;
+  /** @deprecated 用 `subtleForeground` */
+  text3: string;
+  /** @deprecated 用 `hover` */
+  rowHover: string;
+}
+
+const withLegacy = (t: HsuThemeTokens): HsuThemeTokens & LegacyThemeTokens => ({
+  ...t,
+  canvas: t.background,
+  subtle: t.muted,
+  headerBg: t.surface,
+  text: t.foreground,
+  text2: t.mutedForeground,
+  text3: t.subtleForeground,
+  rowHover: t.hover,
+});
+
+export const lightTokens = withLegacy(raw.light);
+export const darkTokens = withLegacy(raw.dark);
 
 /** Default brand colour; consuming projects override it via `ConfigProvider.primaryColor` */
 export const defaultPrimaryColor: string = raw.primary;
