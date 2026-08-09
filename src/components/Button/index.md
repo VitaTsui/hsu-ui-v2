@@ -106,7 +106,7 @@ export default () => (
 | --- | --- | --- | --- |
 | hasPermi | 权限码；当前用户不具备时按钮不渲染（配合 `ConfigProvider.permissions`） | `string[]` | - |
 | hidden | 是否隐藏（不渲染） | `boolean` | `false` |
-| iconPosition | 图标位置 | `'start' \| 'end'` | `'start'` |
+| iconPosition | 图标位置。antd v6 起这个属性改名为 `iconPlacement`，两个名字这里都接受，内部统一翻成 `iconPlacement`，不会触发 antd 的弃用告警 | `'start' \| 'end'` | `'start'` |
 | variant | 形态；比 antd 多一个 `surface`（浅底 + 边框） | `'solid' \| 'outlined' \| 'dashed' \| 'filled' \| 'text' \| 'link' \| 'surface'` | - |
 | reRender | 包裹渲染结果，便于套 Tooltip / Popconfirm | `(btn: ReactElement) => ReactNode` | - |
 

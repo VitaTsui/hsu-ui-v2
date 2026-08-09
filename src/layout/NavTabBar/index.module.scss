@@ -1,3 +1,6 @@
+// 注意：这是 CSS Module，文件里的每个类名都会被哈希。antd 的类名必须写在 :global() 里，
+// 否则 `.ant-tabs-nav` 会被编译成一串哈希，永远匹配不到 antd 渲染出的 DOM —— 规则不会报错，
+// 只是静悄悄地全部失效。本库其余组件的样式都遵循这个写法。
 .NavTabBar {
   padding: 6px 8px 0px;
 
@@ -6,94 +9,131 @@
 
   border-bottom: 1px solid var(--cf-border);
 
-  .ant-tabs-nav {
-    height: 36px;
-    margin-bottom: 0px;
+  // 把根类重复一次（编译成 `.x.x`），只为提一档权重。antd 的卡片样式是
+  // `:where(...).ant-tabs-card.ant-tabs-small.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab`，
+  // `:where()` 不计权重，正好和这里的四个类打平 —— 打平时后注入的赢，而 antd 的
+  // CSS-in-JS 是运行时插进 <head> 的，永远在后面，圆角这类就会被它盖回卡片样式。
+  &.NavTabBar {
+    :global(.ant-tabs-nav) {
+      height: 36px;
+      margin-bottom: 0px;
 
-    &::before {
-      border-bottom: none;
-    }
+      &::before {
+        border-bottom: none;
+      }
 
-    // Card-style tabs do not need the bottom ink bar
-    .ant-tabs-ink-bar {
-      display: none;
-    }
+      // Card-style tabs do not need the bottom ink bar
+      :global(.ant-tabs-ink-bar) {
+        display: none;
+      }
 
-    .ant-tabs-nav-list {
-      .ant-tabs-tab {
-        position: relative;
+      :global(.ant-tabs-nav-list) {
+        :global(.ant-tabs-tab) {
+          position: relative;
 
-        padding: 0px;
-        margin: 0px;
+          padding: 0px;
+          margin: 0px;
 
-        border-radius: 8px;
+          border: none;
+          border-radius: 8px;
+          background: transparent;
 
-        transition: background 0.2s;
+          transition: background 0.2s;
 
-        & + .ant-tabs-tab {
-          margin-left: 4px;
-        }
-
-        .ant-tabs-tab-btn {
-          color: var(--cf-text-2);
-
-          > .tabLabel {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            column-gap: 5px;
-
-            width: 100%;
-            height: 100%;
-            padding: 6px 16px;
+          & + :global(.ant-tabs-tab) {
+            margin-left: 4px;
           }
 
-          > .tabLabel.legacyClosableTabLabel {
-            padding-right: 36px;
-          }
-        }
+          :global(.ant-tabs-tab-btn) {
+            color: var(--cf-text-2);
 
-        &:hover {
-          background: var(--cf-border-weak);
-        }
-
-        &.ant-tabs-tab-active {
-          background: var(--cf-subtle);
-
-          .ant-tabs-tab-btn {
-            color: var(--primary-color);
-            font-weight: 500;
-          }
-        }
-
-        .ant-tabs-tab-remove {
-          position: absolute;
-          right: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-        }
-
-        &:has(.ant-tabs-tab-remove) {
-          .ant-tabs-tab-btn {
             > .tabLabel {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              column-gap: 5px;
+
+              width: 100%;
+              height: 100%;
+              padding: 6px 16px;
+            }
+
+            > .tabLabel.legacyClosableTabLabel {
               padding-right: 36px;
+            }
+          }
+
+          &:hover {
+            background: var(--cf-border-weak);
+          }
+
+          &:global(.ant-tabs-tab-active) {
+            background: var(--cf-subtle);
+
+            :global(.ant-tabs-tab-btn) {
+              color: var(--primary-color);
+              font-weight: 500;
+            }
+          }
+
+          :global(.ant-tabs-tab-remove) {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+
+          &:has(:global(.ant-tabs-tab-remove)) {
+            :global(.ant-tabs-tab-btn) {
+              > .tabLabel {
+                padding-right: 36px;
+              }
             }
           }
         }
       }
     }
-  }
 
-  .ant-tabs-nav-operations {
-    > button {
-      cursor: pointer;
+    // extra 区域自身没有高度，撑满后才能和页签对齐；右边那条竖线把刷新按钮和页签分开
+    :global(.ant-tabs-extra-content) {
+      display: flex;
+      align-items: center;
+      align-self: stretch;
+
+      margin-right: 8px;
+      padding-right: 8px;
+
+      border-right: 1px solid var(--cf-border-weak);
+    }
+
+    // 「刷新当前页」按钮
+    .reload {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 28px;
+      height: 28px;
+      padding: 0px;
+
+      color: var(--cf-text-2);
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+
+    :global(.ant-tabs-nav-operations) {
+      > button {
+        cursor: pointer;
+      }
     }
   }
 }
 
 .popover {
-  .ant-popover-content {
-    .ant-popover-inner {
+  :global(.ant-popover-content) {
+    :global(.ant-popover-inner) {
       padding: 0px;
 
       .part {
@@ -104,7 +144,7 @@
 
         border-bottom: 1px solid var(--cf-border-weak);
 
-        .ant-btn {
+        :global(.ant-btn) {
           justify-content: flex-start;
 
           border-radius: 0px;

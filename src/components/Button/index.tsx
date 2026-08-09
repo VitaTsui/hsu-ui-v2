@@ -17,6 +17,10 @@ export type ButtonVariant = NonNullable<AntdButtonProps["variant"]> | "surface";
 export interface ButtonProps extends Omit<AntdButtonProps, "variant"> {
   hasPermi?: string[];
   hidden?: boolean;
+  /**
+   * 图标位置。antd v6 把这个属性改名成了 `iconPlacement`，`iconPosition` 仍然能用但会打
+   * 弃用告警。这里保留旧名（本库一直这么用）并在内部翻成 `iconPlacement`，两个名字都接受。
+   */
   iconPosition?: "start" | "end";
   variant?: ButtonVariant;
   /**
@@ -62,7 +66,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   const {
     hasPermi,
     hidden,
-    iconPosition = "start",
+    iconPosition,
     className,
     children,
     title,
@@ -107,8 +111,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
       ref={ref}
       color={needsDefaultColor ? "default" : mappedColor}
       variant={isSurface ? "filled" : variant}
+      // 这里曾经把 iconPosition 拦下来换成一个 styles[iconPosition] 类名，但
+      // index.module.scss 里根本没有 .start / .end —— 结果 iconPosition="end" 完全不起作用，
+      // 还给每个按钮挂上一个字符串 "undefined" 的类。现在翻译成 antd v6 的 iconPlacement。
+      iconPlacement={buttonConfig.iconPlacement ?? iconPosition}
       className={classNames(className, styles.button, {
-        [styles[iconPosition]]: iconPosition,
         [styles.surface]: isSurface,
       })}
       children={children ?? title}

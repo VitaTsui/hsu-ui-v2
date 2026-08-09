@@ -15,6 +15,36 @@ import Layout from "@hsu-react/ui/es/layout";
 <Layout.NavTabBar router={router} />;
 ```
 
+## 用法
+
+页签栏最前面是「刷新当前页」按钮，右键页签可以关闭 / 批量关闭 / 重新加载，页签之间可以拖拽排序。
+
+```tsx | pure
+import React from "react";
+import { BrowserRouter } from "react-router-dom";
+import { AliveScope } from "react-activation";
+import Layout from "@hsu-react/ui/es/layout";
+
+const router = [
+  { path: "/home", meta: { name: "首页", menu: true, affix: true } },
+  { path: "/order", meta: { name: "订单管理", menu: true } },
+  { path: "/user", meta: { name: "用户列表", menu: true } },
+];
+
+export default () => (
+  <AliveScope>
+    <BrowserRouter>
+      <Layout.NavTabBar router={router} />
+    </BrowserRouter>
+  </AliveScope>
+);
+```
+
+> 「首页」标了 `meta.affix`，所以没有关闭按钮。
+>
+> 这里只给代码不给可运行示例：页签栏要接管地址栏，而文档站本身也跑在一个 react-router 里，
+> 嵌一层 Router 会直接报错（react-router 不允许嵌套），不嵌又会让示例真的把文档站导走。
+
 ## 说明
 
 页签由访问过的路由累积而来，文案取 `meta.name`、图标取 `meta.icon`。两个开关直接影响这里：
@@ -31,6 +61,7 @@ import Layout from "@hsu-react/ui/es/layout";
 | router | 路由配置 | `RouteType[]` | - |
 | affixRouter | 额外固定的路由路径（等价于给这些路由加 `meta.affix`） | `string[]` | `[]` |
 | basePath | 关掉最后一个页签后回退到的路径 | `string` | `"/"` |
+| showReload | 页签栏最前面的「刷新当前页」按钮 | `boolean` | `true` |
 
 ## 配套 Hook
 

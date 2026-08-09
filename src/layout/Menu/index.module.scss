@@ -1,3 +1,5 @@
+// 注意：CSS Module 里的类名都会被哈希，antd 的类名必须写在 :global() 中，否则
+// `.ant-menu-horizontal` 会变成 `.ant-menu-horizontal___xxxxx`，静悄悄地永不生效。
 .menu {
   &::-webkit-scrollbar {
     width: 0px;
@@ -5,28 +7,32 @@
   }
 
   scrollbar-width: 0px;
+
+  // 顶部横向菜单：占满剩余宽度，背景交给外层的导航渐变
+  &:global(.ant-menu-horizontal) {
+    flex: 1;
+    min-width: 0px;
+
+    background-color: transparent;
+  }
 }
 
-.ant-menu-horizontal {
-  flex: 1;
-  min-width: 0px;
+// 弹出的子菜单挂在 body 上，够不到 .menu，所以由组件把这个类挂到 popup 上
+.popup {
+  &:global(.ant-menu-submenu-popup.ant-menu.ant-menu-dark) {
+    :global(.ant-menu-item),
+    :global(.ant-menu-submenu-title) {
+      color: var(--cf-text);
 
-  background-color: transparent;
-}
+      &:hover {
+        color: var(--primary-color) !important;
+      }
 
-.ant-menu-submenu-popup.ant-menu.ant-menu-dark {
-  .ant-menu-item,
-  .ant-menu-submenu-title {
-    color: var(--cf-text);
+      &:global(.ant-menu-item-selected) {
+        background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
 
-    &:hover {
-      color: var(--primary-color) !important;
-    }
-
-    &.ant-menu-item-selected {
-      background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
-
-      color: var(--primary-color) !important;
+        color: var(--primary-color) !important;
+      }
     }
   }
 }

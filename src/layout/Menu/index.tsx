@@ -6,6 +6,7 @@ import { ItemType } from "antd/es/menu/interface";
 import { RouteType } from "../types";
 import { cloneDeep } from "lodash";
 import classNames from "classnames";
+import { mergeSemantic } from "../../utils/semantic";
 import styles from "./index.module.scss";
 import { formatMenu } from "./_utils/formatMenu";
 import { setActiveIcon } from "./_utils/setActiveIcon";
@@ -66,6 +67,7 @@ const Menu: React.FC<MenuProps> = (props) => {
     onlyLvOneMenu = false,
     secondaryHeader,
     secondaryItemFilter,
+    classNames: semanticClassNames,
     ...menuConfig
   } = props;
   const navigate = useNavigate();
@@ -177,6 +179,16 @@ const Menu: React.FC<MenuProps> = (props) => {
       }}
       theme={theme}
       className={classNames(styles.menu, className)}
+      // 弹出的子菜单挂在 body 上，拿不到根节点的类名。给它挂一个自己的类，样式才有地方落
+      classNames={mergeSemantic(semanticClassNames, (outer) => ({
+        ...outer,
+        popup: [
+          styles.popup,
+          typeof outer.popup === "string" ? outer.popup : outer.popup?.root,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      }))}
     />
   );
 

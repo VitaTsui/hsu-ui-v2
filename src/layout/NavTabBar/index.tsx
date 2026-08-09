@@ -1,5 +1,5 @@
-import { Tabs as AntdTabs } from "antd";
-import React, { ReactNode, useMemo, useState } from "react";
+import { Tabs as AntdTabs, Tooltip } from "antd";
+import React, { ReactNode, useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import {
@@ -31,6 +31,8 @@ import TabLabel from "./_components/TabLabel";
 import DraggableTabNode from "./_components/SortableTab";
 import TabDragOverlay from "./_components/TabDragOverlay";
 import { isLegacyHasSelectorBrowser } from "../../utils/cssSupports";
+import Button from "../../components/Button";
+import Icon from "../../components/Icon";
 
 export interface TabType {
   label: ReactNode;
@@ -47,10 +49,17 @@ export interface NavTabBarProps {
   router: RouteType[];
   affixRouter?: string[];
   basePath?: string;
+  /** 页签栏最前面的「刷新当前页」按钮 */
+  showReload?: boolean;
 }
 
 const NavTabBar: React.FC<NavTabBarProps> = (props) => {
-  const { router, affixRouter = [], basePath = "/" } = props;
+  const {
+    router,
+    affixRouter = [],
+    basePath = "/",
+    showReload = true,
+  } = props;
   const navigate = useNavigate();
   const { drop, refresh } = useAliveController();
   const onReload = useReload();
@@ -100,6 +109,20 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
     setActiveId(null);
   };
 
+  /**
+   * 刷新当前页。走的是和右键菜单「重新加载」完全相同的两步：`onReload` 通知页面自己重挂，
+   * `refresh` 让 react-activation 丢掉这份缓存。少调其中任何一个，都会出现「看上去刷新了、
+   * 实际还是那棵旧组件树」。
+   *
+   * key 要去掉 query —— 缓存是按路径存的，带上 `?a=1` 会找不到对应的那份。
+   */
+  const reloadCurrent = useCallback(() => {
+    const key = tabKey?.split("?")[0];
+    if (!key) return;
+    onReload(key);
+    refresh(key);
+  }, [tabKey, onReload, refresh]);
+
   return (
     <AntdTabs
       className={styles.NavTabBar}
@@ -133,6 +156,26 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
         };
       })}
       activeKey={tabKey}
+      tabBarExtraContent={
+        showReload
+          ? {
+              left: (
+                // 不用 Button 的 title —— 本库的 Button 把 title 当作 children 的兜底
+                // （children ?? title），传了会把文案画到按钮里，而不是变成悬浮提示
+                <Tooltip title="刷新当前页">
+                  <Button
+                    className={styles.reload}
+                    type="text"
+                    size="small"
+                    aria-label="刷新当前页"
+                    icon={<Icon icon="ep:refresh" />}
+                    onClick={reloadCurrent}
+                  />
+                </Tooltip>
+              ),
+            }
+          : undefined
+      }
       hideAdd
       type="editable-card"
       onEdit={(key, action) => {
