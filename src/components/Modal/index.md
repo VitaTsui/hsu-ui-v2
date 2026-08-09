@@ -48,21 +48,21 @@ export default () => {
 ## 子组件
 
 ```tsx | pure
-Modal.confirm / info / success / error / warning   // antd 的静态确认框
-Modal.useModal                                     // hook 版本
+Modal.confirm / info / success / error / warning   // 确认框，跟随主题
+Modal.useModal                                     // antd 的 hook 版本
 Modal.destroyAll
 Modal.config
 ```
 
 0.1.0 之前这些没有透出，消费方只能自己去 `import { Modal } from "antd"`。
 
-> **静态方法读不到主题。** `Modal.confirm` 这类是脱离 React 树调用的，拿不到 `ConfigProvider` 注入的 `theme.token`（antd 一贯的限制），在换过品牌色或暗色下会与页面观感不一致。要跟随主题就用 `Modal.useModal()`：
+> **这里的 `Modal.confirm` 会跟随主题**，与 antd 的同名静态方法不同。
 >
-> ```tsx | pure
-> const [modal, contextHolder] = Modal.useModal();
-> // 记得把 contextHolder 渲染进树里
-> return <>{contextHolder}<Button onClick={() => modal.confirm({ title: "确认？" })} /></>;
-> ```
+> antd 的 `Modal.confirm` 是脱离 React 树调用的，读不到 `ConfigProvider` 注入的 `theme.token`，换过品牌色或切暗色后观感会与页面割裂。本库把它指向了内部的一层代理：`ConfigProvider` 里挂着 `Modal.useModal()` 的实例与 `contextHolder`，调用只是转发过去，所以写法不变而输出在树内。详见指南的[命令式反馈](/guide#命令式反馈message--notification--modalconfirm)一节。
+>
+> 因此**不需要**再自己写 `useModal` + `contextHolder`。`Modal.useModal` 仍然透出，只是通常用不上了。
+>
+> 未挂 `ConfigProvider` 时自动回退到 antd 的静态方法：功能正常，只是不跟随主题。
 
 ## API
 
