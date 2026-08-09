@@ -33,6 +33,14 @@ const GUARDED_ENTRIES = [
   "components/Button/index.js",
 ];
 
+// 说明：根 barrel（index.js）刻意**不**列为守卫入口。它对每个组件都是一句
+// `export { default as X } from "./components/X"`，属于可被 tree-shaking 摇掉的再导出，
+// 与 FormItem 那种「运行时按 type 分发、必然全部求值」的入口性质不同 —— 把它列进来会把
+// CodeMirror / Editor 这些正常的再导出误判成违规。
+//
+// 真正需要守的是「不装就构建失败」的可选 peer（react-router / react-intl）：它们已在下面
+// 的黑名单里，且布局组件不从根 barrel 导出，因此不会被任何一个高频入口静态触达。
+
 /**
  * 重型三方库黑名单。这些包体积大且只服务于特定组件，必须走动态 import()
  * 或由消费方自行深路径引入，不得从高频入口静态可达。
@@ -58,6 +66,11 @@ const HEAVY = [
   "@iconify/json",
   // 0.1.0 起已不是依赖（按钮改自研）；留在黑名单里作为回归护栏，防止有人再引回来
   "@chakra-ui/react",
+  // 布局组件专用，且是**可选** peerDependency。它们一旦从高频入口静态可达，没装
+  // react-router 的项目连 import Button 都会构建失败 —— 可选就失去意义了。
+  // 布局请走子路径：import Layout from "@hsu-react/ui/es/layout"
+  "react-router",
+  "react-intl",
 ];
 
 /** 从 babel 产物里抽静态 import 的模块说明符（刻意不匹配动态 import(...)） */

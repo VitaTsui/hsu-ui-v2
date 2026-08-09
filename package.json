@@ -108,7 +108,9 @@
     "mobx": ">=6",
     "mobx-react-lite": ">=4",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "react-intl": ">=6",
+    "react-router": ">=6 <7"
   },
   "devDependencies": {
     "@ant-design/icons": "^6.3.2",
@@ -127,7 +129,18 @@
     "mobx-react-lite": "^4.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-intl": "^6.6.8",
+    "react-router": "^6.23.1",
+    "react-router-dom": "^6.23.1",
     "sass": "^1.101.0",
     "typescript": "^5.4.5"
+  },
+  "peerDependenciesMeta": {
+    "react-router": {
+      "optional": true
+    },
+    "react-intl": {
+      "optional": true
+    }
   }
 }

@@ -44,6 +44,16 @@ export type { HsuThemeTokens } from "./styles/tokens";
 // ConfigProvider 内，会跟随注入的主题；把 `from "antd"` 换成 `from "@hsu-react/ui"` 即可。
 export { message, notification } from "./feedback";
 
+// 布局组件**刻意不从这里导出**。
+//
+// 它们依赖 react-router / react-intl，而这两个是可选 peerDependency。一旦在根入口静态
+// re-export，`import { Button } from "@hsu-react/ui"` 也会让打包器去解析 react-router ——
+// 没装的项目直接构建失败，"可选" 就名存实亡了。
+//
+// 改为子路径引入：
+//   import Layout from "@hsu-react/ui/es/layout";
+//   import type { RouteType } from "@hsu-react/ui/es/layout";
+
 // Components
 export { default as Button } from "./components/Button";
 export * from "./components/Button";
