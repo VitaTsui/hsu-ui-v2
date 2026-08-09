@@ -11,6 +11,8 @@ import Button from "../../components/Button";
 import Icon from "../../components/Icon";
 import classNames from "classnames";
 
+import styles from "./index.module.scss";
+
 import { observer } from "mobx-react-lite";
 
 import Breadcrumb from "../Breadcrumb";
@@ -85,31 +87,36 @@ const Header: React.FC<HeaderProps> = observer((props) => {
   const nickname = user?.nickname;
 
   return (
-    <Layout.Header className={classNames("header", headerTheme)}>
-      <div className="header-left">
+    <Layout.Header className={classNames(styles.header, styles[headerTheme])}>
+      <div className={styles.headerLeft}>
         {/* Title */}
         {["left", "mixed"].includes(layout) ? (
-          <div className={classNames("title", { titleCollapsed: collapsed })}>
+          <div
+            className={classNames(styles.title, {
+              [styles.titleCollapsed]: collapsed,
+            })}
+          >
             {collapsed ? smallTitle ?? title : title}
           </div>
         ) : (
-          <div className={classNames("title", "titleTop")}>{title}</div>
+          <div className={classNames(styles.title, styles.titleTop)}>
+            {title}
+          </div>
         )}
 
         {/* Collapse button */}
         {["left", "mixed"].includes(layout) && (
           <Button
-            className="collapsed"
+            className={styles.collapsed}
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={onToggleCollapsed}
-            style={{ fontSize: "16px", width: 64, height: 64 }}
           />
         )}
 
         {/* Breadcrumb */}
         {["left"].includes(layout) && (
-          <Breadcrumb router={router} className={"breadcrumb"} />
+          <Breadcrumb router={router} className={styles.breadcrumb} />
         )}
 
         {/* Top menu */}
@@ -123,15 +130,15 @@ const Header: React.FC<HeaderProps> = observer((props) => {
           />
         )}
       </div>
-      <div className="header-right">
+      <div className={styles.headerRight}>
         {/* User info (appearance + language + account actions, all grouped in this dropdown) */}
         <Popover
-          overlayClassName="userPopover"
+          classNames={{ root: styles.userPopover }}
           placement="bottomRight"
           content={
-            <div className="userMenuPanel">
-              <div className="settingRow">
-                <span className="settingLabel">
+            <div className={styles.userMenuPanel}>
+              <div className={styles.settingRow}>
+                <span className={styles.settingLabel}>
                   {isEn ? "Appearance" : "外观"}
                 </span>
                 <Segmented
@@ -141,8 +148,8 @@ const Header: React.FC<HeaderProps> = observer((props) => {
                   onChange={(v) => setAppearance(v as typeof appearance)}
                 />
               </div>
-              <div className="settingRow">
-                <span className="settingLabel">
+              <div className={styles.settingRow}>
+                <span className={styles.settingLabel}>
                   {isEn ? "Language" : "语言"}
                 </span>
                 <Segmented
@@ -153,13 +160,15 @@ const Header: React.FC<HeaderProps> = observer((props) => {
                 />
               </div>
 
-              <div className="settingDivider" />
+              <div className={styles.settingDivider} />
 
-              <div className="menu">
+              <div className={styles.menu}>
                 {menu?.map((item, index) => (
                   <Button
                     key={index}
-                    className={classNames({ menuBtnDanger: item.danger })}
+                    className={classNames({
+                      [styles.menuBtnDanger]: item.danger,
+                    })}
                     icon={<Icon icon={item.icon} />}
                     onClick={item.onclick}
                     type="text"
@@ -171,7 +180,7 @@ const Header: React.FC<HeaderProps> = observer((props) => {
             </div>
           }
         >
-          <Space className="user">
+          <Space className={styles.user}>
             <Avatar
               style={{ backgroundColor: "#1677ff", verticalAlign: "middle" }}
               icon={nickname ? undefined : <UserOutlined />}

@@ -22,16 +22,16 @@
   &:global(.ant-menu-submenu-popup.ant-menu.ant-menu-dark) {
     :global(.ant-menu-item),
     :global(.ant-menu-submenu-title) {
-      color: var(--cf-text);
+      color: var(--vita-foreground);
 
       &:hover {
-        color: var(--primary-color) !important;
+        color: var(--vita-primary) !important;
       }
 
       &:global(.ant-menu-item-selected) {
-        background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
+        background-color: color-mix(in srgb, var(--vita-primary) 8%, transparent);
 
-        color: var(--primary-color) !important;
+        color: var(--vita-primary) !important;
       }
     }
   }

@@ -12,12 +12,12 @@
     font-size: 13px;
     font-weight: 600;
     background: var(--wa-fill);
-    border: 1px solid var(--cf-border);
+    border: 1px solid var(--vita-border);
     border-radius: 8px;
 
     &:hover {
       background: var(--wa-hover-bg);
-      border-color: var(--primary-color);
+      border-color: var(--vita-primary);
     }
   }
 
@@ -44,11 +44,11 @@
   // 明暗两套文字色由 --cf-text 一并承担，不再各写一份字面量
   .back,
   .title {
-    color: var(--cf-text);
+    color: var(--vita-foreground);
   }
 
   &.light {
-    border-inline-end: 1px solid var(--cf-border);
+    border-inline-end: 1px solid var(--vita-border);
   }
 }
 

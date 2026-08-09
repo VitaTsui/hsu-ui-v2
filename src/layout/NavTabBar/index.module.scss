@@ -5,9 +5,9 @@
   padding: 6px 8px 0px;
 
   // Modern look: keep the white strip; the active tab is a light teal pill
-  background: var(--cf-surface);
+  background: var(--vita-surface);
 
-  border-bottom: 1px solid var(--cf-border);
+  border-bottom: 1px solid var(--vita-border);
 
   // 把根类重复一次（编译成 `.x.x`），只为提一档权重。antd 的卡片样式是
   // `:where(...).ant-tabs-card.ant-tabs-small.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab`，
@@ -45,7 +45,7 @@
           }
 
           :global(.ant-tabs-tab-btn) {
-            color: var(--cf-text-2);
+            color: var(--vita-muted-foreground);
 
             > .tabLabel {
               display: inline-flex;
@@ -64,14 +64,14 @@
           }
 
           &:hover {
-            background: var(--cf-border-weak);
+            background: var(--vita-border-weak);
           }
 
           &:global(.ant-tabs-tab-active) {
-            background: var(--cf-subtle);
+            background: var(--vita-muted);
 
             :global(.ant-tabs-tab-btn) {
-              color: var(--primary-color);
+              color: var(--vita-primary);
               font-weight: 500;
             }
           }
@@ -103,7 +103,7 @@
       margin-right: 8px;
       padding-right: 8px;
 
-      border-right: 1px solid var(--cf-border-weak);
+      border-right: 1px solid var(--vita-border-weak);
     }
 
     // 「刷新当前页」按钮
@@ -116,10 +116,10 @@
       height: 28px;
       padding: 0px;
 
-      color: var(--cf-text-2);
+      color: var(--vita-muted-foreground);
 
       &:hover {
-        color: var(--primary-color);
+        color: var(--vita-primary);
       }
     }
 
@@ -132,24 +132,24 @@
 }
 
 .popover {
-  :global(.ant-popover-content) {
-    :global(.ant-popover-inner) {
-      padding: 0px;
+  // antd v6 里承载内边距的是 .ant-popover-container，v5 的 .ant-popover-inner 已经没有了 ——
+  // 照着 v5 写不会报错，只是这条规则永远不生效，右键菜单会白白多出一圈 12px 内边距
+  :global(.ant-popover-container) {
+    padding: 0px;
+  }
 
-      .part {
-        display: flex;
-        flex-direction: column;
+  .part {
+    display: flex;
+    flex-direction: column;
 
-        padding: 6px 0px;
+    padding: 6px 0px;
 
-        border-bottom: 1px solid var(--cf-border-weak);
+    border-bottom: 1px solid var(--vita-border-weak);
 
-        :global(.ant-btn) {
-          justify-content: flex-start;
+    :global(.ant-btn) {
+      justify-content: flex-start;
 
-          border-radius: 0px;
-        }
-      }
+      border-radius: 0px;
     }
   }
 }
@@ -165,9 +165,9 @@
   height: 34px;
   padding: 6px 16px;
 
-  background: var(--cf-surface);
+  background: var(--vita-surface);
   border-radius: 6px 6px 0 0;
-  border: 1px solid var(--cf-border);
+  border: 1px solid var(--vita-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
   .tabLabel {

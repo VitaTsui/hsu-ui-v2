@@ -79,6 +79,16 @@ import Layout from "@hsu-react/ui/es/layout";
 
 顺序上，`ConfigProvider` 在最外层（它提供令牌与 antd 主题），`Layout.Theme` 在内层（它只管外观三态与侧栏配色，不重复做全局主题）。
 
+## 样式
+
+顶栏的样式是**跟着组件发的**，引入组件即可，不需要在应用里另外准备一份全局 CSS。
+
+它原本写在 starter 的全局 `App.scss` 里（`.header` / `.title` / `.menu` 这类裸类名），搬进库时收成了 CSS Module —— 一是库不该要求消费方自带样式表，二是那些类名太通用，留在全局迟早和应用自己的撞上。
+
+有三样**没有**跟进来，因为它们属于应用外壳而不是这个组件：页面整体的 `#App` / `.body` / `.content` 布局、侧栏 `.ant-layout-sider` 的背景与分隔线、右上角的版本号。
+
+深色导航的渐变两端色读 `--nav-dark-top` / `--nav-dark-bottom`，由 [`Layout.Theme`](/layouts/theme) 的 `navDarkColors` 写入；顶栏单独使用（不套 `Theme`）时走内置兜底值，不会变成透明底。
+
 ## API
 
 | 属性 | 说明 | 类型 | 默认值 |

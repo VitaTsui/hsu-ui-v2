@@ -1,0 +1,215 @@
+// 顶栏样式。原本写在消费方的全局 App.scss 里（`.header` 这样的裸类名），组件搬进库之后
+// 一起收成 CSS Module —— 否则库里发出去的是一个没有任何样式的顶栏，还会和消费方自己的
+// `.header` / `.menu` / `.title` 撞名。
+//
+// 注意：CSS Module 里的类名都会被哈希，antd 的类名必须写在 :global() 里，否则规则不报错
+// 但永远匹配不到 antd 渲染出的 DOM。
+//
+// 没有搬进来的部分（属于应用，不属于这个组件）：`#App` 外壳、`.body` / `.content` 的布局、
+// 侧栏 `.ant-layout-sider` 的背景与分隔线、以及右上角的 `.app-version` 版本号。
+.header {
+  position: relative;
+  z-index: 11;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  padding: 0px;
+  overflow: hidden;
+
+  // 用细边框而不是投影，跟随明暗切换
+  border-bottom: 1px solid var(--vita-border);
+  box-shadow: none;
+
+  .headerLeft {
+    display: flex;
+    align-items: center;
+
+    flex: 1;
+    min-width: 0px;
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 230px;
+      min-width: 230px;
+      height: 100%;
+      padding: 0px 20px;
+
+      color: var(--vita-foreground);
+      font-size: 20px;
+      font-weight: bold;
+      white-space: nowrap;
+      word-break: keep-all;
+
+      overflow: hidden;
+
+      transition:
+        width 0.2s,
+        min-width 0.2s;
+
+      // 侧栏收起时标题一起收窄，宽度和收起后的侧栏对齐
+      &.titleCollapsed {
+        width: 80px;
+        min-width: 80px;
+        padding: 0px 10px;
+      }
+
+      // 顶部布局下标题不占固定宽度，按内容撑开
+      &.titleTop {
+        width: max-content;
+        min-width: max-content;
+      }
+    }
+
+    .collapsed {
+      width: max-content;
+      height: 100%;
+      padding: 0px 10px;
+
+      font-size: 16px;
+    }
+
+    .breadcrumb {
+      padding: 0px 10px;
+    }
+  }
+
+  .headerRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 12px;
+
+    min-width: max-content;
+    height: 100%;
+
+    font-size: 16px;
+
+    .user {
+      width: max-content;
+      min-width: max-content;
+      height: 36px;
+      padding: 0 12px;
+      margin-right: 8px;
+
+      white-space: nowrap;
+      word-break: keep-all;
+      color: var(--vita-foreground);
+
+      border-radius: 8px;
+      cursor: pointer;
+
+      transition:
+        background-color 0.3s,
+        color 0.3s;
+
+      &:hover {
+        background-color: var(--vita-hover);
+      }
+    }
+  }
+
+  // 深色 / 主题色导航的覆盖放在最后，并且每条都比上面的结构规则多一个类 ——
+  // 权重打平时后写的赢，靠顺序太脆，这里让它无论顺序都稳赢。
+  &.dark,
+  &.theme {
+    color: #fff;
+
+    border-bottom-color: rgb(255 255 255 / 10%);
+
+    .headerLeft .title,
+    .headerLeft .collapsed,
+    .headerLeft .breadcrumb {
+      color: #fff;
+    }
+
+    .headerRight .user {
+      color: #ffffffd9;
+
+      &:hover {
+        background-color: #ffffff26;
+        color: #ffffff;
+      }
+    }
+  }
+
+  // 只有深色导航铺中性黑渐变。两端颜色由 Layout.Theme 的 navDarkColors 给，但顶栏也允许
+  // 脱离 Theme 单独用，所以这里带上兜底值 —— 否则变量取不到，整条 gradient 会被判为无效，
+  // 深色导航直接变成透明底。
+  &.dark {
+    background: linear-gradient(
+      90deg,
+      var(--nav-dark-top, #1f1f1f) 0%,
+      var(--nav-dark-bottom, #141414) 100%
+    );
+  }
+}
+
+// 账号下拉。挂在 body 上，够不到 .header，所以是一条独立的顶层规则
+.userPopover {
+  // antd v6 里承载内边距的是 .ant-popover-container，v5 的 .ant-popover-inner 已经没有了 ——
+  // 照着 v5 写不会报错，只是这条规则永远不生效
+  :global(.ant-popover-container) {
+    padding: 8px;
+  }
+
+  :global(.ant-btn):hover {
+    color: var(--vita-primary) !important;
+    background-color: transparent !important;
+  }
+
+  .userMenuPanel {
+    min-width: 230px;
+
+    .settingRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      column-gap: 12px;
+
+      padding: 6px 8px;
+
+      .settingLabel {
+        color: var(--vita-muted-foreground);
+        font-size: 13px;
+        white-space: nowrap;
+      }
+    }
+
+    .settingDivider {
+      height: 1px;
+      margin: 6px 0;
+
+      background: var(--vita-border);
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+
+      :global(.ant-btn) {
+        justify-content: flex-start;
+
+        width: 100%;
+
+        // 图标贴左、文字贴右：图标容器右侧留白撑满，把文字推到右端，和上面设置项
+        // 右侧的控件对齐。每一项都这样，不是只有「退出登录」
+        :global(.ant-btn-icon) {
+          margin-right: auto;
+        }
+
+        // 退出登录这类危险动作，用红色悬浮态区分
+        &.menuBtnDanger:hover {
+          background: color-mix(in srgb, var(--vita-error) 14%, transparent);
+          color: var(--vita-error);
+        }
+      }
+    }
+  }
+}
