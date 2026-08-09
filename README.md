@@ -12,8 +12,10 @@
 ```bash
 yarn add @hsu-react/ui
 # peerDependencies
-yarn add react react-dom antd @ant-design/icons mobx mobx-react-lite
+yarn add react react-dom antd@^5 @ant-design/icons@^5 mobx mobx-react-lite
 ```
+
+> **这是 1.x 线，对应 antd v5**，只收 bugfix。需要 antd v6 请用 2.x：`npm i @hsu-react/ui@2`，迁移说明见[文档](https://vitatsui.github.io/hsu-ui/guide)。
 
 ## 使用
 
