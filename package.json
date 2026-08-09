@@ -17,11 +17,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VitaTsui/hsu-ui.git"
+    "url": "git+https://github.com/VitaTsui/hsu-ui-v2.git"
   },
-  "homepage": "https://github.com/VitaTsui/hsu-ui#readme",
+  "homepage": "https://github.com/VitaTsui/hsu-ui-v2#readme",
   "bugs": {
-    "url": "https://github.com/VitaTsui/hsu-ui/issues"
+    "url": "https://github.com/VitaTsui/hsu-ui-v2/issues"
   },
   "publishConfig": {
     "access": "public"

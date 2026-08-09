@@ -5,7 +5,7 @@
 
 一套基于 **React + Ant Design** 的中后台业务组件库，把「列表 + 搜索 + 表单弹窗 + CRUD」这类重复劳动沉淀为页面级组件，并内置 Markdown / CodeMirror / Spreadsheet / Chart / Editor 等内容组件。
 
-📖 **文档与在线示例：https://vitatsui.github.io/hsu-ui**
+📖 **文档与在线示例：https://vitatsui.github.io/hsu-ui-v2**
 
 ## 安装
 
@@ -15,11 +15,16 @@ yarn add @hsu-react/ui
 yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
-两条版本线并行：**2.x 对应 antd v6**（默认安装到这条），**1.x 对应 antd v5**（`npm i @hsu-react/ui@1`）。
+两条版本线并行，包名同为 `@hsu-react/ui`，但分仓维护：
+
+| 版本线 | 依赖 | 仓库 |
+| --- | --- | --- |
+| **2.x**（本仓库） | antd v6 | [VitaTsui/hsu-ui-v2](https://github.com/VitaTsui/hsu-ui-v2) |
+| **1.x** | antd v5 | [VitaTsui/hsu-ui](https://github.com/VitaTsui/hsu-ui)，`npm i @hsu-react/ui@1` |
 
 ## 浏览器支持
 
-Chrome / Edge ≥ 111、Safari ≥ 16.4、Firefox ≥ 121（现代浏览器，不支持 IE），与 antd v6 的口径一致。更老的浏览器不会白屏，但焦点环、选中底色等依赖 `color-mix()` / `:has()` 的样式会失效，详见[文档](https://vitatsui.github.io/hsu-ui/guide#%E6%B5%8F%E8%A7%88%E5%99%A8%E6%94%AF%E6%8C%81)。
+Chrome / Edge ≥ 111、Safari ≥ 16.4、Firefox ≥ 121（现代浏览器，不支持 IE），与 antd v6 的口径一致。更老的浏览器不会白屏，但焦点环、选中底色等依赖 `color-mix()` / `:has()` 的样式会失效，详见[文档](https://vitatsui.github.io/hsu-ui-v2/guide#%E6%B5%8F%E8%A7%88%E5%99%A8%E6%94%AF%E6%8C%81)。
 
 ## 使用
 

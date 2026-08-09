@@ -1,8 +1,8 @@
 import { defineConfig } from "dumi";
 
-// GitHub Pages 项目站点路径为 /hsu-ui/；本地开发(yarn dev)仍用根路径。
+// GitHub Pages 项目站点路径为 /hsu-ui-v2/；本地开发(yarn dev)仍用根路径。
 const isGhPages = !!process.env.GH_PAGES;
-const base = isGhPages ? "/hsu-ui/" : "/";
+const base = isGhPages ? "/hsu-ui-v2/" : "/";
 
 export default defineConfig({
   base,
