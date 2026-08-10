@@ -41,3 +41,33 @@ import Layout from "@hsu-react/ui/es/layout";
 | secondaryItemFilter | 次级菜单项的额外过滤，按 key（绝对路径）判断 | `(key: string) => boolean` | - |
 
 > 其余属性透传给 antd 的 [Menu](https://ant.design/components/menu-cn)。
+
+### 自定义次级菜单头部
+
+不传 `secondaryHeader` 时组件会渲染一个默认头部（返回入口 ＋ 当前实体名）。要在它上面加东西
+——比如详情内检索框——不用整块重写，把 `SecondaryHeader` 拿出来用它的 `extra` 插槽：
+
+```tsx | pure
+import Layout, { SecondaryHeader } from "@hsu-react/ui/es/layout";
+
+<Layout.Menu
+  router={router}
+  secondaryHeader={
+    <SecondaryHeader
+      collapsed={collapsed}
+      theme="dark"
+      title={work.name}
+      extra={<SearchInWork workId={work.id} />}
+    />
+  }
+/>;
+```
+
+| SecondaryHeader 属性 | 说明 | 类型 |
+| --- | --- | --- |
+| collapsed | 侧栏是否收起，收起时只剩箭头 | `boolean` |
+| theme | 明暗，跟随侧栏 | `"light" \| "dark"` |
+| backText | 返回入口文案 | `string` |
+| onBack | 自定义返回行为，不给则退回上一页 | `() => void` |
+| title | 当前实体名 | `string` |
+| extra | 返回入口与标题之间的插槽 | `ReactNode` |

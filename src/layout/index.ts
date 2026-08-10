@@ -29,6 +29,13 @@ export type { RouteType, MetaType } from "./types";
  */
 export type { AccountAction, HeaderProps } from "./Header";
 export type { MenuType, MenuProps } from "./Menu";
+/**
+ * 次级菜单的默认头部。`Menu` 在切到次级菜单时会自己渲染它，一般不用管；
+ * 需要在返回入口下面塞点东西（详情内检索框之类）时，把它的 `extra` 用起来、
+ * 整块作为 `secondaryHeader` 传给 `Menu`。
+ */
+export { default as SecondaryHeader } from "./Menu/_components/SecondaryHeader";
+export type { SecondaryHeaderProps } from "./Menu/_components/SecondaryHeader";
 export type { TabType, NavTabBarProps } from "./NavTabBar";
 export type { BreadcrumbType, BreadcrumbProps } from "./Breadcrumb";
 export type { InternationalizationProps } from "./I18n";
