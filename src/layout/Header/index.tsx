@@ -192,8 +192,10 @@ const Header: React.FC<HeaderProps> = observer((props) => {
           }
         >
           <Space className={styles.user}>
+            {/* 底色跟随主色。从前这里写死 antd 蓝 #1677ff，而且是**行内样式**——
+                换过品牌色的项目连用 CSS 都盖不住，一颗蓝点钉在整套配色里 */}
             <Avatar
-              style={{ backgroundColor: "#1677ff", verticalAlign: "middle" }}
+              className={styles.avatar}
               icon={nickname ? undefined : <UserOutlined />}
             >
               {nickname?.[0]?.toUpperCase()}

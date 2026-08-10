@@ -91,6 +91,12 @@
 
     font-size: 16px;
 
+    .avatar {
+      background: var(--vita-primary);
+      color: var(--vita-primary-foreground);
+      vertical-align: middle;
+    }
+
     .user {
       width: max-content;
       min-width: max-content;
