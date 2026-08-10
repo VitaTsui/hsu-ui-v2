@@ -113,8 +113,10 @@
       align-items: center;
       align-self: stretch;
 
-      margin-right: 8px;
-      padding-right: 8px;
+      // 竖线两侧各留 5px（按钮右缘到首个页签共 11px）。两边取同一个值，竖线才落在正中；
+      // 一边宽一边窄会看起来像是竖线属于其中一侧
+      margin-right: 5px;
+      padding-right: 5px;
 
       border-right: 1px solid var(--vita-border-weak);
     }
