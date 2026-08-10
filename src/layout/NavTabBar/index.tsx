@@ -1,4 +1,4 @@
-import { Tabs as AntdTabs, Tooltip } from "antd";
+import { Tabs as AntdTabs } from "antd";
 import React, { ReactNode, useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
@@ -182,18 +182,18 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
         showReload
           ? {
               left: (
-                // 不用 Button 的 title —— 本库的 Button 把 title 当作 children 的兜底
-                // （children ?? title），传了会把文案画到按钮里，而不是变成悬浮提示
-                <Tooltip title="刷新当前页">
-                  <Button
-                    className={styles.reload}
-                    type="text"
-                    size="small"
-                    aria-label="刷新当前页"
-                    icon={<Icon icon="ep:refresh" />}
-                    onClick={reloadCurrent}
-                  />
-                </Tooltip>
+                // 不加悬浮提示：图标含义直白，一颗 28px 的按钮顶出一块深色气泡反而抢眼。
+                // 文案只留在 aria-label 上给读屏用。
+                // 另注意不能改用 Button 的 title —— 本库的 Button 把 title 当作 children
+                // 的兜底（children ?? title），传了会把文案画进按钮里
+                <Button
+                  className={styles.reload}
+                  type="text"
+                  size="small"
+                  aria-label="刷新当前页"
+                  icon={<Icon icon="ep:refresh" />}
+                  onClick={reloadCurrent}
+                />
               ),
             }
           : undefined
