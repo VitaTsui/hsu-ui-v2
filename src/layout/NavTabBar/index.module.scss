@@ -66,8 +66,11 @@
             }
           }
 
+          // 悬浮态用 --vita-hover，不要用 --vita-border-weak：后者是**边框**色，
+          // 消费方换配色时会连着边框一起调，没法单独把悬浮底改暖/改冷。默认值也不合适
+          // ——它比 --vita-hover 更实，压在自定义底色上会显出一块异色方块。
           &:hover {
-            background: var(--vita-border-weak);
+            background: var(--vita-hover);
           }
 
           &:global(.ant-tabs-tab-active) {

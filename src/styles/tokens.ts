@@ -149,7 +149,12 @@ export const toAntdTheme = (options?: {
     colorBgContainer: t.surface,
     colorBgElevated: t.surface,
     colorBgLayout: t.background,
-    colorBgSpotlight: t.muted,
+
+    // `colorBgSpotlight` 故意不接管。它只服务 Tooltip，而 antd 把 Tooltip 的文字色写死成
+    // `colorTextLightSolid`（白），底色必须是深色才读得出来——把它指到 `muted` 这种浅色
+    // 中性面，亮色下就成了白字打在近白底上，整条提示语看不见。
+    // antd 两套算法给的默认值本来就是深的（亮色 rgba(0,0,0,.85)、暗色抬亮的深灰），
+    // 交回给它。
 
     // antd paints table headers / filled controls from the Fill ramp; pointing the top of it at
     // `muted` is what keeps those surfaces on the zinc scale instead of antd's default greys.
