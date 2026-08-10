@@ -1,8 +1,12 @@
 // 注意：这是 CSS Module，文件里的每个类名都会被哈希。antd 的类名必须写在 :global() 里，
 // 否则 `.ant-tabs-nav` 会被编译成一串哈希，永远匹配不到 antd 渲染出的 DOM —— 规则不会报错，
 // 只是静悄悄地全部失效。本库其余组件的样式都遵循这个写法。
+
+// 栏的左右内边距。刷新按钮与首个页签之间也按它留，两处共用一个值，改了不会走形。
+$gutter: 8px;
+
 .NavTabBar {
-  padding: 6px 8px 0px;
+  padding: 6px $gutter 0px;
 
   // Modern look: keep the white strip; the active tab is a light teal pill
   background: var(--vita-surface);
@@ -113,10 +117,11 @@
       align-items: center;
       align-self: stretch;
 
-      // 竖线两侧各留 5px（按钮右缘到首个页签共 11px）。两边取同一个值，竖线才落在正中；
-      // 一边宽一边窄会看起来像是竖线属于其中一侧
-      margin-right: 5px;
-      padding-right: 5px;
+      // 按钮右缘到首个页签正好留 $gutter，与栏的左内边距一样宽：按钮左边留多少，右边就留
+      // 多少，刷新按钮才像是和页签同属一排、而不是被推开的另一件东西。
+      // 竖线自己占 1px，剩下的两侧对半分，它才落在正中
+      margin-right: calc((#{$gutter} - 1px) / 2);
+      padding-right: calc((#{$gutter} - 1px) / 2);
 
       border-right: 1px solid var(--vita-border-weak);
     }
