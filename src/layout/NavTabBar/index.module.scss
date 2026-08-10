@@ -35,7 +35,10 @@
           margin: 0px;
 
           border: none;
-          border-radius: 8px;
+          // 只圆上面两角：页签是「贴在内容区上沿」的，下沿要与内容区接平，
+          // 四角全圆会让它看起来像一颗浮在栏里的胶囊、和下方内容脱开。
+          // 与拖拽时的浮层（.dragOverlay）保持同一形状。
+          border-radius: 8px 8px 0 0;
           background: transparent;
 
           transition: background 0.2s;
@@ -166,7 +169,8 @@
   padding: 6px 16px;
 
   background: var(--vita-surface);
-  border-radius: 6px 6px 0 0;
+  // 与页签同一形状（上圆下方、同一半径），拖起来才像是把那颗页签拎了起来
+  border-radius: 8px 8px 0 0;
   border: 1px solid var(--vita-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
