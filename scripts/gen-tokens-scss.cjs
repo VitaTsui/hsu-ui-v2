@@ -169,6 +169,11 @@ rLines.push("//   .row   { &:hover { background: …; } }  // 触屏上 hover �
 rLines.push("//   .row   { @include r.hover { &:hover { background: …; } } }  // 正确写法");
 rLines.push("// =============================================================");
 rLines.push("");
+// map-has-key / map-get / map-keys 这几个全局函数在 Dart Sass 3.0 会被移除，现在用会
+// 打弃用告警（消费方每编译一个引了本文件的 module.scss 就打一条，实测刷了 10 条）。
+// 改用 sass:map 模块的同名成员。
+rLines.push("@use \"sass:map\";");
+rLines.push("");
 rLines.push("$breakpoints: (");
 for (const [name, value] of Object.entries(bp)) {
   rLines.push(`  ${name}: ${value}px,`);
@@ -176,10 +181,10 @@ for (const [name, value] of Object.entries(bp)) {
 rLines.push(");");
 rLines.push("");
 rLines.push("@function bp($name) {");
-rLines.push("  @if not map-has-key($breakpoints, $name) {");
-rLines.push("    @error \"未知断点 #{$name}，可用：#{map-keys($breakpoints)}\";");
+rLines.push("  @if not map.has-key($breakpoints, $name) {");
+rLines.push("    @error \"未知断点 #{$name}，可用：#{map.keys($breakpoints)}\";");
 rLines.push("  }");
-rLines.push("  @return map-get($breakpoints, $name);");
+rLines.push("  @return map.get($breakpoints, $name);");
 rLines.push("}");
 rLines.push("");
 rLines.push("/// 视口 < 断点（移动优先的「小屏覆盖」）");

@@ -8,6 +8,8 @@
 //   .row   { @include r.hover { &:hover { background: …; } } }  // 正确写法
 // =============================================================
 
+@use "sass:map";
+
 $breakpoints: (
   sm: 640px,
   md: 768px,
@@ -17,10 +19,10 @@ $breakpoints: (
 );
 
 @function bp($name) {
-  @if not map-has-key($breakpoints, $name) {
-    @error "未知断点 #{$name}，可用：#{map-keys($breakpoints)}";
+  @if not map.has-key($breakpoints, $name) {
+    @error "未知断点 #{$name}，可用：#{map.keys($breakpoints)}";
   }
-  @return map-get($breakpoints, $name);
+  @return map.get($breakpoints, $name);
 }
 
 /// 视口 < 断点（移动优先的「小屏覆盖」）
