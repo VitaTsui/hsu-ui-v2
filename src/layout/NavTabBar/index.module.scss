@@ -39,7 +39,14 @@
           // 四角全圆会让它看起来像一颗浮在栏里的胶囊、和下方内容脱开。
           // 与拖拽时的浮层（.dragOverlay）保持同一形状。
           border-radius: 8px 8px 0 0;
-          background: transparent;
+          // 未选中的页签要能从栏里认出来，所以给一层静息底，而不是 transparent —— 透明会让
+          // 它整个溶进 `--vita-surface` 的栏里，只剩文字浮着。
+          // 取 `--vita-background`：每套色板里它都恰好比 surface 低一级（默认亮色
+          // #fafafa / #ffffff、暗色 #09090b / #18181b），无论消费方怎么换配色，页签与栏
+          // 之间都留得住这一档差 —— 也正是 antd 卡片页签原本靠 colorFillAlter 做出的效果。
+          // 注意选中态并不靠底色深浅跟它拉开（消费方的色板里两者可能很接近），而是靠
+          // 主色文字 + 500 字重，这一点与改造前一致。
+          background: var(--vita-background);
 
           transition: background 0.2s;
 
