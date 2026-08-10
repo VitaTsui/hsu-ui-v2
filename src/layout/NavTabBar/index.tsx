@@ -27,6 +27,7 @@ import { useTabPath } from "./_hooks/useTabPath";
 import { useTabContextMenu } from "./_hooks/useTabContextMenu";
 import { useDropTabKey } from "./_hooks/useDropTabKey";
 import { useTabTitle } from "./_hooks/useTabTitle";
+import { useKeepTabs } from "./_hooks/useKeepTabs";
 import TabLabel from "./_components/TabLabel";
 import DraggableTabNode from "./_components/SortableTab";
 import TabDragOverlay from "./_components/TabDragOverlay";
@@ -51,6 +52,25 @@ export interface NavTabBarProps {
   basePath?: string;
   /** 页签栏最前面的「刷新当前页」按钮 */
   showReload?: boolean;
+  /**
+   * 地址变化时决定每个页签还留不留。返回 false 的会被关掉，并连同 react-activation 的
+   * 缓存一起丢弃。
+   *
+   * 给的是「在当前地址下这个页签还该不该在」这种判定，不需要自己记上一个位置是什么。
+   *
+   * @example 一次只专注一部作品：进入另一部书时，把上一部的页签全收掉
+   * ```ts
+   * const workId = (p: string) => p.match(/\/work\/([0-9a-f-]{36})/)?.[1] ?? null;
+   *
+   * <Layout.NavTabBar
+   *   shouldKeepTab={(tab, { pathname }) => {
+   *     const tabWork = workId(tab.key);
+   *     return !tabWork || tabWork === workId(pathname);
+   *   }}
+   * />
+   * ```
+   */
+  shouldKeepTab?: (tab: TabType, info: { pathname: string }) => boolean;
 }
 
 const NavTabBar: React.FC<NavTabBarProps> = (props) => {
@@ -59,6 +79,7 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
     affixRouter = [],
     basePath = "/",
     showReload = true,
+    shouldKeepTab,
   } = props;
   const navigate = useNavigate();
   const { drop, refresh } = useAliveController();
@@ -78,6 +99,7 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
 
   useDropTabKey(setOpenkeys);
   useTabTitle(setOpenkeys);
+  useKeepTabs(shouldKeepTab, setOpenkeys);
 
   // ID of the tab currently being dragged
   const [activeId, setActiveId] = useState<string | null>(null);

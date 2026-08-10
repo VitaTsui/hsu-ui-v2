@@ -53,6 +53,14 @@ export interface HeaderProps {
   title?: React.ReactNode;
   /** 侧栏收起时用的短标题；不传则回落到 title */
   smallTitle?: React.ReactNode;
+  /**
+   * 是否显示语言切换。
+   *
+   * 只有中文一种文案的项目把它关掉——留着会给用户一个切了之后只有 antd 内建文案变化、
+   * 业务文案纹丝不动的开关，比没有更糟。关掉后 `Layout.I18n` 仍可照常用（日期、分页
+   * 这些 antd 内建文案还是要它）。
+   */
+  showLocale?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = observer((props) => {
@@ -65,6 +73,7 @@ const Header: React.FC<HeaderProps> = observer((props) => {
     user,
     title,
     smallTitle,
+    showLocale = true,
   } = props;
   const { layout, headerTheme, appearance, setAppearance } = ThemeStore;
   const { locale, setLocale } = I18nStore;
@@ -148,17 +157,19 @@ const Header: React.FC<HeaderProps> = observer((props) => {
                   onChange={(v) => setAppearance(v as typeof appearance)}
                 />
               </div>
-              <div className={styles.settingRow}>
-                <span className={styles.settingLabel}>
-                  {isEn ? "Language" : "语言"}
-                </span>
-                <Segmented
-                  size="small"
-                  value={locale}
-                  options={languageOptions}
-                  onChange={(v) => setLocale(v as string)}
-                />
-              </div>
+              {showLocale && (
+                <div className={styles.settingRow}>
+                  <span className={styles.settingLabel}>
+                    {isEn ? "Language" : "语言"}
+                  </span>
+                  <Segmented
+                    size="small"
+                    value={locale}
+                    options={languageOptions}
+                    onChange={(v) => setLocale(v as string)}
+                  />
+                </div>
+              )}
 
               <div className={styles.settingDivider} />
 

@@ -62,6 +62,32 @@ export default () => (
 | affixRouter | 额外固定的路由路径（等价于给这些路由加 `meta.affix`） | `string[]` | `[]` |
 | basePath | 关掉最后一个页签后回退到的路径 | `string` | `"/"` |
 | showReload | 页签栏最前面的「刷新当前页」按钮 | `boolean` | `true` |
+| shouldKeepTab | 地址变化时决定每个页签留不留，返回 `false` 的会被关掉并丢弃缓存 | `(tab, { pathname }) => boolean` | - |
+
+## 按业务规则批量收页签
+
+`shouldKeepTab` 用来表达「在当前这个位置，这个页签还该不该留着」。典型场景是同一时间只
+围绕一个对象工作，切到另一个对象时把上一个的页签一起收掉：
+
+```tsx | pure
+const workId = (p: string) => p.match(/\/work\/([0-9a-f-]{36})/)?.[1] ?? null;
+
+<Layout.NavTabBar
+  router={router}
+  shouldKeepTab={(tab, { pathname }) => {
+    const tabWork = workId(tab.key);
+    // 不属于任何作品的页签（总览、设置…）一律留着；属于某部作品的，只在还在那部作品里时留
+    return !tabWork || tabWork === workId(pathname);
+  }}
+/>;
+```
+
+判定按**当前地址**做，不用自己记「上一个位置是什么」—— 每次地址变化重新评估一遍，语义更
+直白，也不会因为漏更新而残留。
+
+> 关页签这件事必须由组件来做：光把它从列表里去掉不够，还要丢掉 react-activation 的缓存，
+> 否则那棵组件树留在内存里，下次同名路由回来会复用旧实例。所以这里只让你给判定，删除与
+> 丢缓存由组件统一执行。
 
 ## 配套 Hook
 

@@ -116,5 +116,10 @@ import type {
 | onToggleCollapsed | 点击收起按钮 | `() => void` | - |
 | onChildItems | mixed 布局下把顶部菜单的子项回传给左侧栏 | `(items: MenuType[]) => void` | - |
 | menu | 账号下拉里的动作项（改密、退出等） | `AccountAction[]` | - |
+| showLocale | 是否显示语言切换 | `boolean` | `true` |
+
+只有中文一种文案的项目请把 `showLocale` 关掉：留着会给用户一个「切了之后只有 antd 内建
+文案变化、业务文案纹丝不动」的开关，比没有更糟。关掉后 [`Layout.I18n`](/layouts/i18n) 仍
+可照常用 —— 日期选择器、分页这些 antd 内建文案还是要它。
 
 > `user` 与 `title` 原本分别读应用的鉴权模块与全局 `Config`，移入库时改成了属性 —— 组件不该认识消费方的这两样东西。
