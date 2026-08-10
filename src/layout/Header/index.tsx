@@ -40,7 +40,7 @@ export interface AccountAction {
   danger?: boolean;
 }
 
-interface HeaderProps {
+export interface HeaderProps {
   router: Parameters<typeof Breadcrumb>[0]["router"];
   collapsed: boolean;
   onToggleCollapsed: () => void;

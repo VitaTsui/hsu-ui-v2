@@ -20,6 +20,18 @@ import I18nStore from "./I18n/I18nStore";
 import ThemeStore from "./Theme/ThemeStore";
 
 export type { RouteType, MetaType } from "./types";
+
+/**
+ * 各组件的公开类型。第一个真实消费方（vita-admin-starter）一上来就需要 `AccountAction`
+ * 与 `MenuType` —— 前者用来声明账号菜单，后者用来存 mixed 布局回传的子项。它们原本只在
+ * 各自模块里导出，消费方只能写 `@hsu-react/ui/es/layout/Header` 这种深路径，等于把内部
+ * 目录结构变成公开契约。统一从这里出。
+ */
+export type { AccountAction, HeaderProps } from "./Header";
+export type { MenuType, MenuProps } from "./Menu";
+export type { TabType, NavTabBarProps } from "./NavTabBar";
+export type { BreadcrumbType, BreadcrumbProps } from "./Breadcrumb";
+export type { InternationalizationProps } from "./I18n";
 export type { ThemeProps } from "./Theme";
 
 export { default as useSetTabTitle, NavTabBarTitleContent } from "./_hooks/useSetTabTitle";

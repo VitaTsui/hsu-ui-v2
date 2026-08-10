@@ -23,7 +23,7 @@ export interface BreadcrumbType extends Omit<ItemType, "children"> {
   index?: boolean;
 }
 
-interface BreadcrumbProps {
+export interface BreadcrumbProps {
   router: RouteType[];
   className?: string;
 }

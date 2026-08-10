@@ -79,6 +79,21 @@ import Layout from "@hsu-react/ui/es/layout";
 
 顺序上，`ConfigProvider` 在最外层（它提供令牌与 antd 主题），`Layout.Theme` 在内层（它只管外观三态与侧栏配色，不重复做全局主题）。
 
+## 类型
+
+组件用到的公开类型都从 `@hsu-react/ui/es/layout` 出，不要深路径引到各组件目录里去：
+
+```ts | pure
+import type {
+  RouteType, MetaType,          // 路由与其附加信息
+  AccountAction, HeaderProps,   // 顶栏
+  MenuType, MenuProps,          // 菜单
+  TabType, NavTabBarProps,      // 页签栏
+  BreadcrumbType, BreadcrumbProps,
+  InternationalizationProps, ThemeProps,
+} from "@hsu-react/ui/es/layout";
+```
+
 ## 样式
 
 顶栏的样式是**跟着组件发的**，引入组件即可，不需要在应用里另外准备一份全局 CSS。

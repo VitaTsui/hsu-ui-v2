@@ -29,7 +29,7 @@ export type MenuType = ItemType & {
   parent?: MenuType;
 };
 
-interface MenuProps extends AntdMenuProps {
+export interface MenuProps extends AntdMenuProps {
   router: RouteType[];
   collapsed?: boolean;
   menuItems?: MenuType[];
