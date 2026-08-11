@@ -54,7 +54,15 @@
     }
   }
 
-  &:hover,
+  // 悬浮只加深边框，聚焦才画光环。
+  //
+  // 两者从前并在同一块里，鼠标一碰整圈就亮起来，看上去像是已经聚焦——而同一行里的
+  // Input / DatePicker 悬浮都只变边框色，一排控件里只有下拉框自己在发光。
+  // 光环是「此刻的输入焦点在这里」的信号，悬浮借用它，焦点就没有了唯一标识。
+  &:hover {
+    border-color: var(--vita-primary);
+  }
+
   &.focused {
     border-color: var(--vita-primary);
 
