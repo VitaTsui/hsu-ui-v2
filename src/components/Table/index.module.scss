@@ -294,7 +294,13 @@
         height: 100%;
       }
 
-      :global(.ant-spin-nested-loading) {
+      // 这里原本写的是 `.ant-spin-nested-loading` —— antd v5 里 Spin 包裹子节点时的那层
+      // 类名。v6 把它删了（现在包裹层只有 `.ant-spin`），于是**整段滚动布局一条都不命中**，
+      // 表体拿不到 `flex: 1` 与 `overflow-y: auto`，纵向滚动直接消失，而且不报错。
+      //
+      // 改用直接子选择器：wrapper 下本来就只有这一个包裹层，不写死它叫什么，
+      // v5 / v6 都命中，将来 antd 再改名也不会又静默失效。
+      :global(.ant-table-wrapper) > * {
         width: 100%;
         height: 100%;
 
@@ -344,13 +350,12 @@
       }
 
       &.y-unScroll {
-        :global(.ant-spin-nested-loading) {
-          :global(.ant-spin-container) {
-            :global(.ant-table) {
-              :global(.ant-table-container) {
-                > :global(.ant-table-body) {
-                  overflow-y: visible !important;
-                }
+        // 同上：不再经过 v5 才有的 .ant-spin-nested-loading
+        :global(.ant-spin-container) {
+          :global(.ant-table) {
+            :global(.ant-table-container) {
+              > :global(.ant-table-body) {
+                overflow-y: visible !important;
               }
             }
           }
