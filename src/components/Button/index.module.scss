@@ -30,20 +30,31 @@
   --ant-btn-border-color-hover: var(--ant-btn-color-hover);
   --ant-btn-border-color-active: var(--ant-btn-color-active);
 
-  // 中性色系要单独抬一档：它的 color-base 就是边框色，而边框色与浅底色在暗色下恰好同值
+  // 中性色系要单独处理：它的 color-base 就是边框色，而边框色与浅底色在暗色下恰好同值
   // （--vita-border 与 --vita-muted 都是 #27272a），照抄就等于没有边框。
-  // 往文字色方向混一点即可 —— 浅色下变深、暗色下变浅，一条规则两个主题都成立。
+  //
+  // 从**按钮自己那一档浅底**（--ant-btn-color-light，即 antd 给 filled 的底色）往文字色
+  // 混一档推出边框：同一色系、只是深一度，浅色下变深、暗色下变浅，一条规则两个主题都成立。
+  // 消费方把浅底换成暖色，边框自动跟着变暖，不会一个冷一个暖。
+  //
+  // 12% 是照标准边框相对面板的落差定的（#ffffff → #e4e4e7 约 27/255），够看见又不抢眼。
+  // 从前混的是 color-base 且高达 38%，等于往中性黑里灌，浅底上就是一圈发黑的框。
+  // 三个状态各自从对应那档底色推，边框始终比自己的底深一度。
   &:global(.ant-btn-color-default) {
     --ant-btn-border-color: color-mix(
       in srgb,
-      var(--ant-btn-color-base) 62%,
+      var(--ant-btn-color-light) 88%,
       var(--vita-foreground)
     );
     --ant-btn-border-color-hover: color-mix(
       in srgb,
-      var(--ant-btn-color-base) 40%,
+      var(--ant-btn-color-light-hover) 88%,
       var(--vita-foreground)
     );
-    --ant-btn-border-color-active: var(--ant-btn-border-color-hover);
+    --ant-btn-border-color-active: color-mix(
+      in srgb,
+      var(--ant-btn-color-light-active) 88%,
+      var(--vita-foreground)
+    );
   }
 }
