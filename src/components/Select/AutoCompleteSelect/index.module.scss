@@ -134,12 +134,16 @@
       // `.ant-select-content > input.ant-select-input`.
       :global(.ant-select-content),
       :global(.ant-select-input) {
-        height: 100%;
-
         font-family: inherit;
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
+      }
+
+      // 高度只给 input。`.ant-select-content` 由 antd 用 `align-self: center` 在行里居中，
+      // 拉成 height: 100% 会让它自己撑满、居中失效，文字贴顶偏上。
+      :global(.ant-select-input) {
+        height: 100%;
       }
 
       :global(.ant-select-placeholder) {
@@ -213,6 +217,13 @@
 
       :global(.ant-select-suffix) {
         margin-top: 0px;
+      }
+
+      // 与箭头对齐。antd 的 `inset-inline-end: 11px` 是按「控件自带 11px 横向内边距」算的，
+      // 而这份内边距被挪到了外层，`.ant-select` 的 padding 是 0——箭头（flex 末位子项）没有
+      // 这 11px，绝对定位的清除按钮却还有，于是悬浮时图标会往左跳一格。
+      :global(.ant-select-clear) {
+        inset-inline-end: 0px;
       }
     }
   }
