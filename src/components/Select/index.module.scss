@@ -148,12 +148,19 @@
     // `.ant-select-content > input.ant-select-input`.
     :global(.ant-select-content),
     :global(.ant-select-input) {
-      height: 100%;
-
       font-family: inherit;
       font-size: inherit;
       font-weight: inherit;
       color: inherit;
+    }
+
+    // 高度只给 input：它是铺在控件上的那层输入框，要满高才好点。
+    //
+    // `.ant-select-content` **不能**给。antd 让它保持一行高（line-height 22px），再用
+    // `align-self: center` 在 32px 的行里居中；一旦拉成 height: 100%，它自己就撑满了，
+    // align-self 无事可做，22px 的行盒贴着顶边排，文字整体偏上（实测 5.5px）。
+    :global(.ant-select-input) {
+      height: 100%;
     }
 
     :global(.ant-select-placeholder) {
@@ -220,6 +227,16 @@
     // 所以这里只重置箭头的，清除按钮的 margin-top 交给 antd。
     :global(.ant-select-suffix) {
       margin-top: 0px;
+    }
+
+    // 清除按钮要和箭头落在同一个位置——悬浮时它顶替箭头出现，位置一变就是「跳一下」。
+    //
+    // antd 给它 `inset-inline-end: 11px`，那是按「控件自己带 11px 横向内边距」算的；
+    // 本组件把这份内边距挪到了外层 `.select`、把 `.ant-select` 的 padding 清成了 0，
+    // 于是这 11px 对箭头（flex 末位子项，右缘就是 `.ant-select` 的右缘）不再存在，
+    // 对绝对定位的清除按钮却还在，两者正好差一个 11px。归零即对齐。
+    :global(.ant-select-clear) {
+      inset-inline-end: 0px;
     }
 
     &:global(.ant-select-multiple) {
