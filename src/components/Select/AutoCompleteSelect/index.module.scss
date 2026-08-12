@@ -196,19 +196,23 @@
         }
       }
 
-      // Both icons are laid out by v6's flexbox root, so the absolute-position compensation
-      // (`inset-inline-end` / `translateY(-50%)`) that v5 needed is gone.
+      // 箭头由 v6 的 flex 根布局，居中不用补偿；**清除按钮不是** —— antd 仍然把它绝对定位，
+      // 用 `top: 50%` 加 `margin-top: -半个图标高` 拉回中线。把 margin-top 一并归零就只剩
+      // top: 50%，图标整个掉到中线以下（实测偏下 7px，正好半个 14px 图标）。
       :global(.ant-select-suffix),
       :global(.ant-select-clear) {
         width: 14px;
         height: 14px;
-        margin-top: 0px;
 
         font-size: 14px;
 
         transition: transform 0.3s;
 
         pointer-events: all;
+      }
+
+      :global(.ant-select-suffix) {
+        margin-top: 0px;
       }
     }
   }
