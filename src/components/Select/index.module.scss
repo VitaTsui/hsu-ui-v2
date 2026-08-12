@@ -205,13 +205,21 @@
     :global(.ant-select-clear) {
       width: 14px;
       height: 14px;
-      margin-top: 0px;
 
       font-size: 14px;
 
       transition: transform 0.3s;
 
       pointer-events: all;
+    }
+
+    // 箭头是 `.ant-select` 的 flex 子项，靠 align-items: center 居中，margin 归零无副作用。
+    // 清除按钮不一样：它是绝对定位的，antd 靠 `top: 50%` 再配一个 `margin-top: -半个图标高`
+    // 把它拉回中线。上面那条规则从前把 margin-top 一并重置成 0，等于只做了 top: 50%
+    // 而没有回拉，图标就整个掉到中线以下（实测偏下 7px，正好是半个 14px 图标）。
+    // 所以这里只重置箭头的，清除按钮的 margin-top 交给 antd。
+    :global(.ant-select-suffix) {
+      margin-top: 0px;
     }
 
     &:global(.ant-select-multiple) {
