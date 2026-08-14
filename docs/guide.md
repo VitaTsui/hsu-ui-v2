@@ -333,6 +333,30 @@ import "@hsu-react/ui/es/styles/utils.scss";
 
 > `antd-overload.scss` 内部已 `@use` 令牌文件，引入它就带上了整套 `--vita-*`。若只想要变量、不想要观感覆盖，单独引 `@hsu-react/ui/es/styles/tokens.scss` 即可。
 
+### webpack 项目：loader 要放行本库的 scss 与图片
+
+本库产物里带的是**未编译的 `.module.scss`** 和图片资源，交给消费方自己的 loader 处理 —— 这样 CSS Module 的类名哈希、`getLocalIdent` 等策略才由你说了算。于是 scss / 图片规则上需要开一个「排除 `node_modules`，但放行本库」的例外。
+
+**别自己写正则**，直接用库导出的判定：
+
+```js
+// webpack.config.js（CJS）
+const { excludeNodeModulesExceptHsuUi } = require("@hsu-react/ui/lib/build/webpack");
+
+{ test: /\.scss$/,                       exclude: excludeNodeModulesExceptHsuUi, use: [...] }
+{ test: /\.(png|jpe?g|gif|webp|svg)$/i,  exclude: excludeNodeModulesExceptHsuUi, type: "asset/resource" }
+```
+
+手写版本几乎都是 `/node_modules\/(?!@hsu-react\/ui\/)/`。它只看**第一个** `node_modules` 后面跟着什么：扁平安装（yarn / npm）下确实是 `@hsu-react/ui/`，但 pnpm 的真实路径是
+
+```
+node_modules/.pnpm/@hsu-react+ui@<版本>/node_modules/@hsu-react/ui/es/...
+```
+
+跟着的是 `.pnpm/`，否定前瞻立刻失败，本库的 scss 与图片会被**全部排除**，报 `no loaders are configured to process this file`。导出的这支按「整条路径里有没有 `@hsu-react/ui`」判断，扁平与嵌套都成立，也兼容 Windows 的 `\` 分隔符。
+
+> Vite 项目不需要这一步 —— 它没有这种按路径写死的 loader 规则。
+
 ## 按需引入
 
 组件库为 bundless 产物（`es/` 为 ESM、`lib/` 为 CJS），支持按目录按需引入：
