@@ -42,35 +42,6 @@ const THEMED = [
   ["shadow-3", "shadow3", "浮层阴影 - 强"],
 ];
 
-/**
- * 旧变量名 -> 新变量名。2.0 之前的 --cf-* 全部保留为单向别名，
- * 消费方项目里既有的覆盖不会一夜失效。
- */
-const LEGACY = [
-  ["--cf-canvas", "--vita-background"],
-  ["--cf-surface", "--vita-surface"],
-  ["--cf-subtle", "--vita-muted"],
-  ["--cf-border", "--vita-border"],
-  ["--cf-border-weak", "--vita-border-weak"],
-  ["--cf-text", "--vita-foreground"],
-  ["--cf-text-2", "--vita-muted-foreground"],
-  ["--cf-text-3", "--vita-subtle-foreground"],
-  ["--cf-row-hover", "--vita-hover"],
-  ["--cf-success", "--vita-success"],
-  ["--cf-warning", "--vita-warning"],
-  ["--cf-error", "--vita-error"],
-  ["--cf-font-family", "--vita-font-family"],
-  ["--cf-font-size-sm", "--vita-font-size-sm"],
-  ["--cf-font-size", "--vita-font-size"],
-  ["--cf-font-size-lg", "--vita-font-size-lg"],
-  ["--cf-radius-sm", "--vita-radius-sm"],
-  ["--cf-radius", "--vita-radius"],
-  ["--cf-radius-lg", "--vita-radius-lg"],
-  ["--cf-shadow-1", "--vita-shadow-1"],
-  ["--cf-shadow-2", "--vita-shadow-2"],
-  ["--cf-shadow-3", "--vita-shadow-3"],
-];
-
 const decl = (name, value, comment) =>
   `  --vita-${name}: ${value};${comment ? ` // ${comment}` : ""}`;
 
@@ -132,11 +103,6 @@ lines.push("  // ---- 断点（媒体查询用不了 CSS 变量，这里只是�
 lines.push("  //      真正的断点判断走 styles/_responsive.scss 的 mixin 或 useBreakpoint）----");
 for (const [name, value] of Object.entries(tokens.breakpoint)) {
   lines.push(`  --vita-screen-${name}: ${value}px;`);
-}
-lines.push("");
-lines.push("  // ---- 兼容别名（2.0 前的 --cf-*，单向指向新名）----");
-for (const [oldName, newName] of LEGACY) {
-  lines.push(`  ${oldName}: var(${newName});`);
 }
 lines.push("}");
 lines.push("");
@@ -234,7 +200,7 @@ if (process.argv.includes("--check")) {
   fs.writeFileSync(OUT, output);
   fs.writeFileSync(OUT_RESPONSIVE, responsiveOutput);
   console.log(
-    `✓ tokens：已生成 tokens.scss（${THEMED.length} 个主题变量 + ${LEGACY.length} 个兼容别名）` +
+    `✓ tokens：已生成 tokens.scss（${THEMED.length} 个主题变量）` +
       ` 与 _responsive.scss（${Object.keys(bp).length} 个断点）`
   );
 }
