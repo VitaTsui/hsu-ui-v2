@@ -1,6 +1,6 @@
 // =============================================================
 // 本文件由 scripts/gen-tokens-scss.cjs 从 src/styles/tokens.json 生成，请勿手改。
-// 改令牌请改 tokens.json，然后跑 `yarn tokens`（build / prepublish 会自动跑并校验）。
+// 改令牌请改 tokens.json，然后跑 `pnpm tokens`（build / prepublish 会自动跑并校验）。
 //
 // 暗色由 html[data-theme="dark"] 激活（消费方主题开关），
 // 或 html[data-prefers-color(-scheme)="dark"]（dumi 文档站）。
