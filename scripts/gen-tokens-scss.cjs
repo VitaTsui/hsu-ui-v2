@@ -77,7 +77,7 @@ const decl = (name, value, comment) =>
 const lines = [];
 lines.push("// =============================================================");
 lines.push("// 本文件由 scripts/gen-tokens-scss.cjs 从 src/styles/tokens.json 生成，请勿手改。");
-lines.push("// 改令牌请改 tokens.json，然后跑 `yarn tokens`（build / prepublish 会自动跑并校验）。");
+lines.push("// 改令牌请改 tokens.json，然后跑 `pnpm tokens`（build / prepublish 会自动跑并校验）。");
 lines.push("//");
 lines.push("// 暗色由 html[data-theme=\"dark\"] 激活（消费方主题开关），");
 lines.push("// 或 html[data-prefers-color(-scheme)=\"dark\"]（dumi 文档站）。");
@@ -225,7 +225,7 @@ if (process.argv.includes("--check")) {
     : "";
   if (current !== output || currentR !== responsiveOutput) {
     console.error(
-      "✗ tokens：src/styles/tokens.scss 与 tokens.json 不一致，请运行 `yarn tokens` 后重新提交"
+      "✗ tokens：src/styles/tokens.scss 与 tokens.json 不一致，请运行 `pnpm tokens` 后重新提交"
     );
     process.exit(1);
   }

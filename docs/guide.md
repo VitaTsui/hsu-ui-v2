@@ -13,13 +13,13 @@ Hsu UI 是一套基于 React + Ant Design 的中后台业务组件库，把「�
 ## 安装
 
 ```bash
-yarn add @hsu-react/ui
+pnpm add @hsu-react/ui
 ```
 
 同时确保宿主项目已安装 peerDependencies：
 
 ```bash
-yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
+pnpm add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
 ### 两条版本线
