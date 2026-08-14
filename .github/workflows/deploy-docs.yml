@@ -25,13 +25,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
+
+      # 用 Node 自带的 corepack，而不是第三方 action：pnpm 版本由 package.json 的
+      # packageManager 字段决定，本地和 CI 必然一致，也不给发布链路多引一个信任源。
+      # 必须放在 setup-node 之后 —— shim 装在当前生效的 Node bin 下，先装会被覆盖掉。
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build docs (dumi)
-        run: yarn docs:build
+        run: pnpm docs:build
         env:
           GH_PAGES: "true"
 

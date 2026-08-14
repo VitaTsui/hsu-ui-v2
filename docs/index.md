@@ -34,7 +34,7 @@ features:
 ```bash
 npm i @hsu-react/ui
 # 或
-yarn add @hsu-react/ui
+pnpm add @hsu-react/ui
 ```
 
 > peerDependencies：`react >=18`、`react-dom >=18`、`antd >=6`、`@ant-design/icons >=6`、`mobx >=6`、`mobx-react-lite >=4`，请在宿主项目中安装。

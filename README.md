@@ -10,9 +10,9 @@
 ## 安装
 
 ```bash
-yarn add @hsu-react/ui
+pnpm add @hsu-react/ui
 # peerDependencies
-yarn add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
+pnpm add react react-dom antd@^6 @ant-design/icons@^6 mobx mobx-react-lite
 ```
 
 两条版本线并行，包名同为 `@hsu-react/ui`，但分仓维护：
@@ -53,10 +53,10 @@ import "@hsu-react/ui/es/styles/antd-overload.scss";
 ## 开发
 
 ```bash
-yarn          # 安装依赖
-yarn dev      # 启动 dumi 文档站
-yarn build    # father 构建 es/ + lib/ + 类型
-yarn docs:build  # 构建文档站静态产物
+pnpm install  # 安装依赖
+pnpm dev      # 启动 dumi 文档站
+pnpm build    # father 构建 es/ + lib/ + 类型
+pnpm docs:build  # 构建文档站静态产物
 ```
 
 ## 组件一览

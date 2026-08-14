@@ -71,9 +71,16 @@ jobs:
             echo "$NAME@$VERSION 已在 npm 上，跳过 publish"
           fi
 
+      # 用 Node 自带的 corepack，而不是第三方 action：pnpm 版本由 package.json 的
+      # packageManager 字段决定，本地和 CI 必然一致，发布链路也不多一个信任源。
+      # 必须放在 setup-node 之后 —— shim 装在当前生效的 Node bin 下，先装会被覆盖掉。
+      - name: 启用 corepack（pnpm）
+        if: steps.ver.outputs.skip != 'true' && steps.npmver.outputs.published != 'true'
+        run: corepack enable
+
       - name: 安装依赖（publish 时 prepublishOnly 自动构建）
         if: steps.ver.outputs.skip != 'true' && steps.npmver.outputs.published != 'true'
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: 发布 npm
         if: steps.ver.outputs.skip != 'true' && steps.npmver.outputs.published != 'true'
