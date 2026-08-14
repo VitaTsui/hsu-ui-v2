@@ -88,7 +88,7 @@ peerDependencies 收紧为 `antd >=6` / `@ant-design/icons >=6`。**antd 5 与 6
 
 ### 3. 设计变量改名，且 ConfigProvider 开始接管 antd 主题
 
-- CSS 变量 `--cf-*` 改为语义化的 `--vita-*`（见下方「设计令牌与主题」）。旧名**全部保留为兼容别名**，样式里既有的覆盖不会失效
+- CSS 变量 `--cf-*` 改为语义化的 `--vita-*`（见下方「设计令牌与主题」）。2.0～2.2 期间旧名保留为兼容别名，**2.3.0 起已移除**：升级前请全局搜一遍 `--cf-`，逐个换成对应的 `--vita-*`（映射表见下方「设计令牌与主题」）
 - JS 侧 `lightTokens` / `darkTokens` 的**字段名**也一并改了（`canvas` → `background`、`text` → `foreground` 等）。旧字段同样保留，但标记为 deprecated，建议改用新名。其中 `headerBg` 在新命名里没有对应项，别名指向 `surface`（2.0 之前两者取值本就一致）
 - `ConfigProvider` 现在默认会把令牌喂给 antd 的 `theme.token`。若你的应用入口已经自己包了一层 antd `ConfigProvider` 做主题，两者会按 antd 的规则就近合并（内层胜）；不希望本库插手就传 `antdTheme={false}`
 - 换品牌色请改用 `<ConfigProvider primaryColor="...">`，它会同时设置 CSS 变量与 antd 的 `colorPrimary`；只覆盖 `--primary-color` 的老写法仍然有效，但**只影响 CSS 侧**，antd 组件不会跟着变
@@ -159,7 +159,25 @@ CSS 变量自己监听 `html[data-theme="dark"]`；antd 的令牌是 JS 算的�
 --vita-focus-ring / --vita-focus-ring-error
 ```
 
-> 2.0 之前这套变量叫 `--cf-*`，全部保留为指向新名的兼容别名，既有覆盖不会失效。
+#### 从 `--cf-*` 迁移
+
+2.0 之前这套变量叫 `--cf-*`。2.0～2.2 期间以别名形式保留，**2.3.0 起已移除** —— 升级到 2.3 前把项目里的旧名按下表换掉，否则那些声明会静默失效（CSS 变量取不到值不会报错，只是回落到继承值或初始值）。
+
+| 旧名 | 新名 | 旧名 | 新名 |
+| --- | --- | --- | --- |
+| `--cf-canvas` | `--vita-background` | `--cf-error` | `--vita-error` |
+| `--cf-surface` | `--vita-surface` | `--cf-font-family` | `--vita-font-family` |
+| `--cf-subtle` | `--vita-muted` | `--cf-font-size-sm` | `--vita-font-size-sm` |
+| `--cf-border` | `--vita-border` | `--cf-font-size` | `--vita-font-size` |
+| `--cf-border-weak` | `--vita-border-weak` | `--cf-font-size-lg` | `--vita-font-size-lg` |
+| `--cf-text` | `--vita-foreground` | `--cf-radius-sm` | `--vita-radius-sm` |
+| `--cf-text-2` | `--vita-muted-foreground` | `--cf-radius` | `--vita-radius` |
+| `--cf-text-3` | `--vita-subtle-foreground` | `--cf-radius-lg` | `--vita-radius-lg` |
+| `--cf-row-hover` | `--vita-hover` | `--cf-shadow-1` | `--vita-shadow-1` |
+| `--cf-success` | `--vita-success` | `--cf-shadow-2` | `--vita-shadow-2` |
+| `--cf-warning` | `--vita-warning` | `--cf-shadow-3` | `--vita-shadow-3` |
+
+替换时按名字**从长到短**做，否则 `--cf-text` 会先吃掉 `--cf-text-2` 的前缀，得到 `--vita-foreground-2` 这种并不存在的变量。
 
 ### 不想让本库管 antd 主题
 

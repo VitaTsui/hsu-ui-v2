@@ -62,30 +62,6 @@
   --vita-screen-lg: 1024px;
   --vita-screen-xl: 1280px;
   --vita-screen-xxl: 1536px;
-
-  // ---- 兼容别名（2.0 前的 --cf-*，单向指向新名）----
-  --cf-canvas: var(--vita-background);
-  --cf-surface: var(--vita-surface);
-  --cf-subtle: var(--vita-muted);
-  --cf-border: var(--vita-border);
-  --cf-border-weak: var(--vita-border-weak);
-  --cf-text: var(--vita-foreground);
-  --cf-text-2: var(--vita-muted-foreground);
-  --cf-text-3: var(--vita-subtle-foreground);
-  --cf-row-hover: var(--vita-hover);
-  --cf-success: var(--vita-success);
-  --cf-warning: var(--vita-warning);
-  --cf-error: var(--vita-error);
-  --cf-font-family: var(--vita-font-family);
-  --cf-font-size-sm: var(--vita-font-size-sm);
-  --cf-font-size: var(--vita-font-size);
-  --cf-font-size-lg: var(--vita-font-size-lg);
-  --cf-radius-sm: var(--vita-radius-sm);
-  --cf-radius: var(--vita-radius);
-  --cf-radius-lg: var(--vita-radius-lg);
-  --cf-shadow-1: var(--vita-shadow-1);
-  --cf-shadow-2: var(--vita-shadow-2);
-  --cf-shadow-3: var(--vita-shadow-3);
 }
 
 html[data-theme="dark"],

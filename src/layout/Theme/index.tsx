@@ -30,7 +30,7 @@ export interface ThemeProps {
  * - 自存一份主题色（原来固定是青色）                                -> antd useToken 里当前生效的 colorPrimary
  * - matchMedia 监听系统深色                                       -> useIsDark
  * - borderRadius / colorBorder / Table / Card / Button / Input 等成套 token 覆盖 -> toAntdTheme
- * - 在包裹元素上内联重定义 --cf-*：那会盖掉 tokens.scss 生成的值，属于主动帮倒忙
+ * - 在包裹元素上内联重定义 --vita-*：那会盖掉 tokens.scss 生成的值，属于主动帮倒忙
  */
 const Theme: React.FC<ThemeProps> = observer((props) => {
   const { children, navDarkColors } = props;

@@ -42,8 +42,10 @@ export interface HsuThemeTokens {
 }
 
 /**
- * 2.0 之前的字段名。CSS 变量那侧留了 `--cf-*` 别名，但这里的 TS 字段是直接改名的 ——
- * 消费方写 `lightTokens.canvas` 会直接拿到 undefined，且没有任何提示。补上映射。
+ * 2.0 之前的字段名。TS 字段是直接改名的，消费方写 `lightTokens.canvas` 会拿到
+ * undefined 且没有任何提示，所以这里补上映射。
+ *
+ * （CSS 变量那侧原本也有一层 `--cf-*` 别名，2.3.0 起已移除，见 docs/guide.md。）
  *
  * `headerBg` 在重命名时被整个删掉了（没有对应的新名），这里指回 `surface`：2.0 之前
  * 两者在浅色下同为 #ffffff、暗色下同为卡片底色，语义上就是「顶栏用的面」。
