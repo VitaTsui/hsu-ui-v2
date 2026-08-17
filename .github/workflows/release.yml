@@ -9,6 +9,11 @@ on:
       - main
       - "[0-9]+.x"
 
+  # 手动补发。push 触发偶尔会丢：2.4.1 合进 main 之后 GitHub 没有为那次 push 产生
+  # 任何 workflow（release 与 deploy-docs 一起没跑），版本就卡在了仓库里发不出去。
+  # 这个任务本身是幂等的 —— tag 或 npm 上已有该版本都会跳过 —— 所以随手重跑没有风险。
+  workflow_dispatch:
+
 jobs:
   release:
     runs-on: ubuntu-latest
