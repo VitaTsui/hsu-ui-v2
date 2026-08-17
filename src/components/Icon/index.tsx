@@ -5,7 +5,7 @@ import {
 } from "@iconify/react";
 
 import * as AntdIcons from "@ant-design/icons";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import classNames from "classnames";
 import styles from "./index.module.scss";
 
@@ -38,7 +38,13 @@ interface IconProps
   fontSize?: number | string;
 }
 
-const Icon: React.FC<IconProps> = (props) => {
+/**
+ * `forwardRef` 不是可选的：`Tooltip` / `Dropdown` / `Popover` 都要往触发元素上挂 ref
+ * 才能定位浮层。作为普通函数组件时，把 Icon 直接塞进它们里面会让 React 报
+ * “Function components cannot be given refs”，浮层的定位也失去了锚点。
+ * 图标是这几个组件最常见的触发元素，所以这个坑几乎人人会踩。
+ */
+const Icon = React.forwardRef<HTMLSpanElement, IconProps>((props, forwardedRef) => {
   const {
     iconProps,
     icon,
@@ -50,6 +56,22 @@ const Icon: React.FC<IconProps> = (props) => {
     ...iconConfig
   } = props;
   const ref = useRef<HTMLDivElement>(null);
+
+  // 内外两个 ref 都要喂：内部这个是 `onRef` 回调的载体（老接口，不能动），
+  // 外部那个是浮层组件用来定位的
+  const setRef = useCallback(
+    (node: HTMLSpanElement | null) => {
+      (ref as React.MutableRefObject<HTMLDivElement | null>).current =
+        node as unknown as HTMLDivElement | null;
+
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        forwardedRef.current = node;
+      }
+    },
+    [forwardedRef]
+  );
 
   useEffect(() => {
     onRef?.(ref);
@@ -69,7 +91,7 @@ const Icon: React.FC<IconProps> = (props) => {
         {...iconConfig}
         className={classNames([styles.icon, className])}
         style={mergedStyle}
-        ref={ref as unknown as React.Ref<HTMLSpanElement>}
+        ref={setRef}
       />
     );
   }
@@ -80,13 +102,15 @@ const Icon: React.FC<IconProps> = (props) => {
     <span
       {...iconConfig}
       role="img"
-      ref={ref as unknown as React.Ref<HTMLSpanElement>}
+      ref={setRef}
       className={classNames(["anticon", styles.icon, className])}
       style={mergedStyle}
     >
       <Iconify {...iconProps} icon={icon} width="1em" height="1em" />
     </span>
   );
-};
+});
+
+Icon.displayName = "Icon";
 
 export default Icon;
