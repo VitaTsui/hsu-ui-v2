@@ -6,6 +6,8 @@ import {
   createDefaultHeatmapXAxis,
   createDefaultHeatmapYAxis,
 } from "../_utils/heatmap";
+import { resolveChartChrome } from "../_utils/chartTheme";
+import useIsDark from "../../../hooks/useIsDark";
 
 export interface HeatmapDataItem {
   /** X-axis index or name */
@@ -73,6 +75,10 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  // echarts options are plain JS and cannot read the `--vita-*` variables, so the axis and legend
+  // colours have to be resolved against the active appearance here
+  const isDark = useIsDark();
+  const chrome = useMemo(() => resolveChartChrome(isDark), [isDark]);
 
   // Process the data and generate the chart option
   const chartOption = useMemo(() => {
@@ -120,7 +126,7 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
       left: "right",
       top: "center",
       textStyle: {
-        color: "#373D48",
+        color: chrome.text,
       },
       inRange: {
         color: inRangeColor,
@@ -128,7 +134,7 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
     };
 
     // Process xAxis config
-    const def_xAxis = createDefaultHeatmapXAxis(xAxisData);
+    const def_xAxis = createDefaultHeatmapXAxis(xAxisData, chrome);
     const processedXAxis = Array.isArray(xAxis)
       ? xAxis?.map((item) => ({
           ...def_xAxis,
@@ -142,7 +148,7 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
         };
 
     // Process yAxis config
-    const def_yAxis = createDefaultHeatmapYAxis(yAxisData);
+    const def_yAxis = createDefaultHeatmapYAxis(yAxisData, chrome);
     const processedYAxis = Array.isArray(yAxis)
       ? yAxis?.map((item) => ({
           ...def_yAxis,
@@ -244,6 +250,7 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
     series,
     coreOption,
     zeroColor,
+    chrome,
   ]);
 
   // Callback for handling chart resize

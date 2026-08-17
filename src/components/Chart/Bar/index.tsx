@@ -21,6 +21,8 @@ import {
   percentWindowToIndexWindow,
   resolveScrollConfig,
 } from "../_utils/cartesian";
+import { resolveChartChrome } from "../_utils/chartTheme";
+import useIsDark from "../../../hooks/useIsDark";
 
 export interface ChartBarProps extends ChartCommonProps {
   chartTitle?: string;
@@ -79,11 +81,15 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
     () => resolveScrollConfig(scrollConfig),
     [scrollConfig],
   );
+  // echarts options are plain JS and cannot read the `--vita-*` variables, so the axis and
+  // legend colours have to be resolved against the active appearance here
+  const isDark = useIsDark();
+  const chrome = useMemo(() => resolveChartChrome(isDark), [isDark]);
 
   // Cache the chart option with useMemo
   const chartOption = useMemo(() => {
-    const def_xAxis = createDefaultCategoryXAxis(xAxisData);
-    const def_yAxis = createDefaultValueYAxis("bar");
+    const def_xAxis = createDefaultCategoryXAxis(xAxisData, chrome);
+    const def_yAxis = createDefaultValueYAxis("bar", chrome);
 
     // Process xAxis config
     const processedXAxis = Array.isArray(xAxis)
@@ -212,8 +218,7 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
           data: legendData,
           icon: "circle",
           textStyle: {
-            color: "#373D48",
-            fontSize: 16,
+            color: chrome.text,
           },
           itemWidth: 8,
           itemHeight: 8,
@@ -259,6 +264,7 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
     series,
     enableLegendAutoScroll,
     coreOption,
+    chrome,
   ]);
 
   // Callback for handling chart resize
