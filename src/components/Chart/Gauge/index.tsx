@@ -1,4 +1,5 @@
 import * as echarts from "echarts";
+import useContainerReady from "../_hooks/useContainerReady";
 
 import {
   ChartCommonProps,
@@ -31,6 +32,8 @@ const Gauge: React.FC<ChartGaugeProps> = (props) => {
   } = series as echarts.GaugeSeriesOption;
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
+  // Defers `echarts.init` until the container has a box — see the hook for why
+  const containerReady = useContainerReady(chartRef);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   // Cache the chart option with useMemo
@@ -104,12 +107,17 @@ const Gauge: React.FC<ChartGaugeProps> = (props) => {
 
   // Callback for handling chart resize
   const handleResize = useCallback(() => {
+    // A keep-alive tab losing focus fires the observer with a 0×0 box; resizing to that throws
+    // the laid-out canvas away and it has to be rebuilt when the tab comes back
+    const el = chartRef.current;
+    if (!el || el.clientWidth === 0 || el.clientHeight === 0) return;
+
     chartInstanceRef.current?.resize();
   }, []);
 
   // Initialize the chart
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !containerReady) return;
 
     // Initialize or reuse the existing instance
     let chart = chartInstanceRef.current;
@@ -134,7 +142,9 @@ const Gauge: React.FC<ChartGaugeProps> = (props) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [chartOption, handleResize]);
+  }, [chartOption, handleResize,
+    containerReady,
+  ]);
 
   // Clean up resources when the component unmounts
   useEffect(() => {

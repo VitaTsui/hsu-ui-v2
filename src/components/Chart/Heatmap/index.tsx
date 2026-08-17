@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import useContainerReady from "../_hooks/useContainerReady";
 import styles from "../index.module.scss";
 import { ChartCommonProps, ChartOptionType, ChartsOption } from "..";
 import * as echarts from "echarts";
@@ -74,6 +75,8 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
   } = props;
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
+  // Defers `echarts.init` until the container has a box — see the hook for why
+  const containerReady = useContainerReady(chartRef);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   // echarts options are plain JS and cannot read the `--vita-*` variables, so the axis and legend
   // colours have to be resolved against the active appearance here
@@ -255,12 +258,17 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
 
   // Callback for handling chart resize
   const handleResize = useCallback(() => {
+    // A keep-alive tab losing focus fires the observer with a 0×0 box; resizing to that throws
+    // the laid-out canvas away and it has to be rebuilt when the tab comes back
+    const el = chartRef.current;
+    if (!el || el.clientWidth === 0 || el.clientHeight === 0) return;
+
     chartInstanceRef.current?.resize();
   }, []);
 
   // Initialize the chart
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !containerReady) return;
 
     // Initialize or reuse the existing instance
     let chart = chartInstanceRef.current;
@@ -296,7 +304,9 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
         chartInstanceRef.current?.off("click", onClick);
       }
     };
-  }, [chartOption, handleResize, onChart, onClick]);
+  }, [chartOption, handleResize, onChart, onClick,
+    containerReady,
+  ]);
 
   // Clean up resources when the component unmounts
   useEffect(() => {

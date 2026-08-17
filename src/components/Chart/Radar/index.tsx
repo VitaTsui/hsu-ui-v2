@@ -1,4 +1,5 @@
 import * as echarts from "echarts";
+import useContainerReady from "../_hooks/useContainerReady";
 import { ChartCommonProps, ChartOptionType, ChartsOption } from "..";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import styles from "../index.module.scss";
@@ -55,6 +56,8 @@ const Radar: React.FC<ChartRadarProps> = (props) => {
 
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
+  // Defers `echarts.init` until the container has a box — see the hook for why
+  const containerReady = useContainerReady(chartRef);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const hoveredIndicatorRef = useRef<number>(-1);
 
@@ -188,11 +191,16 @@ const Radar: React.FC<ChartRadarProps> = (props) => {
   ]);
 
   const handleResize = useCallback(() => {
+    // A keep-alive tab losing focus fires the observer with a 0×0 box; resizing to that throws
+    // the laid-out canvas away and it has to be rebuilt when the tab comes back
+    const el = chartRef.current;
+    if (!el || el.clientWidth === 0 || el.clientHeight === 0) return;
+
     chartInstanceRef.current?.resize();
   }, []);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !containerReady) return;
 
     let chart = chartInstanceRef.current;
     if (!chart) {
@@ -343,6 +351,7 @@ const Radar: React.FC<ChartRadarProps> = (props) => {
     singleIndicatorHighlight,
     singleIndicatorHoverFill,
     color,
+    containerReady,
   ]);
 
   useEffect(() => {

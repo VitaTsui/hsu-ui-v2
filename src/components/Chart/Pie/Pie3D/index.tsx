@@ -1,4 +1,5 @@
 import * as echarts from "echarts";
+import useContainerReady from "../../_hooks/useContainerReady";
 import "echarts-gl";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -108,6 +109,8 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
 
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
+  // Defers `echarts.init` until the container has a box — see the hook for why
+  const containerReady = useContainerReady(chartRef);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const hoveredIndexRef = useRef<number | "">("");
   const optionRef = useRef<ChartsOption | null>(null);
@@ -145,6 +148,11 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
   ]);
 
   const handleResize = useCallback(() => {
+    // A keep-alive tab losing focus fires the observer with a 0×0 box; resizing to that throws
+    // the laid-out canvas away and it has to be rebuilt when the tab comes back
+    const el = chartRef.current;
+    if (!el || el.clientWidth === 0 || el.clientHeight === 0) return;
+
     chartInstanceRef.current?.resize();
   }, []);
 
@@ -163,7 +171,7 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
   );
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !containerReady) return;
 
     let chart = chartInstanceRef.current;
     if (!chart) {
@@ -205,6 +213,7 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
     handleGlobalOut,
     onChart,
     onClick,
+    containerReady,
   ]);
 
   useEffect(() => {
