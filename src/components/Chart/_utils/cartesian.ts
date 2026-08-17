@@ -1,5 +1,6 @@
 import * as echarts from "echarts";
 import { ChartOptionType, SeriesData, SeriesDataType } from "..";
+import { ChartChrome } from "./chartTheme";
 
 export interface ChartScrollConfig {
   enabled?: boolean;
@@ -50,7 +51,8 @@ export const percentWindowToIndexWindow = (
 };
 
 export const createDefaultCategoryXAxis = (
-  xAxisData?: Array<string>,
+  xAxisData: Array<string> | undefined,
+  chrome: ChartChrome,
 ): ChartOptionType => ({
   type: "category",
   boundaryGap: true,
@@ -58,10 +60,10 @@ export const createDefaultCategoryXAxis = (
   axisLabel: {
     interval: 0,
     hideOverlap: true,
-    textStyle: {
-      fontSize: 14,
-      color: "#373D48",
-    },
+    // echarts removed the `textStyle` nesting under `axisLabel` in v4: keeping it means both
+    // properties are silently dropped *and* a deprecation warning is logged on every render.
+    fontSize: chrome.fontSize,
+    color: chrome.axis,
   },
   axisTick: {
     show: false,
@@ -70,19 +72,18 @@ export const createDefaultCategoryXAxis = (
 
 export const createDefaultValueYAxis = (
   mode: "bar" | "line" = "bar",
+  chrome: ChartChrome,
 ): ChartOptionType => ({
   type: "value",
   axisLabel: {
-    textStyle: {
-      fontSize: 14,
-      color: "#373D48",
-    },
+    fontSize: chrome.fontSize,
+    color: chrome.axis,
   },
   splitLine:
     mode === "line"
       ? {
           lineStyle: {
-            color: "#C9CED6",
+            color: chrome.splitLine,
             type: "dashed",
           },
         }
