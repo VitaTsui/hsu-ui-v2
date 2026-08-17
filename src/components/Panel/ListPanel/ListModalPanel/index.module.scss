@@ -21,8 +21,18 @@
 
   height: 100%;
 
+  // Inside a modal the Search must not keep its card chrome. On a page it is an outlined white
+  // card standing on the grey page background; in a modal the body is already `--vita-surface`,
+  // so the same treatment paints a white card on white and only the border survives — a stray
+  // outline around the search row. The padding was already being cleared here; the background and
+  // border are the other half of the same intent, and `.tableContainer` below is flush for
+  // exactly this reason.
   .search {
     padding: 0px;
+
+    background: transparent;
+
+    border: none;
   }
 
   .tableContainer {
