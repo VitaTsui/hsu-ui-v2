@@ -19,4 +19,14 @@
       }
     }
   }
+
+  // Same guard as Input: once the box is an .ant-input-affix-wrapper, `.ant-input` names
+  // the one-line <input> inside it, and an app sizing `.ant-input` like a bare input
+  // pushes that inner element out of the box and the text onto the bottom border.
+  // Full story in components/Input/index.module.scss.
+  &:global(.ant-input-affix-wrapper) > :global(.ant-input),
+  :global(.ant-input-affix-wrapper) > :global(.ant-input) {
+    height: auto;
+    min-height: 0px;
+  }
 }

@@ -19,4 +19,23 @@
       min-height: inherit;
     }
   }
+
+  // Keep the inner <input> one line tall, whatever the app says about `.ant-input`.
+  //
+  // `.ant-input` is two different elements depending on the shape: on a bare antd input
+  // it is the bordered box itself, but as soon as there is a clear button, a prefix or a
+  // suffix — and this component turns allowClear on by default, so there almost always
+  // is one — the box becomes `.ant-input-affix-wrapper` and `.ant-input` moves to the
+  // <input> inside it. Apps carry the bare-input habit over and write
+  // `.some-form .ant-input { height: 32px }` meaning the box; that height lands on the
+  // inner input instead, which is then taller than the ~22px the wrapper's padding
+  // leaves it, hangs out of the bottom, and drags the text down onto the border.
+  //
+  // Three classes, so it outweighs the two-class selectors apps typically write; an app
+  // that really means the inner input can still say so with one more level.
+  &:global(.ant-input-affix-wrapper) > :global(.ant-input),
+  :global(.ant-input-affix-wrapper) > :global(.ant-input) {
+    height: auto;
+    min-height: 0px;
+  }
 }
