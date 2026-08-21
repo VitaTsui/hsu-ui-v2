@@ -45,6 +45,28 @@ export interface ConfigProviderProps {
 }
 
 /**
+ * Merge the library's per-component tokens with the consumer's, one level deeper than a spread.
+ *
+ * Spreading the two maps replaces a whole component block: an app that only wants
+ * `Button.primaryColor` would silently lose the library's `Button.*Shadow: none` and get antd's
+ * stock 2px shadow back under every button — no error, and nothing in the app's own theme to
+ * explain it. Merging per component means an app overrides *tokens*, not blocks.
+ */
+const mergeComponents = (
+  base: ThemeConfig["components"],
+  extra: ThemeConfig["components"]
+): ThemeConfig["components"] => {
+  if (!extra) return base;
+
+  const merged = { ...base } as Record<string, object | undefined>;
+  for (const [name, tokens] of Object.entries(extra)) {
+    merged[name] = { ...merged[name], ...tokens };
+  }
+
+  return merged as ThemeConfig["components"];
+};
+
+/**
  * Hsu UI global configuration: permissions, the request implementation, and the design tokens.
  *
  * On the theme: the `--vita-*` CSS variables cover everything this library styles itself, but not
@@ -82,7 +104,7 @@ const ConfigProvider: React.FC<ConfigProviderProps> = ({
       algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
       ...theme,
       token: { ...toAntdTheme({ dark: isDark, primaryColor }), ...theme?.token },
-      components: { ...toAntdComponents(), ...theme?.components },
+      components: mergeComponents(toAntdComponents(), theme?.components),
     }),
     [isDark, primaryColor, theme]
   );
