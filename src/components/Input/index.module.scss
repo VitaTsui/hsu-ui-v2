@@ -1,8 +1,12 @@
 .antdInput {
   width: 100%;
-  height: 100%;
-  // When the parent has no set height (height:100% resolves to auto), ensure a minimum height so the input is not squashed;
-  // the inner .ant-input-wrapper / .ant-input inherit this value via min-height: inherit.
+  // The control height is a floor, not `height: 100%` — see the long note in
+  // `Select/index.module.scss`. Same failure: under a flex item stretched by a taller
+  // sibling, `height: 100%` inflates the input to the item's whole content box.
+  //
+  // The inner `height: 100%` rules below stay: when this root *is* stretched (as a flex
+  // child, or because the app asked for it), they propagate that height inward. They
+  // resolve to `auto` otherwise and fall back to `min-height: inherit`.
   min-height: var(--vita-control-height);
 
   :global(.ant-input-clear-icon) {

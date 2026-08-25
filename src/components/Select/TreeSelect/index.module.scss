@@ -4,7 +4,10 @@
   --tree-switcher-gap: 0px;
 
   width: 100%;
-  height: 100%;
+  // Control height as a floor, not `height: 100%` — same reason as `Select` (see the
+  // note there). TreeSelect had no `min-height` at all because `height: 100%` was doing
+  // that job by accident; dropping one without adding the other would collapse it.
+  min-height: var(--vita-control-height);
 
   // CF style: outlined input control that follows appearance switching.
   //

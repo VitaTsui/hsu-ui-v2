@@ -5,9 +5,24 @@
   align-items: center;
 
   width: 100%;
-  height: 100%;
-  // When the parent has no explicit height (height:100% resolves to auto), guarantee a min height
-  // consistent with Input and other form controls, so it is neither squashed nor mis-sized in search rows.
+  // The control height is a floor, not `height: 100%`.
+  //
+  // `height: 100%` looks harmless because it resolves to `auto` under an auto-height
+  // parent — but the moment the parent has a *definite* height the control inflates to
+  // fill it, and the most common way a parent acquires one is by accident: a flex item
+  // stretched by a taller sibling. A card holding `<label> <Select> <hint>` where the
+  // hint wraps to two lines is enough — the Select swells to the card's whole content
+  // box (measured: 102px for a 32px control) and covers the label and the hint.
+  //
+  // This bit hsu-ui itself: `ChainGraph/SearchSelect` has to park the Select in a
+  // fixed 32px box, "preventing the Select root's height:100% from resolving against
+  // the graph and being stretched to the full graph height". Consumers hit it too and
+  // reach for the same wrapper, which is a workaround for a default that is wrong.
+  //
+  // Filling a deliberately sized parent still works without the declaration: as a flex
+  // child the default `align-self: stretch` fills the cross axis, and the inner
+  // `height: 100%` rules below then resolve against a genuinely definite height.
+  // A block parent that really wants a taller control can still say `height: 100%`.
   min-height: var(--vita-control-height);
   padding: 0px 11px;
 
@@ -118,7 +133,16 @@
     align-items: center;
 
     width: 100%;
-    height: 100%;
+    // 撑满外壳用 align-self，不用 height: 100%。
+    //
+    // 外壳 `.select` 的高度是 `min-height` 撑出来的、`height` 仍是 auto，
+    // 百分比高度对着 auto 解析不出东西 —— 这一层会缩回内容高（实测 22px，
+    // 而外壳是 32px），上下各多出 5px 点不动的死区：看着是个 32px 的下拉框，
+    // 边缘一圈却没有反应。
+    //
+    // 外壳是 flex 且 align-items: center，所以这里要显式 stretch；
+    // 前后缀图标不受影响，它们该保持居中
+    align-self: stretch;
     margin: 0px !important;
 
     border-radius: inherit;
