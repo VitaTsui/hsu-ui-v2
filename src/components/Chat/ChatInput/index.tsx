@@ -67,6 +67,16 @@ export interface ChatInputProps {
   onFileInterceptClick?: (e: React.MouseEvent<HTMLSpanElement>) => void;
   buttonGroup?: ButtonProps[];
   uploadEnabled?: boolean;
+  /**
+   * Disable sending. The send button turns disabled and Enter no longer submits;
+   * the textarea stays editable so a half-typed message is never lost.
+   *
+   * The component already disables the send button during its own uploads
+   * (`isUpload`), but consumers that run their own upload flow
+   * (`uploadEnabled={false}`) had no way in: they could only intercept `onSend`
+   * and pop a warning, leaving the button looking perfectly clickable.
+   */
+  disabled?: boolean;
 }
 
 const ChatInput: React.FC<ChatInputProps> = (props) => {
@@ -88,6 +98,7 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
     onFileInterceptClick,
     buttonGroup,
     uploadEnabled = true,
+    disabled = false,
   } = props;
 
   const [value, setValue] = useState<string>("");
@@ -178,6 +189,9 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
 
   // Handle sending
   const handleSend = () => {
+    if (disabled) {
+      return;
+    }
     if (value.trim() !== "") {
       setValue("");
       onSend?.(value);
@@ -275,7 +289,7 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
                 value={value}
                 onSend={handleSend}
                 sendIcon={sendIcon}
-                disabled={isUpload}
+                disabled={isUpload || disabled}
               />
             )}
           </>
