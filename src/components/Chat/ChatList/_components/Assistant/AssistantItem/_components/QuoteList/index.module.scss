@@ -108,7 +108,8 @@
       transition: background-color 0.3s, color 0.3s;
 
       &:hover {
-        color: #fff;
+        // 同 TabBar：主色实底上的前景色走配对令牌
+        color: var(--vita-primary-foreground);
 
         background-color: var(--vita-primary);
       }

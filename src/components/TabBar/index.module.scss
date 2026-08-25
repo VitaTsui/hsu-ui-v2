@@ -51,7 +51,10 @@
     &.active {
       background: var(--vita-primary);
 
-      color: #fff;
+      // 压在主色实底上的前景色走配对令牌，不要写死白：--vita-primary 是可配置的，
+      // 消费方把它换成近白的中性色时（shadcn 那种 primary/primary-foreground 配法），
+      // 写死的白就是白压白。默认值仍是 #ffffff，彩色品牌色的消费方不受影响
+      color: var(--vita-primary-foreground);
 
       z-index: 2;
     }
