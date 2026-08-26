@@ -145,7 +145,16 @@ export const toAntdTheme = (options?: {
 
     colorText: t.foreground,
     colorTextSecondary: t.mutedForeground,
-    colorTextTertiary: t.subtleForeground,
+    // antd 有四档文字色，本套令牌只有三档，压缩时分界线要放对：
+    // tertiary 在 antd 里是**描述性的可读文字**（面包屑、表单 extra、Descriptions 的
+    // 标签都吃它），quaternary 才是占位与禁用。原来两档都指向 subtleForeground，
+    // 于是面包屑拿到了占位级的对比度 —— 浅色下 #a1a1aa 压白只有 2.56:1，
+    // 14px 正文按 WCAG AA 要 4.5:1，连大字号的 3:1 都不到（消费方实测）。
+    //
+    // 压深 subtleForeground 治不了：要够 4.5:1 得到 #767676，那已经和
+    // mutedForeground(#71717a, 4.83:1) 几乎同色，第三档等于不存在。
+    // 所以按语义分流 —— 可读的归 muted，只有占位/禁用留在 subtle。
+    colorTextTertiary: t.mutedForeground,
     colorTextQuaternary: t.subtleForeground,
 
     colorBgContainer: t.surface,
