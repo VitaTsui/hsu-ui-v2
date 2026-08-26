@@ -10,7 +10,8 @@
       font-size: 12px;
       font-weight: normal;
 
-      color: var(--vita-subtle-foreground);
+      // 说明文字，不是占位符
+      color: var(--vita-muted-foreground);
     }
   }
 

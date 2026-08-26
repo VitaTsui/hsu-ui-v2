@@ -8,7 +8,8 @@
 
     font-size: 14px;
     font-weight: bold;
-    color: var(--vita-subtle-foreground);
+    // 分组标题（「今天」「近 7 天」），与侧栏菜单的分组标题同一件事
+    color: var(--vita-muted-foreground);
 
     cursor: default;
   }

@@ -127,7 +127,14 @@ textarea,
     line-height: 1.4;
     text-transform: uppercase;
 
-    color: var(--vita-subtle-foreground);
+    // 注释写的就是 muted，值却落在 subtle —— 那一档是「占位 / 禁用文字」，
+    // 浅色下 #a1a1aa 压白只有 2.6:1。这是分组导航的标题，是要被读的内容，
+    // 而且 11px 粗体在 WCAG 里仍按正文算（大字号要 18.66px 粗体起），得够 4.5:1。
+    // muted(#71717a) 约 4.8:1，字号与字重维持不变。
+    //
+    // 同一类错在 tokens.ts 的 colorTextTertiary 上刚修过一次：可读的归 muted，
+    // 只有占位/禁用留在 subtle。这里是被本文件的单类选择器盖掉的第二处。
+    color: var(--vita-muted-foreground);
   }
 
   // Items within a group use more restrained left-aligned indentation (closer to CF)
@@ -192,4 +199,23 @@ textarea,
 }
 .ant-modal-mask {
   pointer-events: auto !important;
+}
+
+// =============================================================
+// Alert 圆角：补 antd 没注入的那个变量
+//
+// antd 的 Alert 样式写的是 `border-radius: var(--ant-alert-border-radius)`，但在
+// CSS-var 模式下它**从不注入**这个变量 —— 实测该变量读出来是「未定义」，
+// 于是圆角回退成 0，四角是直的。
+//
+// 走组件令牌修不了：`Alert: { borderRadiusLG }` 注入的是 `--ant-border-radius-lg`
+// （Alert 一次都没引用），改成 `borderRadius` 也一样不生成该变量（两种都实测过）。
+// 对照组是 Table —— 它的 `--ant-table-border-radius` 同样未定义，但圆角正常 8px，
+// 因为 Table 的圆角来自本库自己的 scss，不依赖 antd 那条规则。
+//
+// 所以只能在样式层直接给。`.ant-alert-banner` 自带 `border-radius: 0`，
+// 且选择器更具体，通栏提示条不受影响。
+// =============================================================
+.ant-alert {
+  border-radius: var(--vita-radius);
 }
