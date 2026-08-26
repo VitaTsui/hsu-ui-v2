@@ -127,7 +127,14 @@ textarea,
     line-height: 1.4;
     text-transform: uppercase;
 
-    color: var(--vita-subtle-foreground);
+    // 注释写的就是 muted，值却落在 subtle —— 那一档是「占位 / 禁用文字」，
+    // 浅色下 #a1a1aa 压白只有 2.6:1。这是分组导航的标题，是要被读的内容，
+    // 而且 11px 粗体在 WCAG 里仍按正文算（大字号要 18.66px 粗体起），得够 4.5:1。
+    // muted(#71717a) 约 4.8:1，字号与字重维持不变。
+    //
+    // 同一类错在 tokens.ts 的 colorTextTertiary 上刚修过一次：可读的归 muted，
+    // 只有占位/禁用留在 subtle。这里是被本文件的单类选择器盖掉的第二处。
+    color: var(--vita-muted-foreground);
   }
 
   // Items within a group use more restrained left-aligned indentation (closer to CF)

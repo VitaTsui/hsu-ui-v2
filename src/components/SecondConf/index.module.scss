@@ -29,7 +29,9 @@
 
       .text {
         font-size: 16px;
-        color: var(--vita-subtle-foreground);
+        // 二次确认的正文，是这个弹窗里唯一要读的内容，不能用占位档。
+        // 与上面 .title 的层级差已经由 20px/bold 对 16px/normal 拉开了
+        color: var(--vita-muted-foreground);
       }
     }
   }
