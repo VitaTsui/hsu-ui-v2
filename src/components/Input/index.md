@@ -36,7 +36,15 @@ export default () => {
 
 ## 数字输入框
 
-数字输入框，`onChange` 返回字符串，内置 `allowClear`、`controls={false}` 与 `stringMode`。
+数字输入框，`onChange` 返回**字符串**，内置 `allowClear`、`controls={false}` 与 `stringMode`。
+
+返回字符串是刻意的：`stringMode` 让超出 IEEE754 安全范围的大数（订单号、雪花 ID）
+不丢精度，而转成 `number` 就丢了。
+
+> **注意**：作为**表单字段**用时（`FormItem type="INPUTNUMBER"`）行为不同 ——
+> 自 `2.5.0` 起它交给表单的是 `number | null`。表单值通常会直接进请求体，
+> 而后端字段多半是整数，交字符串上去会被强类型服务端拒掉。
+> 详见 [FormItem 的 INPUTNUMBER](/components/form-item)。
 
 ```tsx
 import React from "react";
