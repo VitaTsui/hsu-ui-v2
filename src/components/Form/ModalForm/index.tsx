@@ -10,6 +10,7 @@ import React, { useEffect, useRef } from "react";
 
 import { ItemContainerProps } from "../../FormItem/ItemContainer";
 import styles from "./index.module.scss";
+import { formItemKeys } from "../_utils/formItemKey";
 import usePermissions from "../../../hooks/usePermissions";
 import { useFormItems } from "./_hooks/useFormItems";
 import type { FormRef } from "../../../types/antd";
@@ -110,6 +111,10 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
   );
 
   const _formItems = useFormItems(formItems, layout, adaptiveColumnNum);
+  /* `extraFormItems` 是 JSX 形态的表单项，同样可能重名（互斥字段） */
+  const extraKeys = formItemKeys(
+    extraFormItems?.map((i) => i.props as FormItemProps),
+  );
 
   if (!permitted) {
     return null;
@@ -147,7 +152,11 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
           style={{ "--column-num": adaptiveColumnNum } as React.CSSProperties}
           onValuesChange={onValuesChange}
         >
-          {Object.keys(_formItems ?? {})?.map((key) => (
+          {Object.keys(_formItems ?? {})?.map((key) => {
+            /* key 一次算完（重名的第二条起加 `#n`），别在 map 体里每项重算 */
+            const itemKeys = formItemKeys(_formItems?.[key]);
+
+            return (
             <div
               className={`${styles.formItemGroup} ${
                 formItemGroupClassName ?? ""
@@ -168,9 +177,9 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
                 className={styles.formItemGroupContent}
                 style={{ paddingLeft: !key ? 0 : undefined }}
               >
-                {_formItems?.[key]?.map((item) => (
+                {_formItems?.[key]?.map((item, idx) => (
                   <FormItem
-                    key={item.name}
+                    key={itemKeys[idx]}
                     requiredMsg={
                       item.requiredMsg ??
                       ((item.name as string)?.endsWith("En")
@@ -186,11 +195,14 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
                 ))}
               </div>
             </div>
-          ))}
-          {extraFormItems?.map((item) => {
+            );
+          })}
+          {extraFormItems?.map((item, idx) => {
             item = {
               ...item,
-              key: item.props.name,
+              /* 与上面那组同一套 key 规则：重名的第二条起加 `#n`，
+                 按声明顺序编号（见 formItemKeys 的说明） */
+              key: extraKeys[idx],
               props: {
                 requiredMsg:
                   item.props.requiredMsg ??

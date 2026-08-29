@@ -11,6 +11,7 @@ import Icon from "../../Icon";
 import { ItemContainerProps } from "../../FormItem/ItemContainer";
 import classNames from "classnames";
 import styles from "./index.module.scss";
+import { formItemKeys } from "../_utils/formItemKey";
 import useLabelWidth from "../../../hooks/useLabelWidth";
 import usePermissions from "../../../hooks/usePermissions";
 import { mergeSemantic } from "../../../utils/semantic";
@@ -89,9 +90,9 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       {...drawerConfig}
     >
       <Form form={form} className={styles.form}>
-        {formItems?.map((item) => (
+        {formItems?.map((item, idx) => (
           <FormItem
-            key={item.name}
+            key={formItemKeys(formItems)[idx]}
             requiredMsg={
               (item.name as string)?.endsWith("En")
                 ? `${PlaceholderDictEn[item.type]} ${item.name}`
