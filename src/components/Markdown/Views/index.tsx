@@ -5,6 +5,7 @@ import ReactMarkdown, {
 } from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
+import remarkCjkFriendly from "remark-cjk-friendly";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import classNames from "classnames";
@@ -125,7 +126,13 @@ const MarkdownViews: React.FC<MarkdownViewsProps> = (props) => {
       <ReactMarkdown
         {...props}
         rehypePlugins={[rehypeHighlight, rehypeKatex]}
-        remarkPlugins={[remarkGfm, remarkMath]}
+        /* `remarkCjkFriendly` 修的是中文里最常见的一处 markdown 失效：
+           `我得先知道**「这件事」是什么**` —— 开头那对 `**` 后面跟着 `「`
+           （标点）、前面是 `道`（非空白非标点），按 CommonMark 的 flanking 规则
+           它不是左侧定界符，于是整段**原样显示两个星号**。
+           而中文里「**「…」**」「**《…》**」这种写法极常见，模型输出里到处都是。
+           这个插件按 CJK 友好规则重判 flanking，是这条规则的通行修法。 */
+        remarkPlugins={[remarkCjkFriendly, remarkGfm, remarkMath]}
         className={classNames(styles.MarkdownViews, className, "markdown-body")}
         components={{
           code: CodeBlock,

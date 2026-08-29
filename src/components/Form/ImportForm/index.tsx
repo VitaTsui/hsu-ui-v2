@@ -13,6 +13,7 @@ import { downloadFile } from "hsu-utils";
 import { get } from "../../../request";
 import { observer } from "mobx-react-lite";
 import styles from "./index.module.scss";
+import { formItemKeys } from "../_utils/formItemKey";
 import useLabelWidth from "../../../hooks/useLabelWidth";
 import usePermissions from "../../../hooks/usePermissions";
 import Modal, { ModalProps } from "../../Modal";
@@ -106,9 +107,9 @@ const ImportForm: React.FC<ImportFormProps> = observer((props) => {
       {...modalConfig}
     >
       <Form className={`${styles.form} ${formClassName ?? ""}`}>
-        {formItems?.map((item) => (
+        {formItems?.map((item, idx) => (
           <FormItem
-            key={item.name}
+            key={formItemKeys(formItems)[idx]}
             requiredMsg={
               item.requiredMsg ??
               ((item.name as string)?.endsWith("En")
