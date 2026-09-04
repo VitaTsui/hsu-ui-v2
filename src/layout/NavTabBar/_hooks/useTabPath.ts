@@ -129,23 +129,29 @@ export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
   );
 
   /**
-   * Closing the last tab navigates to `basePath` — but when that tab *was* `basePath`, the
-   * location never changes, so path matching would not re-run and the bar would be left empty
-   * while its page is still on screen. Going empty has to re-trigger the match on its own.
+   * 路径匹配只跟着**地址**跑，不跟着 openKeys 的空/非空跑。
    *
-   * This settles rather than looping: re-matching adds the tab back, which flips `isEmpty` and
-   * runs the effect once more, and that pass finds the tab already present and returns the same
-   * state object — so React stops there. (Only true because the setters below bail out when
-   * nothing changed; without that this would spin.)
+   * 这里原本还挂了一个 `isEmpty` 依赖：openKeys 一变空就重跑一次匹配，用意是补上
+   * 「关掉的正是 basePath 那一页 ⇒ navigate(basePath) 不改变地址 ⇒ 匹配不会重跑」
+   * 这一档。但它会把**刚关掉的那个页签原样加回来**：
+   *
+   * 关闭按钮里 `setOpenkeys([])` 是默认优先级的更新，而 `navigate()` 引起的
+   * location 变更走的是 router 的低优先级更新（startTransition / deferred 路由表）。
+   * React 先提交前者，此时 `useLocation()` 还停在**被关掉的那一页**，本 effect 因
+   * `isEmpty` 翻转而跑了一遍，匹配到的自然还是它，于是页签复活；等 location 真正
+   * 落地，匹配又把目标页加成第二个页签。用户看到的就是「点一次关不掉，还多出一个」，
+   * 非得再点一次。
+   *
+   * 所以不补那一档：**页签栏空着是合法状态**。关掉最后一个页签时，若目标地址与当前
+   * 地址不同，location 变化自会把目标页签匹配出来；若相同（关掉的就是 basePath），
+   * 页签栏就空着，内容区仍是 basePath 那一页 —— 一次点击、不复活、不空白。
    */
-  const isEmpty = openKeys.length === 0;
-
   useEffect(() => {
     // Handle affixed routes first to populate openKeys
     _checkAffix(items);
     // Then run path matching
     _checkPath(items);
-  }, [_checkAffix, _checkPath, items, isEmpty]);
+  }, [_checkAffix, _checkPath, items]);
 
   return { tabKey, setTabKey, openKeys, setOpenkeys };
 };
