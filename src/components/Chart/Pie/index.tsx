@@ -14,6 +14,7 @@ import { autoScrollLegend } from "../chartUtils";
 import styles from "../index.module.scss";
 import ChartPie3D, { ChartPie3DProps } from "./Pie3D";
 import { useLatestRef } from "../../../hooks/useLatestRef";
+import useShallowStable from "../../../hooks/useShallowStable";
 
 export interface ChartPieProps extends ChartCommonProps {
   chartTitle?: string;
@@ -43,6 +44,9 @@ export interface ChartPieFC extends React.FC<ChartPieProps> {
   Three: React.FC<ChartPie3DProps>;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_EXTEND_SERIES: Series[] = [];
+
 const ChartPie: ChartPieFC = (props) => {
   const {
     className,
@@ -54,7 +58,7 @@ const ChartPie: ChartPieFC = (props) => {
     series,
     title,
     onChart,
-    extendSeries = [],
+    extendSeries = EMPTY_EXTEND_SERIES,
     onClick,
     enableLegendAutoScroll = false,
     legendVisibleCount = 8,
@@ -64,8 +68,12 @@ const ChartPie: ChartPieFC = (props) => {
     spanAngle = 180,
     center,
     radius,
-    ...coreOption
+    ...restOption
   } = props;
+  // rest 解构出来的对象每次渲染都是新引用，直接进依赖数组会让 chartOption 的 memo
+  // 恒不命中 —— 父组件每渲染一次就重跑一次 setOption(notMerge)，动画重播、悬浮态被清掉。
+  // useShallowStable 让它回到值语义：内容浅相等就复用同一引用，真变了立刻透出新引用。
+  const coreOption = useShallowStable(restOption);
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
   // Defers `echarts.init` until the container has a box — see the hook for why

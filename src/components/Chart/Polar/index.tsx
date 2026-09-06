@@ -8,6 +8,7 @@ import {
 } from "..";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import styles from "../index.module.scss";
+import useShallowStable from "../../../hooks/useShallowStable";
 
 export interface ChartPolarProps extends ChartCommonProps {
   title1?: string;
@@ -17,6 +18,9 @@ export interface ChartPolarProps extends ChartCommonProps {
   seriesData: SeriesData;
   color?: string[] | string;
 }
+
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const DEFAULT_COLOR = ["#00FFA3", "#00FFA3"];
 
 const Polar: React.FC<ChartPolarProps> = (props) => {
   const {
@@ -32,9 +36,13 @@ const Polar: React.FC<ChartPolarProps> = (props) => {
     title2Style,
     textStyle,
     seriesData,
-    color = ["#00FFA3", "#00FFA3"],
-    ...coreOption
+    color = DEFAULT_COLOR,
+    ...restOption
   } = props;
+  // rest 解构出来的对象每次渲染都是新引用，直接进依赖数组会让 chartOption 的 memo
+  // 恒不命中 —— 父组件每渲染一次就重跑一次 setOption(notMerge)，动画重播、悬浮态被清掉。
+  // useShallowStable 让它回到值语义：内容浅相等就复用同一引用，真变了立刻透出新引用。
+  const coreOption = useShallowStable(restOption);
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
   // Defers `echarts.init` until the container has a box — see the hook for why
