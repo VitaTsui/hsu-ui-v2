@@ -8,6 +8,7 @@ import {
   SeriesData,
 } from "..";
 import * as echarts from "echarts";
+import useLatestRef from "../../../hooks/useLatestRef";
 import { deepCopy } from "hsu-utils";
 import { handleTreeData } from "../_utils/tree";
 
@@ -41,6 +42,13 @@ const Tree: React.FC<ChartTreeProps> = (props) => {
     return option;
   }, [seriesData, series]);
 
+  // getImage 只是「出图后把 dataURL 交出去」的出口，既不决定图怎么画，
+  // 也不该决定要不要重画。它进依赖数组会让 effect 跟着重跑 → setOption(notMerge)
+  // → 图重绘 → 再触发一次 finished → 再回调；消费方把图存进 state 就是死循环。
+  // 而且 finished 监听只在首次 init 时注册，闭包里锁死的是首帧的 getImage，
+  // 后续换了引用永远调不到 —— 依赖数组写了它也没用，是条死依赖。走 ref 两个问题一起解决。
+  const getImageRef = useLatestRef(getImage);
+
   // Callback handling chart resize
   const handleResize = useCallback(() => {
     // A keep-alive tab losing focus fires the observer with a 0×0 box; resizing to that throws
@@ -63,7 +71,7 @@ const Tree: React.FC<ChartTreeProps> = (props) => {
 
       // Attach the finished event listener on first initialization
       chart.on("finished", () => {
-        getImage?.(
+        getImageRef.current?.(
           chart!.getDataURL({
             type: "png",
             pixelRatio: 1,
@@ -89,9 +97,7 @@ const Tree: React.FC<ChartTreeProps> = (props) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [chartOption, handleResize, getImage,
-    containerReady,
-  ]);
+  }, [chartOption, handleResize, getImageRef, containerReady]);
 
   // Clean up resources on unmount
   useEffect(() => {

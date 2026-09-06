@@ -1,6 +1,7 @@
 import { useMutationObserver } from "ahooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TableProps } from "..";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 
 const DEFAULT_INTERVAL = 2000;
 const DEFAULT_SPEED = 25;
@@ -38,6 +39,13 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
     autoScrollLoopMode = "reset",
     autoScrollingOffset = 0,
   } = props;
+
+  // onAutoScrollEndAdd 在这里身兼两职：既是「有没有加载更多」的开关，又是真正去加载的动作。
+  // 整个 rAF 循环（loop → 依赖它 → 启停 effect 依赖 loop）都挂在它的引用上，
+  // 消费方传内联箭头就会每渲染一次重启一次滚动循环 —— 表格滚到一半被打回起点。
+  // 拆成两半：开关看布尔量（从无到有传入时仍会正确接上加载更多），动作取 ref 里的最新引用。
+  const onAutoScrollEndAddRef = useLatestRef(onAutoScrollEndAdd);
+  const hasOnAutoScrollEndAdd = !!onAutoScrollEndAdd;
 
   const validSpeed =
     autoScrollingSpeed > 0 ? autoScrollingSpeed : DEFAULT_SPEED;
@@ -324,12 +332,13 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
   );
 
   const runLoadMore = useCallback(() => {
-    if (!onAutoScrollEndAdd || pendingLoadMoreRef.current) return;
+    const loadMore = onAutoScrollEndAddRef.current;
+    if (!loadMore || pendingLoadMoreRef.current) return;
     pendingLoadMoreRef.current = true;
     phaseRef.current = "loading";
     const token = ++loadTokenRef.current;
 
-    onAutoScrollEndAdd()
+    loadMore()
       .then((hasMore) => {
         if (token !== loadTokenRef.current) return;
         const currentBody = getBody();
@@ -352,7 +361,7 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
         if (token !== loadTokenRef.current) return;
         pendingLoadMoreRef.current = false;
       });
-  }, [autoScrollLoop, getBody, onAutoScrollEndAdd]);
+  }, [autoScrollLoop, getBody, onAutoScrollEndAddRef]);
 
   const loop = useCallback(() => {
     rafRef.current = requestAnimationFrame(loop);
@@ -391,7 +400,7 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
         // In seamless mode the scroll never actually reaches the bottom; just keep scrolling
         phaseRef.current = "idle";
       } else if (isAtBottom(body)) {
-        if (onAutoScrollEndAdd) {
+        if (hasOnAutoScrollEndAdd) {
           runLoadMore();
         } else {
           if (autoScrollLoop) {
@@ -457,7 +466,7 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
     isAtBottom,
     isBodyScrollable,
     isSeamless,
-    onAutoScrollEndAdd,
+    hasOnAutoScrollEndAdd,
     ready,
     ref,
     runLoadMore,
@@ -506,7 +515,7 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
       return;
     }
 
-    if (onAutoScrollEndAdd) {
+    if (hasOnAutoScrollEndAdd) {
       // In load-more mode, if scrolling had stopped, resume auto-scrolling when new data arrives
       if (phaseRef.current === "stopped") {
         phaseRef.current = autoScrollMode === "row" ? "wait" : "idle";
@@ -530,7 +539,7 @@ const useAutoScrolling = (props: UseAutoScrollingProps) => {
     interval,
     isBodyScrollable,
     isSeamless,
-    onAutoScrollEndAdd,
+    hasOnAutoScrollEndAdd,
   ]);
 
   useEffect(() => {

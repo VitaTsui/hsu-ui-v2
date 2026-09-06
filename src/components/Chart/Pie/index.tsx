@@ -255,6 +255,12 @@ const ChartPie: ChartPieFC = (props) => {
 
   const onChartRef = useLatestRef(onChart);
 
+  // onClick 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 跟着重跑就会
+  // 再走一遍 setOption(notMerge)，动画重播、悬浮/高亮态被清掉。注册与否看布尔量，
+  // 这样「从无到有传入 onClick」仍会注册；实际调用取 ref 里的最新引用。
+  const onClickRef = useLatestRef(onClick);
+  const hasOnClick = !!onClick;
+
   // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
   // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   // Initialize the chart
@@ -283,8 +289,11 @@ const ChartPie: ChartPieFC = (props) => {
     }
 
     // Add click event
-    if (onClick) {
-      chartInstanceRef.current?.on("click", onClick);
+    const handleClick = (event: echarts.ECElementEvent) => {
+      onClickRef.current?.(event);
+    };
+    if (hasOnClick) {
+      chartInstanceRef.current?.on("click", handleClick);
     }
 
     // Legend auto-scroll
@@ -307,8 +316,8 @@ const ChartPie: ChartPieFC = (props) => {
     return () => {
       window.removeEventListener("resize", handleResize);
 
-      if (onClick) {
-        chartInstanceRef.current?.off("click", onClick);
+      if (hasOnClick) {
+        chartInstanceRef.current?.off("click", handleClick);
       }
 
       // Clean up legend scrolling
@@ -321,7 +330,8 @@ const ChartPie: ChartPieFC = (props) => {
     chartOption,
     handleResize,
     onChartRef,
-    onClick,
+    onClickRef,
+    hasOnClick,
     enableLegendAutoScroll,
     seriesData,
     legendVisibleCount,
