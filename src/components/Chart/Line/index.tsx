@@ -24,6 +24,7 @@ import {
 } from "../_utils/cartesian";
 import { resolveChartChrome } from "../_utils/chartTheme";
 import useIsDark from "../../../hooks/useIsDark";
+import useLatestRef from "../../../hooks/useLatestRef";
 
 export interface ChartLineProps extends ChartCommonProps {
   chartTitle?: string;
@@ -89,6 +90,36 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
   // legend colours have to be resolved against the active appearance here
   const isDark = useIsDark();
   const chrome = useMemo(() => resolveChartChrome(isDark), [isDark]);
+
+  // 回调 prop 一律走 useLatestRef，不进依赖数组：消费方传内联箭头（React 里最常见的
+  // 写法）时每次渲染都是新引用，进依赖数组会让「init + setOption(notMerge)」整段重跑，
+  // 还会把当前可视窗口再同步一次给父级 —— 父级据此改 state 就是死循环。
+  // 但「有没有传回调」决定要不要注册监听，所以单独拆成布尔量进依赖数组，
+  // 这样「从无到有传入回调」仍会重新注册，不会漏。
+  const onClickRef = useLatestRef(onClick);
+  const onLegendSelectChangedRef = useLatestRef(onLegendSelectChanged);
+  const onDataZoomWindowChangedRef = useLatestRef(onDataZoomWindowChanged);
+  const hasOnClick = !!onClick;
+  const hasOnLegendSelectChanged = !!onLegendSelectChanged;
+  const hasOnDataZoomWindowChanged = !!onDataZoomWindowChanged;
+  // 已通知过父级的窗口用 ref 记账（不参与渲染）：窗口没变就不再通知，
+  // 掐断「通知 → 父级重算坐标轴 → chartOption 变 → effect 重跑 → 再通知」的自激回路
+  const notifiedZoomWindowRef = useRef<DataZoomIndexWindow | null>(null);
+  const emitZoomWindow = useCallback(
+    (next: DataZoomIndexWindow) => {
+      const prev = notifiedZoomWindowRef.current;
+      if (
+        prev &&
+        prev.startIndex === next.startIndex &&
+        prev.endIndex === next.endIndex
+      ) {
+        return;
+      }
+      notifiedZoomWindowRef.current = next;
+      onDataZoomWindowChangedRef.current?.(next);
+    },
+    [onDataZoomWindowChangedRef],
+  );
 
   // Cache the chart option with useMemo
   const chartOption = useMemo(() => {
@@ -326,18 +357,18 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
     }
 
     // Sync the current visible window to the caller (on initial render and after restore), used to recalculate axes based on the displayed portion
-    if (onDataZoomWindowChanged) {
+    if (hasOnDataZoomWindowChanged) {
       const zooms = (chart.getOption() as ChartsOption | undefined)
         ?.dataZoom as Array<{ start?: number; end?: number }> | undefined;
       const zoom = zooms?.[0];
       const totalLen = xAxisData?.length ?? 0;
       if (typeof zoom?.start === "number" && typeof zoom?.end === "number") {
-        onDataZoomWindowChanged(
+        emitZoomWindow(
           percentWindowToIndexWindow(zoom.start, zoom.end, totalLen),
         );
       } else {
         // Without dataZoom (e.g. scrolling not enabled due to insufficient data) the window is the full range; sync once to avoid a stale old window
-        onDataZoomWindowChanged({
+        emitZoomWindow({
           startIndex: 0,
           endIndex: Math.max(0, totalLen - 1),
         });
@@ -353,18 +384,21 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
       resizeObserverRef.current.observe(chartRef.current);
     }
 
-    // Add click event
-    if (onClick) {
-      chartInstanceRef.current?.on("click", onClick);
+    // Add click event（注册与否看布尔量，实际调用取最新引用）
+    const handleClick = (event: echarts.ECElementEvent) => {
+      onClickRef.current?.(event);
+    };
+    if (hasOnClick) {
+      chartInstanceRef.current?.on("click", handleClick);
     }
 
     // Legend selection event
     const handleLegendSelectChanged = (params: unknown) => {
-      onLegendSelectChanged?.(
+      onLegendSelectChangedRef.current?.(
         (params as { selected: Record<string, boolean> }).selected,
       );
     };
-    if (onLegendSelectChanged) {
+    if (hasOnLegendSelectChanged) {
       chartInstanceRef.current?.on(
         "legendselectchanged",
         handleLegendSelectChanged,
@@ -390,7 +424,7 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
         typeof info?.startValue === "number" &&
         typeof info?.endValue === "number"
       ) {
-        onDataZoomWindowChanged?.({
+        emitZoomWindow({
           startIndex: Math.max(0, Math.round(info.startValue)),
           endIndex: Math.max(0, Math.round(info.endValue)),
         });
@@ -398,7 +432,7 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
         typeof info?.start === "number" &&
         typeof info?.end === "number"
       ) {
-        onDataZoomWindowChanged?.(
+        emitZoomWindow(
           percentWindowToIndexWindow(
             info.start,
             info.end,
@@ -407,7 +441,7 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
         );
       }
     };
-    if (onDataZoomWindowChanged) {
+    if (hasOnDataZoomWindowChanged) {
       chartInstanceRef.current?.on("datazoom", handleDataZoom);
     }
 
@@ -443,18 +477,18 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
     return () => {
       window.removeEventListener("resize", handleResize);
 
-      if (onClick) {
-        chartInstanceRef.current?.off("click", onClick);
+      if (hasOnClick) {
+        chartInstanceRef.current?.off("click", handleClick);
       }
 
-      if (onLegendSelectChanged) {
+      if (hasOnLegendSelectChanged) {
         chartInstanceRef.current?.off(
           "legendselectchanged",
           handleLegendSelectChanged,
         );
       }
 
-      if (onDataZoomWindowChanged) {
+      if (hasOnDataZoomWindowChanged) {
         chartInstanceRef.current?.off("datazoom", handleDataZoom);
       }
 
@@ -466,9 +500,12 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
   }, [
     chartOption,
     handleResize,
-    onClick,
-    onLegendSelectChanged,
-    onDataZoomWindowChanged,
+    onClickRef,
+    onLegendSelectChangedRef,
+    hasOnClick,
+    hasOnLegendSelectChanged,
+    hasOnDataZoomWindowChanged,
+    emitZoomWindow,
     xAxisData,
     enableLegendAutoScroll,
     legendVisibleCount,
@@ -505,9 +542,9 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
       startIndex: normalizedScroll.startIndex,
       autoPlay: normalizedScroll.autoScroll,
       enableWheelScroll,
-      onWindowChange: onDataZoomWindowChanged
+      onWindowChange: hasOnDataZoomWindowChanged
         ? (startPercent, endPercent) =>
-            onDataZoomWindowChanged(
+            emitZoomWindow(
               percentWindowToIndexWindow(
                 startPercent,
                 endPercent,
@@ -523,7 +560,8 @@ const ChartLine: React.FC<ChartLineProps> = (props) => {
     normalizedScroll,
     sliderDataZoom,
     xAxisData,
-    onDataZoomWindowChanged,
+    hasOnDataZoomWindowChanged,
+    emitZoomWindow,
   ]);
 
   // Clean up resources when the component unmounts

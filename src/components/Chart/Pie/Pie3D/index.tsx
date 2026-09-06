@@ -173,6 +173,12 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
 
   const onChartRef = useLatestRef(onChart);
 
+  // onClick 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 跟着重跑会重建
+  // 3D 饼的 option 并重播动画。注册与否看布尔量（保证「从无到有传入」仍会注册），
+  // 实际调用取 ref 里的最新引用。
+  const onClickRef = useLatestRef(onClick);
+  const hasOnClick = !!onClick;
+
   // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
   // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   useEffect(() => {
@@ -197,8 +203,11 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
 
     chart.on("mouseover", handleMouseOver);
     chart.on("globalout", handleGlobalOut);
-    if (onClick) {
-      chart.on("click", onClick);
+    const handleClick = (event: echarts.ECElementEvent) => {
+      onClickRef.current?.(event);
+    };
+    if (hasOnClick) {
+      chart.on("click", handleClick);
     }
 
     return () => {
@@ -206,8 +215,8 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
       if (chart) {
         chart.off("mouseover", handleMouseOver);
         chart.off("globalout", handleGlobalOut);
-        if (onClick) {
-          chart.off("click", onClick);
+        if (hasOnClick) {
+          chart.off("click", handleClick);
         }
       }
     };
@@ -217,7 +226,8 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
     handleMouseOver,
     handleGlobalOut,
     onChartRef,
-    onClick,
+    onClickRef,
+    hasOnClick,
     containerReady,
   ]);
 
