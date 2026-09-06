@@ -1,13 +1,6 @@
 // 注意：CSS Module 里的类名都会被哈希，antd 的类名必须写在 :global() 中，否则
 // `.ant-menu-horizontal` 会变成 `.ant-menu-horizontal___xxxxx`，静悄悄地永不生效。
 .menu {
-  &::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-  }
-
-  scrollbar-width: none;
-
   // 顶部横向菜单：占满剩余宽度，背景交给外层的导航渐变
   &:global(.ant-menu-horizontal) {
     flex: 1;
@@ -15,6 +8,50 @@
 
     background-color: transparent;
   }
+
+  /* ===== inline（侧栏）：菜单根**就是**那个滚动容器 =====
+     antd 的 `.ant-layout-sider` / `.ant-layout-sider-children` 都没有设 overflow，
+     所以在这条路径上，「谁滚」原本是没人规定的 —— 展开子菜单那 200ms 里
+     rc-motion 会逐帧改高度，容器先超出再收回，滚动条由**当时**恰好溢出的那个
+     元素临时长出来，于是闪一下。
+
+     这里把它定死：菜单根 `flex: 1 / min-height: 0 / overflow-y: auto`，配上外面
+     那层不滚的 `.scrollHost`，中间态怎么抖都轮不到别人显示滚动条；菜单长过一屏
+     时也仍然滚得到底部。 */
+  &:global(.ant-menu-inline),
+  &:global(.ant-menu-inline-collapsed) {
+    flex: 1;
+    min-height: 0px;
+
+    // 横向一律不滚：菜单文字过长时该省略，不该把侧栏推出一条横向滚动条
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* 子菜单在展开 / 收起动画期间被 rc-motion 逐帧改高度。antd 的
+     `.ant-motion-collapse` 自带 overflow hidden，这里补的是**动画结束、类名摘掉
+     之后**那一帧：此时 ul 的高度刚回到 auto，若父级恰好差几像素，浏览器会先画出
+     滚动条再重排。子菜单本来也永远不需要自己滚。 */
+  :global(.ant-menu-sub.ant-menu-inline) {
+    overflow: hidden;
+  }
+
+  /* ===== 滚动条外观：本组件不管，交给消费方 =====
+     这里曾经写着 `scrollbar-width: none` ＋ `::-webkit-scrollbar { width: 0 }`，
+     用「把滚动条永久藏掉」来遮上面那个闪动。现在闪动由 overflow 归属治本了，
+     这份「藏」不但多余，还有两处害处，所以整段删掉：
+
+     1. **Chrome 121+ 一旦读到 `scrollbar-width` / `scrollbar-color` 的非默认值，
+        就会整套忽略该元素上的 `::-webkit-scrollbar` 规则。** 库里无差别写下一句
+        `scrollbar-width: none`，等于在每个消费方的侧栏上悄悄废掉他们全站那套
+        滚动条皮肤，只剩系统细条 —— 而且不报错、很难查。
+        （所以本库任何地方要写这两个属性，都必须锁在
+        `@supports (-moz-appearance: none)` 里，让 Chrome 读不到。）
+     2. 滚动条的「显 / 隐 / 配色」是应用级的设计语言（有的应用要常驻，有的要
+        悬浮才显现），不是菜单组件的行为。库只该规定**谁滚**，不该用高权重规则
+        把可见性堵死、逼消费方回过头来盖。
+
+     消费方在全局写 `::-webkit-scrollbar` 那一套即可，会自然落到菜单根上。 */
 }
 
 // 弹出的子菜单挂在 body 上，够不到 .menu，所以由组件把这个类挂到 popup 上
@@ -37,14 +74,20 @@
   }
 }
 
-// 次级菜单：头部固定在上，菜单撑满剩余高度
-.secondaryWrap {
+/* inline 菜单的滚动宿主：撑满侧栏高度、自己**不滚**，把高度整份让给菜单根。
+   有它在，菜单组件才是自带滚动容器语义的一整块 —— 消费方把 Menu 塞进任何一个
+   有高度的容器（antd 的 Sider、或自己的 div）都不必再补 overflow 规则。 */
+.scrollHost {
   height: 100%;
   display: flex;
   flex-direction: column;
 
+  overflow: hidden;
+}
+
+// 次级菜单：头部固定在上，菜单撑满剩余高度（滚动归属见 .scrollHost）
+.secondaryWrap {
   :global(.ant-menu) {
-    flex: 1;
     border-inline-end: none !important;
   }
 }
