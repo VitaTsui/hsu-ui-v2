@@ -40,6 +40,9 @@ export interface AutoCompleteSelectProps
   optionFontSize?: number;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_OPTIONS: AutoCompleteOption[] = [];
+
 const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   const {
     prefix,
@@ -53,7 +56,7 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
     popupClassName,
     filterOption: customFilterOption,
     onChange,
-    options = [],
+    options = EMPTY_OPTIONS,
     placement = "bottomLeft",
     onDropdownVisibleChange,
     popupMatchSelectWidth,

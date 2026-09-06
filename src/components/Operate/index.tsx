@@ -28,6 +28,9 @@ export interface OperateProps
   moreIcon?: ReactNode | false;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_MENU: OperateProps[] = [];
+
 /**
  * Render an icon
  * @param icon - Icon configuration
@@ -56,7 +59,7 @@ const Operate: React.FC<OperateProps> = (props) => {
   const {
     title,
     className,
-    menu = [],
+    menu = EMPTY_MENU,
     icon,
     delete: isDelete,
     popconfirm,

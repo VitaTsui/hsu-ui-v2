@@ -64,50 +64,97 @@ export function walkSources(dir: string, out: string[] = []) {
 }
 
 /**
- * 找出每个匹配 `hookRe` 的 hook 调用的依赖数组，返回 `[行号, 依赖名]`。
+ * 找出每个匹配 `hookRe` 的 hook 调用的依赖数组，返回 `[行号, 依赖名, 依赖原文]`。
  * `hookRe` 必须带 `g`，且以 `\(` 结尾（例如 `/use(?:Layout)?Effect\(/g`）。
+ *
+ * 依赖数组按「调用参数里最后一个顶层 `[...]`，且它后面到 `)` 之间只剩逗号/空白」
+ * 来定位。早先用 `/,\s*\[([\s\S]*)\]\s*$/` 正则从**最左**的 `, [` 起贪婪匹配，
+ * 回调体里只要出现一次 `, [`（JSX 的 `classNames(x, { [styles.a]: b })` 就会），
+ * 真正的依赖数组就被并进同一段，切出来的是带换行的 JSX 碎片而不是标识符 ——
+ * 结果是真命中被静默漏掉。这里改成括号配平扫描，不再漏。
  */
 export function hookDeps(
   src: string,
   hookRe: RegExp,
-): Array<[number, string]> {
-  const found: Array<[number, string]> = [];
+): Array<[number, string, string]> {
+  const found: Array<[number, string, string]> = [];
   const re = new RegExp(hookRe.source, "g");
   let m: RegExpExecArray | null;
 
   while ((m = re.exec(src))) {
-    let i = m.index + m[0].length;
+    const start = m.index + m[0].length;
+    let i = start;
     let depth = 1;
     let quote: string | null = null;
     let prev = "";
+    /** 调用参数里所有顶层 `[...]` 的起止下标 */
+    const topArrays: Array<[number, number]> = [];
+    let openAt = -1;
 
     while (i < src.length && depth > 0) {
       const c = src[i];
       if (quote) {
         if (c === quote && prev !== "\\") quote = null;
       } else if (c === '"' || c === "'" || c === "`") quote = c;
-      else if (c === "(" || c === "[" || c === "{") depth++;
-      else if (c === ")" || c === "]" || c === "}") depth--;
+      else if (c === "(" || c === "[" || c === "{") {
+        if (depth === 1 && c === "[") openAt = i;
+        depth++;
+      } else if (c === ")" || c === "]" || c === "}") {
+        depth--;
+        if (depth === 1 && c === "]" && openAt >= 0) {
+          topArrays.push([openAt, i]);
+          openAt = -1;
+        }
+      }
       prev = c;
       i++;
     }
 
-    const body = src.slice(m.index, i).replace(/\)\s*$/, "");
-    const deps = body.match(/,\s*\[([\s\S]*)\]\s*$/);
+    const closeParen = i - 1;
+    const deps = topArrays[topArrays.length - 1];
+    // 依赖数组必须是最后一个实参：前面紧邻一个顶层逗号（把 `useMemo(() => [x])`
+    // 这种「返回数组、根本没依赖数组」的写法排除掉），后面到 `)` 只剩逗号与空白
     if (!deps) continue;
+    if (!/,\s*$/.test(src.slice(start, deps[0]))) continue;
+    if (!/^\s*,?\s*$/.test(src.slice(deps[1] + 1, closeParen))) continue;
 
     const line = src.slice(0, m.index).split("\n").length;
-    for (const raw of deps[1].split(",")) {
-      const name = raw
-        .replace(/\/\/.*$/gm, "")
-        .trim()
-        .split(/[.?[]/)[0]
-        .trim();
-      if (name) found.push([line, name]);
+    for (const raw of splitTopLevel(src.slice(deps[0] + 1, deps[1]))) {
+      const expr = raw.replace(/\/\/.*$/gm, "").trim();
+      if (!expr) continue;
+      const name = expr.split(/[.?[(!]/)[0].trim();
+      if (name) found.push([line, name, expr]);
     }
   }
 
   return found;
+}
+
+/** 按顶层逗号切分（括号/引号内部的逗号不算） */
+function splitTopLevel(text: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let quote: string | null = null;
+  let prev = "";
+  let cur = "";
+
+  for (const c of text) {
+    if (quote) {
+      if (c === quote && prev !== "\\") quote = null;
+    } else if (c === '"' || c === "'" || c === "`") quote = c;
+    else if (c === "(" || c === "[" || c === "{") depth++;
+    else if (c === ")" || c === "]" || c === "}") depth--;
+    else if (c === "," && depth === 0) {
+      parts.push(cur);
+      cur = "";
+      prev = c;
+      continue;
+    }
+    cur += c;
+    prev = c;
+  }
+  parts.push(cur);
+  return parts;
 }
 
 /**

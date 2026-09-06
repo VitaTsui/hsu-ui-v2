@@ -31,36 +31,35 @@ import {
 const SRC = path.resolve(__dirname, "..");
 const HOOK_RE = /use(?:Memo|Callback|(?:Layout)?Effect)\(/g;
 
-/** `文件相对路径::依赖名` → 无害的理由（确实无害才登记这里） */
-const ALLOWED: Record<string, string> = {};
+/**
+ * 正式白名单：`文件相对路径::依赖名` → `{ raw, why }`。
+ *
+ * 只登记**经过逐处判断、确认不是缺陷**的写法，且必须精确到依赖原文 `raw`：
+ * 同一个绑定换一种写法（比如从 `x.open` 变成裸 `x`）就不再匹配，会照常失败。
+ * 这样白名单不会变成整文件整绑定的免死金牌。
+ */
+const ALLOWED: Record<string, { raw: string; why: string }> = {
+  "components/Panel/ListPanel/ListModalPanel/index.tsx::modalConfig": {
+    raw: "modalConfig.open",
+    why: "依赖取的是 modalConfig.open 这个布尔值，不是那个新对象本身；布尔值按值比较，effect 只在弹窗真的开合时重跑，不存在恒不命中",
+  },
+};
 
 /**
- * 存量欠账：守卫上线（2.5.6）时就已经存在的命中。**它们不是无害的**，只是不在这
- * 一轮的改动范围内（这轮只修 Chart 一族）。修法与 Chart 相同：rest 包走
- * `useShallowStable`，字面量默认值提到模块级常量。
+ * 存量欠账：守卫上线（2.5.6）时就已经存在的命中。2.5.7 已逐处清完，名单为空。
  *
  * 这份名单**只许变短**——下面「只许变短」那条用例会在某项修好却忘了删时报错。
  * 新写的代码一律直接失败，不许往这里加。
  */
-const KNOWN_DEBT = [
-  "components/Checkbox/CheckboxGroup/index.tsx::options",
-  "components/FormItem/FormCodeMirror/index.tsx::rules",
-  "components/FormItem/ItemContainer/index.tsx::tipsConfig",
-  "components/Operate/index.tsx::menu",
-  "components/Pagination/index.tsx::pageSizeOptions",
-  "components/Panel/ListPanel/ListModalPanel/index.tsx::modalConfig",
-  "components/Search/_hooks/useSearchCommon.ts::moreSearchItems",
-  "components/Select/AutoCompleteSelect/index.tsx::options",
-  "components/Spreadsheet/index.tsx::xOptionsRest",
-  "components/Table/_hooks/useTableColumns.tsx::columns",
-  "components/Tree/index.tsx::treeData",
-];
+const KNOWN_DEBT: string[] = [];
 
 interface Hit {
   /** `文件相对路径::依赖名` */
   key: string;
   file: string;
   line: number;
+  /** 依赖数组里的原文（`x` 还是 `x.open`），白名单按它精确匹配 */
+  raw: string;
   why: string;
 }
 
@@ -73,10 +72,10 @@ function scan(): Hit[] {
     const fresh = freshObjectBindings(src);
     if (!fresh.size) continue;
 
-    for (const [line, dep] of hookDeps(src, HOOK_RE)) {
+    for (const [line, dep, raw] of hookDeps(src, HOOK_RE)) {
       const why = fresh.get(dep);
       if (!why) continue;
-      hits.push({ key: `${rel}::${dep}`, file: rel, line, why });
+      hits.push({ key: `${rel}::${dep}`, file: rel, line, raw, why });
     }
   }
 
@@ -86,13 +85,22 @@ function scan(): Hit[] {
 describe("每次渲染都新建的对象不进 hook 依赖数组", () => {
   it("全库无未登记的新命中", () => {
     const offenders = scan()
-      .filter(({ key }) => !ALLOWED[key] && !KNOWN_DEBT.includes(key))
+      .filter(({ key, raw }) => ALLOWED[key]?.raw !== raw && !KNOWN_DEBT.includes(key))
       .map(({ file, line, why }) => `${file}:${line}  ${why}`);
 
     expect(offenders).toEqual([]);
   });
 
-  it("Chart 一族一条都不剩（这一轮修的就是它）", () => {
+  it("白名单不许留过期条目（对应写法改掉了就删掉它）", () => {
+    const live = new Set(scan().map(({ key, raw }) => `${key}::${raw}`));
+    expect(
+      Object.entries(ALLOWED)
+        .filter(([key, { raw }]) => !live.has(`${key}::${raw}`))
+        .map(([key]) => key),
+    ).toEqual([]);
+  });
+
+  it("Chart 一族一条都不剩（2.5.6 修的就是它）", () => {
     const chartHits = scan()
       .filter(({ file }) => file.startsWith("components/Chart/"))
       .map(({ key, line }) => `${key}@${line}`);
@@ -100,7 +108,7 @@ describe("每次渲染都新建的对象不进 hook 依赖数组", () => {
     expect(chartHits).toEqual([]);
   });
 
-  it("存量欠账名单只许变短", () => {
+  it("存量欠账名单只许变短（2.5.7 起应恒为空）", () => {
     const live = new Set(scan().map(({ key }) => key));
     // 修好了就把它从 KNOWN_DEBT 里删掉，别留着已经不存在的条目
     expect(KNOWN_DEBT.filter((key) => !live.has(key))).toEqual([]);
@@ -133,6 +141,29 @@ describe("每次渲染都新建的对象不进 hook 依赖数组", () => {
       const option = useMemo(() => ({ ...coreOption }), [coreOption]);
     `;
     expect(freshObjectBindings(fixed).has("coreOption")).toBe(false);
+
+    // 回调体里出现过 `, [`（JSX 的 classNames 常写成这样）时，依赖数组仍要切对：
+    // 旧的贪婪正则会从最左那个 `, [` 起一路吞到结尾，把真命中静默漏掉
+    const jsxCase = `
+      const { colors = ["#fff"] } = props;
+      const node = useMemo(() => (
+        <span className={classNames(styles.a, { [styles.b]: on })} />
+      ), [colors, on]);
+    `;
+    expect(hookDeps(jsxCase, HOOK_RE).map(([, d]) => d)).toEqual([
+      "colors",
+      "on",
+    ]);
+
+    // 依赖原文要原样带出来，白名单才能按 `x` / `x.open` 精确区分
+    expect(
+      hookDeps(`useEffect(() => {}, [cfg.open, cfg]);`, HOOK_RE).map(
+        ([, , raw]) => raw,
+      ),
+    ).toEqual(["cfg.open", "cfg"]);
+
+    // 最后一个实参不是依赖数组时不算依赖（例如 `useMemo(() => [1, 2])`）
+    expect(hookDeps(`const a = useMemo(() => [x, y]);`, HOOK_RE)).toEqual([]);
 
     // 注释里的示例代码不算命中
     expect(

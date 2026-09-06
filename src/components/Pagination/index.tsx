@@ -20,10 +20,13 @@ export interface PaginationProps
   onStaticPaginationChange?: (page: number, pageSize: number) => void;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_PAGE_SIZE_OPTIONS: number[] = [];
+
 const Pagination: React.FC<PaginationProps> = (props) => {
   const {
     simple,
-    pageSizeOptions = [],
+    pageSizeOptions = EMPTY_PAGE_SIZE_OPTIONS,
     showSizeChanger,
     onShowSizeChange,
     onChange,

@@ -21,6 +21,7 @@ import { ButtonProps } from "../Button";
 import { getExpandedKeysByLevel, getNodePath } from "./_utils";
 import TextEllipsis from "../TextEllipsis";
 import usePermissions from "../../hooks/usePermissions";
+import useShallowStable from "../../hooks/useShallowStable";
 import { isLegacyHasSelectorBrowser } from "../../utils/cssSupports";
 
 export interface TreeData extends Record<string, unknown> {
@@ -79,6 +80,9 @@ interface TreeFC extends React.FC<TreeProps> {
   TreeNode: typeof AntdTree.TreeNode;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_TREE_DATA: TreeData[] = [];
+
 const Tree = ((props: TreeProps) => {
   const {
     title,
@@ -88,7 +92,7 @@ const Tree = ((props: TreeProps) => {
     titleClassName,
     className,
     search,
-    treeData = [],
+    treeData = EMPTY_TREE_DATA,
     onChange,
     onCheck,
     onSelect,
@@ -109,8 +113,11 @@ const Tree = ((props: TreeProps) => {
     onSelectPath,
     allowDeselect = true,
     titleSearchBarClassName,
-    ...treeConfig
+    ...restTreeConfig
   } = props;
+  // rest 解构出来的对象每次渲染都是新引用，直接进依赖数组会让 memo 恒不命中。
+  // useShallowStable 让它回到值语义：内容浅相等就复用同一引用，真变了立刻透出新引用。
+  const treeConfig = useShallowStable(restTreeConfig);
   const { permitted } = usePermissions(hasPermi);
   const legacyHasSelector = isLegacyHasSelectorBrowser();
 
