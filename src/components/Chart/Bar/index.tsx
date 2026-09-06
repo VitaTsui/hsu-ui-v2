@@ -25,6 +25,7 @@ import {
 import { resolveChartChrome } from "../_utils/chartTheme";
 import useIsDark from "../../../hooks/useIsDark";
 import useLatestRef from "../../../hooks/useLatestRef";
+import useShallowStable from "../../../hooks/useShallowStable";
 
 export interface ChartBarProps extends ChartCommonProps {
   chartTitle?: string;
@@ -70,8 +71,12 @@ const ChartBar: React.FC<ChartBarProps> = (props) => {
     enableLegendAutoScroll = false,
     legendVisibleCount = 8,
     legendScrollInterval = 1500,
-    ...coreOption
+    ...restOption
   } = props;
+  // rest 解构出来的对象每次渲染都是新引用，直接进依赖数组会让 chartOption 的 memo
+  // 恒不命中 —— 父组件每渲染一次就重跑一次 setOption(notMerge)，动画重播、悬浮态被清掉。
+  // useShallowStable 让它回到值语义：内容浅相等就复用同一引用，真变了立刻透出新引用。
+  const coreOption = useShallowStable(restOption);
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
   // Defers `echarts.init` until the container has a box — see the hook for why
