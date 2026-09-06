@@ -1,4 +1,4 @@
-import { useEffect, useState, Key, useMemo, useRef } from "react";
+import { useEffect, useState, Key, useMemo, useRef, useCallback } from "react";
 import { Equal } from "hsu-utils";
 import { CheckedKeys, TreeData } from "..";
 import { normalizeCheckedKeys } from "../_utils/normalizeCheckedKeys";
@@ -42,13 +42,19 @@ export const useExpandedKeys = (
     }
   }, [defaultExpandedKeys, expandedKeysProps]);
 
-  // Wrap setExpandedKeys to mark that the user has manually interacted
-  const handleSetExpandedKeys = (
-    keys: Key[] | undefined | ((prev: Key[] | undefined) => Key[] | undefined)
-  ) => {
-    hasUserInteractedRef.current = true;
-    setExpandedKeys(keys);
-  };
+  // Wrap setExpandedKeys to mark that the user has manually interacted.
+  // 必须 useCallback：这个函数被 Tree 的 handleExpand 当依赖用，
+  // 每渲染新建一个就让那个 useCallback 恒不命中——展开回调每渲染换引用透给 antd Tree。
+  // 函数体只碰 ref 和状态 setter，两者都恒定，所以依赖数组是空的。
+  const handleSetExpandedKeys = useCallback(
+    (
+      keys: Key[] | undefined | ((prev: Key[] | undefined) => Key[] | undefined)
+    ) => {
+      hasUserInteractedRef.current = true;
+      setExpandedKeys(keys);
+    },
+    []
+  );
 
   return [expandedKeys, handleSetExpandedKeys] as const;
 };

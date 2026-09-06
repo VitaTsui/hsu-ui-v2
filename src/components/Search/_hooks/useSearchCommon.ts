@@ -76,6 +76,9 @@ export interface UseSearchCommonReturn {
   permitted: boolean;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_SEARCH_ITEMS: FormItemProps[] = [];
+
 /**
  * Extracts the common logic shared by all Search components
  */
@@ -85,7 +88,7 @@ export const useSearchCommon = (
   const {
     form,
     searchItems,
-    moreSearchItems = [],
+    moreSearchItems = EMPTY_SEARCH_ITEMS,
     searchData,
     hasPermi,
     beforeButtonGroup,

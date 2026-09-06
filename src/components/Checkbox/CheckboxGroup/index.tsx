@@ -9,6 +9,9 @@ import styles from "./index.module.scss";
 
 const Group = Checkbox.Group;
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_OPTIONS: AntdCheckboxGroupProps["options"] = [];
+
 export interface CheckboxGroupProps extends AntdCheckboxGroupProps {
   outline?: boolean;
   hasAll?: boolean;
@@ -21,7 +24,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = (props) => {
     className,
     outline,
     hasAll,
-    options = [],
+    options = EMPTY_OPTIONS,
     value,
     onChange,
     layout = "horizontal",

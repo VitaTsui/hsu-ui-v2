@@ -7,12 +7,15 @@ export interface FormCodeMirrorProps extends ItemContainerProps {
   componentProps?: CodeMirrorProps;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_RULES: ItemContainerProps["rules"] = [];
+
 const FormCodeMirror: React.FC<FormCodeMirrorProps> = (props) => {
   const {
     componentProps = {},
     className: itemClassName,
     disabled,
-    rules = [],
+    rules = EMPTY_RULES,
     name,
     ...formItemProps
   } = props;

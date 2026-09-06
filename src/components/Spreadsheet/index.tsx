@@ -6,6 +6,7 @@ import "x-data-spreadsheet/dist/xspreadsheet.css";
 import classNames from "classnames";
 import { WorkBook } from "xlsx";
 import { stox } from "./xlsxspread";
+import useShallowStable from "../../hooks/useShallowStable";
 
 interface XOptions extends Omit<Options, "view"> {
   showBottomTool?: boolean;
@@ -17,9 +18,15 @@ interface SpreadsheetProps {
   className?: string;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个对象，进依赖数组就让 effect 每渲染必重跑；提到模块级常量
+const EMPTY_X_OPTIONS: XOptions = {};
+
 const Spreadsheet: React.FC<SpreadsheetProps> = (props) => {
-  const { data, xOptions = {}, className } = props;
-  const { showBottomTool = true, ...xOptionsRest } = xOptions;
+  const { data, xOptions = EMPTY_X_OPTIONS, className } = props;
+  const { showBottomTool = true, ...restXOptions } = xOptions;
+  // rest 解构出来的对象每次渲染都是新引用，直接进依赖数组会让 memo 恒不命中。
+  // useShallowStable 让它回到值语义：内容浅相等就复用同一引用，真变了立刻透出新引用。
+  const xOptionsRest = useShallowStable(restXOptions);
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const id = useMemo(() => generateRandomStr(10), []);

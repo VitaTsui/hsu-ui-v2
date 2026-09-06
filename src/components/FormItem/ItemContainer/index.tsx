@@ -9,6 +9,7 @@ import usePermissions from "../../../hooks/usePermissions";
 import { isLegacyHasSelectorBrowser } from "../../../utils/cssSupports";
 import { generateRandomStr } from "hsu-utils";
 import useLabelSize from "./_hooks/useLabelSize";
+import useShallowStable from "../../../hooks/useShallowStable";
 import useInputSize from "./_hooks/useInputSize";
 
 interface TipsProps {
@@ -50,6 +51,9 @@ export interface ItemContainerProps extends FormItemProps {
   visible?: boolean;
 }
 
+// 解构默认值写成字面量会每次渲染新建一个对象，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_TIPS: NonNullable<ItemContainerProps["tips"]> = {};
+
 const ItemContainer: React.FC<ItemContainerProps> = (props) => {
   const {
     children,
@@ -73,7 +77,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
     colon,
     label,
     labelRender,
-    tips = {},
+    tips = EMPTY_TIPS,
     horizontalAlignment = "start",
     hideRequired = false,
     labelClassName,
@@ -89,7 +93,18 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
     visible: _visible,
     ...formItemProps
   } = props;
-  const { icon = "material-symbols:help", iconClassName, ...tipsConfig } = tips;
+  const {
+    icon = "material-symbols:help",
+    iconClassName,
+    ...restTipsConfig
+  } = tips;
+  // rest 解构出来的对象每次渲染都是新引用，直接进依赖数组会让 memo 恒不命中。
+  // useShallowStable 让它回到值语义：内容浅相等就复用同一引用，真变了立刻透出新引用。
+  const tipsConfig = useShallowStable(restTipsConfig);
+  // memo 只需要知道「有没有配 tips」，把对象本身放进依赖数组等于按引用比：
+  // 消费方写内联 `tips={{ ... }}`（最常见的写法）就让 label 的 memo 恒不命中。
+  // 拆成布尔量后依赖回到值语义。
+  const hasTips = Object.keys(tips).length > 0;
   const { permitted } = usePermissions(hasPermi);
   const cls = useMemo(() => generateRandomStr(10), []);
   const legacyHasSelector = isLegacyHasSelectorBrowser();
@@ -99,7 +114,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
       return undefined;
     }
 
-    return Object.keys(tips).length ? (
+    return hasTips ? (
       <>
         <span className={classNames(styles.labelContent, labelClassName)}>
           <span
@@ -160,7 +175,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
       </>
     ) : undefined;
   }, [
-    tips,
+    hasTips,
     labelClassName,
     label,
     tipsConfig,
@@ -225,7 +240,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
         [styles.hideRequired]: hideRequired,
         [styles[horizontalAlignment]]:
           layout === "horizontal" && horizontalAlignment,
-        [styles.hasLabelContent]: !!Object.keys(tips).length,
+        [styles.hasLabelContent]: hasTips,
         [styles.hideAdditiona]: hideAdditiona,
         [styles.legacyHasLabelExtra]:
           legacyHasSelector &&
@@ -233,7 +248,7 @@ const ItemContainer: React.FC<ItemContainerProps> = (props) => {
           !hideLabel &&
           !!label &&
           !!labelExtra &&
-          !Object.keys(tips).length,
+          !hasTips,
       })}
       colon={
         typeof colon === "boolean"

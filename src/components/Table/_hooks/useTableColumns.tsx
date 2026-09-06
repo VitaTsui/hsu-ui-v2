@@ -19,6 +19,9 @@ import {
 import usePermissions from "../../../hooks/usePermissions";
 import { PaginationProps } from "../../Pagination";
 
+// 解构默认值写成字面量会每次渲染新建一个数组，进依赖数组就让 memo 恒不命中；提到模块级常量
+const EMPTY_COLUMNS: ColumnsType = [];
+
 // measureAlign columns: measured at 14px, consistent with the table body and autoWidth title measurement
 const MEASURE_ALIGN_FONT_SIZE = 14;
 // Canvas measureText only returns the advance width, about 1px narrower than the actual DOM rendering; add a 2px buffer to avoid squeezing the widest row
@@ -97,7 +100,7 @@ const useTableColumns = <T extends AnyObject>(
   handleTableChange: TableProps<T>["onChange"];
 } => {
   const {
-    columns = [],
+    columns = EMPTY_COLUMNS,
     scroll,
     autoWidth,
     dataSource,
