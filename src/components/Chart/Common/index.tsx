@@ -3,6 +3,7 @@ import useContainerReady from "../_hooks/useContainerReady";
 import styles from "../index.module.scss";
 import { ChartCommonProps, ChartOptionType, ChartsOption } from "..";
 import * as echarts from "echarts";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 
 const Common: React.FC<ChartCommonProps> = (props) => {
   const { className, style, onChart, ...coreOption } = props;
@@ -31,6 +32,10 @@ const Common: React.FC<ChartCommonProps> = (props) => {
     chartInstanceRef.current?.resize();
   }, []);
 
+  const onChartRef = useLatestRef(onChart);
+
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   // Initialize the chart
   useEffect(() => {
     if (!chartRef.current || !containerReady) return;
@@ -46,7 +51,7 @@ const Common: React.FC<ChartCommonProps> = (props) => {
     chart.setOption(chartOption as ChartOptionType, true);
 
     // Chart-ready callback (can be used for legend auto-scroll, etc.)
-    onChart?.(chart);
+    onChartRef.current?.(chart);
 
     // Add resize listener
     window.addEventListener("resize", handleResize);
@@ -61,7 +66,7 @@ const Common: React.FC<ChartCommonProps> = (props) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [chartOption, handleResize, onChart,
+  }, [chartOption, handleResize, onChartRef,
     containerReady,
   ]);
 

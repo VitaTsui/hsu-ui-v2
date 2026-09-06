@@ -7,6 +7,7 @@ import { ChartCommonProps, ChartOptionType, ChartsOption } from "../..";
 import { useMouseOverHandler, useGlobalOutHandler } from "./_hooks";
 import { getPie3DOption } from "./_utils/option";
 import styles from "../../index.module.scss";
+import { useLatestRef } from "../../../../hooks/useLatestRef";
 
 export interface Pie3DDataItem {
   name: string;
@@ -170,6 +171,10 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
     { minHeight, maxHeight, yOffset, autoRotate }
   );
 
+  const onChartRef = useLatestRef(onChart);
+
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   useEffect(() => {
     if (!chartRef.current || !containerReady) return;
 
@@ -177,7 +182,7 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
     if (!chart) {
       chart = echarts.init(chartRef.current);
       chartInstanceRef.current = chart;
-      onChart?.(chart);
+      onChartRef.current?.(chart);
     }
 
     chart.setOption(chartOption as ChartOptionType, true);
@@ -211,7 +216,7 @@ const ChartPie3D: React.FC<ChartPie3DProps> = (props) => {
     handleResize,
     handleMouseOver,
     handleGlobalOut,
-    onChart,
+    onChartRef,
     onClick,
     containerReady,
   ]);

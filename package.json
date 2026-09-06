@@ -1,6 +1,6 @@
 {
   "name": "@hsu-react/ui",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "description": "一套基于 React + Ant Design 的中后台业务组件库",
   "license": "MIT",
   "type": "module",
@@ -42,7 +42,9 @@
     "docs:build": "dumi build",
     "docs:preview": "dumi preview",
     "build": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
-    "prepublishOnly": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs --check && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
+    "prepublishOnly": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs --check && vitest run && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check:deps": "node scripts/check-heavy-deps.cjs",
     "tokens": "node scripts/gen-tokens-scss.cjs",
     "check:tokens": "node scripts/gen-tokens-scss.cjs --check"
@@ -115,6 +117,8 @@
   },
   "devDependencies": {
     "@ant-design/icons": "^6.3.2",
+    "@testing-library/dom": "^10",
+    "@testing-library/react": "^16",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.4",
     "@types/markdown-it": "^14.1.2",
@@ -126,6 +130,7 @@
     "antd": "6.5.4",
     "dumi": "^2.4.0",
     "father": "^4.5.0",
+    "jsdom": "^25",
     "mobx": "^6.12.3",
     "mobx-react-lite": "^4.0.7",
     "react": "^18.3.1",
@@ -134,7 +139,8 @@
     "react-router": "^6.23.1",
     "react-router-dom": "^6.23.1",
     "sass": "^1.101.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2"
   },
   "peerDependenciesMeta": {
     "react-router": {
