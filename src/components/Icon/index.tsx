@@ -8,6 +8,7 @@ import * as AntdIcons from "@ant-design/icons";
 import React, { useCallback, useEffect, useRef } from "react";
 import classNames from "classnames";
 import styles from "./index.module.scss";
+import { useLatestRef } from "../../hooks/useLatestRef";
 
 type AntdNamedIconComponent = React.ForwardRefExoticComponent<
   {
@@ -73,9 +74,13 @@ const Icon = React.forwardRef<HTMLSpanElement, IconProps>((props, forwardedRef) 
     [forwardedRef]
   );
 
+  const onRefRef = useLatestRef(onRef);
+
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   useEffect(() => {
-    onRef?.(ref);
-  }, [onRef, ref]);
+    onRefRef.current?.(ref);
+  }, [onRefRef, ref]);
 
   const mergedStyle: React.CSSProperties = {
     color,

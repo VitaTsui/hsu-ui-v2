@@ -8,8 +8,8 @@ import { CloseCircleFilled } from "@ant-design/icons";
 
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { useDebounceEffect } from "ahooks";
 import type { InputNumberRef } from "../../../types/antd";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 
 export interface InputNumberProps extends Omit<
   AntdInputNumberProps,
@@ -44,6 +44,7 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
   // `getRef` keeps handing consumers an `HTMLInputElement` exactly as before.
   const ref = useRef<InputNumberRef>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const getRefRef = useLatestRef(getRef);
 
   // On initialization, prefer value, then fall back to defaultValue
   const initialValue =
@@ -58,22 +59,21 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
         : "";
 
   const [_value, setValue] = useState<string>(initialValue);
-  const [lastValue, setLastValue] = useState<string>(initialValue);
   const prevValueRef = useRef<typeof value>(undefined);
+  // 最近一次通知出去的文本，代替原来那个用 state 记账的写法
+  const notifiedRef = useRef<string>(initialValue);
 
-  useDebounceEffect(
-    () => {
-      if (_value !== lastValue) {
-        setLastValue(_value);
-
-        onChange?.(_value);
-      }
-    },
-    [_value, lastValue, onChange],
-    {
-      wait: 10,
-    },
-  );
+  /**
+   * `onChange` 是「用户改了输入」这个**事件**的通知，不是从 state 推导出来的结果，
+   * 所以在事件处理里发，不在 effect 里发。详见 `TextArea/index.tsx` 里那段说明——
+   * 旧写法（依赖数组里放 `onChange`、体内又调它、用 state 记「通知过没有」）
+   * 会让传内联箭头的消费方死循环。
+   */
+  const notify = (next: string) => {
+    if (next === notifiedRef.current) return;
+    notifiedRef.current = next;
+    onChange?.(next);
+  };
 
   useEffect(() => {
     // Update internal state only when the external value prop actually changes
@@ -96,17 +96,18 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
         Number(value) === Number(_value);
 
       if (sameNumber) {
-        // 只同步「已提交值」，不动正在编辑的文本
-        setLastValue(_value);
+        // 只同步「已通知过的值」，不动正在编辑的文本
+        notifiedRef.current = _value;
       } else if (value !== undefined && value !== null) {
         const newValue =
           typeof value === "number" ? `${value}` : value?.toString();
+        // 外部把值改了，之前通知过什么就不作数了，重新以外部值为准
+        notifiedRef.current = newValue;
         setValue(newValue);
-        setLastValue(newValue);
       } else {
         // Clear only on initialization or when explicitly set to undefined/null externally
+        notifiedRef.current = "";
         setValue("");
-        setLastValue("");
       }
     }
     // `_value` 是刻意不进依赖的：这个 effect 只该在**外部** value 变化时跑，
@@ -114,15 +115,15 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  // 只在挂载时把 ref 交出去。`getRef` 进依赖数组同样会被内联箭头带着每次渲染重跑
   useEffect(() => {
-    getRef?.(ref.current);
-  }, [getRef]);
+    getRefRef.current?.(ref.current);
+  }, [getRefRef]);
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     setValue("");
-    setLastValue("");
-    onChange?.("");
+    notify("");
   };
 
   const showClear =
@@ -138,6 +139,7 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
             ? ""
             : (typeof e === "number" ? e : e || "").toString();
         setValue(newValue);
+        notify(newValue);
       }}
       className={classNames(styles.antdInput, className)}
       controls={false}

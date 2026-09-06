@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { UploadFile } from "antd";
 import { deepCopy, Equal } from "hsu-utils";
 import { extractFileUrl } from "../_utils";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 
 interface UseUploadFileListProps {
   fileList?: UploadFile[];
@@ -19,7 +20,10 @@ export function useUploadFileList({
 }: UseUploadFileListProps) {
   const [_fileList, setFilelist] = useState<UploadFile[]>([]);
   const [lastFileList, setLastFileList] = useState<UploadFile[]>([]);
+  const onChangeRef = useLatestRef(onChange);
 
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   useEffect(() => {
     if (rmFile) {
       const file = _fileList.find((item) => item.uid === rmFile);
@@ -27,14 +31,14 @@ export function useUploadFileList({
       if (file) {
         setFilelist(filteredList);
         setTimeout(() => {
-          onChange?.({
+          onChangeRef.current?.({
             file,
             fileList: filteredList,
           });
         }, 100);
       }
     }
-  }, [_fileList, onChange, rmFile]);
+  }, [_fileList, onChangeRef, rmFile]);
 
   useEffect(() => {
     if (!Equal.ObjEqual(fileList ?? [], lastFileList)) {

@@ -14,6 +14,7 @@ import {
 } from "./_components";
 import classNames from "classnames";
 import Button, { ButtonProps } from "../../Button";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 export type { AgentToggleConfig } from "./_components";
 
 export interface AgentConfig {
@@ -127,6 +128,10 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
   // Use external state or internal state
   const agentsState = isControlled ? externalAgentsState : internalAgentsState;
 
+  const onAgentsChangeRef = useLatestRef(onAgentsChange);
+
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   // When the model switches, sync the agents state (only in uncontrolled mode)
   useEffect(() => {
     if (isControlled) return; // In controlled mode, state is managed externally
@@ -136,12 +141,12 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
     );
     if (currentModel?.agents && currentModel.agents.length > 0) {
       setInternalAgentsState(currentModel.agents);
-      onAgentsChange?.(currentModel.agents);
+      onAgentsChangeRef.current?.(currentModel.agents);
     }
   }, [
     modelConfig?.modelType,
     modelConfig?.modelList,
-    onAgentsChange,
+    onAgentsChangeRef,
     isControlled,
   ]);
 

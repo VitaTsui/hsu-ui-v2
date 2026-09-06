@@ -14,7 +14,7 @@ import TextArea, { TextAreaProps } from "./TextArea";
 import classNames from "classnames";
 import styles from "./index.module.scss";
 import RangeInput, { RangeInputProps } from "./Range";
-import { useDebounceEffect } from "ahooks";
+import { useLatestRef } from "../../hooks/useLatestRef";
 
 export interface InputProps extends Omit<
   AntdInputProps,
@@ -54,8 +54,11 @@ const Input: InputFC = (props) => {
     escapeCharacters,
     ...inputConfig
   } = props;
-  const [isComposing, setComposing] = useState<boolean>(false);
   const ref = useRef<InputRef>(null);
+  const getRefRef = useLatestRef(getRef);
+  // 输入法组字期间不往外通知。放 ref 不放 state：它只决定「要不要发通知」，
+  // 不参与渲染，而且必须在同一次事件里立刻生效
+  const composingRef = useRef(false);
 
   // Handle escaping: if the value contains characters listed in escapeCharacters, prefix them with an escape
   const escapeValue = useCallback(
@@ -143,25 +146,23 @@ const Input: InputFC = (props) => {
   const initialValue = getInitialValue();
 
   const [_value, setValue] = useState<string>(initialValue);
-  const [lastValue, setLastValue] = useState<string>(initialValue);
   const prevValueRef = useRef<typeof value>(undefined);
+  // 最近一次通知出去的原文（未转义）。只用来去掉 compositionend 与 input
+  // 两个事件的重复通知
+  const notifiedRef = useRef<string>(initialValue);
 
-  useDebounceEffect(
-    () => {
-      if (!isComposing && _value !== lastValue) {
-        const trimmedValue = _value.trim();
-        const finalValue = trimmedValue === "" ? "" : _value;
-        setLastValue(finalValue);
-        // If escapeCharacters is set and the value matches, return the escaped value
-        const escapedValue = escapeValue(finalValue);
-        onChange?.(escapedValue);
-      }
-    },
-    [_value, isComposing, lastValue, onChange, escapeValue],
-    {
-      wait: 10,
-    },
-  );
+  /**
+   * `onChange` 是「用户改了输入」这个**事件**的通知，不是从 state 推导出来的结果，
+   * 所以在事件处理里发，不在 effect 里发。详见 `TextArea/index.tsx` 里那段说明——
+   * 旧写法（依赖数组里放 `onChange`、体内又调它、用 state 记「通知过没有」）
+   * 会让传内联箭头的消费方死循环。
+   */
+  const notify = (next: string) => {
+    if (next === notifiedRef.current) return;
+    notifiedRef.current = next;
+    // 全是空白等同于空；escapeCharacters 命中时对外给转义后的值
+    onChange?.(escapeValue(next.trim() === "" ? "" : next));
+  };
 
   useEffect(() => {
     // Update internal state only when the external value prop actually changes
@@ -173,19 +174,21 @@ const Input: InputFC = (props) => {
           typeof value === "number" ? `${value}` : value?.toString();
         // Unescape before displaying
         const newValue = unescapeValue(rawValue);
+        // 外部把值改了，之前通知过什么就不作数了，重新以外部值为准
+        notifiedRef.current = newValue;
         setValue(newValue);
-        setLastValue(newValue);
       } else {
         // Clear only on initialization or when explicitly set to undefined externally
+        notifiedRef.current = "";
         setValue("");
-        setLastValue("");
       }
     }
   }, [value, unescapeValue]);
 
+  // 只在挂载时把 ref 交出去。`getRef` 进依赖数组同样会被内联箭头带着每次渲染重跑
   useEffect(() => {
-    getRef?.(ref.current);
-  }, [getRef]);
+    getRefRef.current?.(ref.current);
+  }, [getRefRef]);
 
   return (
     <Tooltip placement="topLeft" {...tooltip}>
@@ -193,11 +196,14 @@ const Input: InputFC = (props) => {
         ref={ref}
         disabled={disabled}
         placeholder={disabled ? "" : placeholder}
-        onCompositionStart={() => setComposing(true)}
-        onCompositionEnd={() => {
-          setTimeout(() => {
-            setComposing(false);
-          }, 1);
+        onCompositionStart={() => {
+          composingRef.current = true;
+        }}
+        onCompositionEnd={(e) => {
+          composingRef.current = false;
+          // 组完字的那一下自己发通知。浏览器之间 compositionend 与 input 的先后
+          // 不一致，`notify` 里按原文去重，两种顺序都只会发出一次
+          notify(unescapeValue(e.currentTarget.value));
         }}
         value={_value}
         onChange={(e) => {
@@ -205,6 +211,7 @@ const Input: InputFC = (props) => {
           const inputValue = e.target.value;
           const unescapedInput = unescapeValue(inputValue);
           setValue(unescapedInput);
+          if (!composingRef.current) notify(unescapedInput);
         }}
         className={classNames(styles.antdInput, className)}
         type={type}

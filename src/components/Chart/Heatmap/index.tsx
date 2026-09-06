@@ -9,6 +9,7 @@ import {
 } from "../_utils/heatmap";
 import { resolveChartChrome } from "../_utils/chartTheme";
 import useIsDark from "../../../hooks/useIsDark";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 
 export interface HeatmapDataItem {
   /** X-axis index or name */
@@ -266,6 +267,10 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
     chartInstanceRef.current?.resize();
   }, []);
 
+  const onChartRef = useLatestRef(onChart);
+
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   // Initialize the chart
   useEffect(() => {
     if (!chartRef.current || !containerReady) return;
@@ -276,7 +281,7 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
       chart = echarts.init(chartRef.current);
       chartInstanceRef.current = chart;
       // Call the onChart callback on first initialization
-      onChart?.(chart);
+      onChartRef.current?.(chart);
     }
 
     // Apply the option
@@ -304,7 +309,7 @@ const Heatmap: React.FC<ChartHeatmapProps> = (props) => {
         chartInstanceRef.current?.off("click", onClick);
       }
     };
-  }, [chartOption, handleResize, onChart, onClick,
+  }, [chartOption, handleResize, onChartRef, onClick,
     containerReady,
   ]);
 

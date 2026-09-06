@@ -12,6 +12,7 @@ import {
   defaultBubbleColorList,
   drawCircles,
 } from "../_utils/bubble";
+import { useLatestRef } from "../../../hooks/useLatestRef";
 
 export interface BubbleDataItem {
   name: string;
@@ -370,6 +371,10 @@ const Bubble: React.FC<ChartBubbleProps> = (props) => {
     }
   }, [chartOption, data]);
 
+  const onChartRef = useLatestRef(onChart);
+
+  // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
+  // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
   // Initialize the chart
   useEffect(() => {
     if (!chartRef.current) return;
@@ -382,7 +387,7 @@ const Bubble: React.FC<ChartBubbleProps> = (props) => {
       chart = echarts.init(chartRef.current);
       chartInstanceRef.current = chart;
       // Call the onChart callback on first initialization
-      onChart?.(chart);
+      onChartRef.current?.(chart);
     }
 
     // Resize first so echarts picks up the correct container size, then apply the option
@@ -410,7 +415,7 @@ const Bubble: React.FC<ChartBubbleProps> = (props) => {
     containerSize.width,
     containerSize.height,
     handleResize,
-    onChart,
+    onChartRef,
     onClick,
   ]);
 
