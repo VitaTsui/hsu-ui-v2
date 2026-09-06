@@ -193,13 +193,30 @@ const Menu: React.FC<MenuProps> = (props) => {
   );
 
   // 次级菜单默认带一段头部（至少给出返回入口），调用方可用 secondaryHeader 整块换掉
-  return secondary ? (
-    <div className={styles.secondaryWrap}>
-      {secondaryHeader ?? (
-        <SecondaryHeader collapsed={collapsed} theme={theme as "light" | "dark"} />
-      )}
-      {menu}
-    </div>
+  if (secondary) {
+    return (
+      <div className={classNames(styles.scrollHost, styles.secondaryWrap)}>
+        {secondaryHeader ?? (
+          <SecondaryHeader collapsed={collapsed} theme={theme as "light" | "dark"} />
+        )}
+        {menu}
+      </div>
+    );
+  }
+
+  /**
+   * 侧栏（inline）菜单自带滚动宿主：宿主不滚、菜单根滚。
+   *
+   * 不这么做的话「谁滚」就落在消费方的 Sider 上 —— 而 antd 的
+   * `.ant-layout-sider` / `.ant-layout-sider-children` 都没有 overflow，
+   * 展开子菜单的动画期间高度先超出再收回，滚动条会闪一下。几何契约必须由组件
+   * 自己闭合，不能指望每个消费方都补一遍 overflow 规则。
+   *
+   * 横向菜单不需要（rc-overflow 自己收成 “…”），也不能加：那层 div 会把
+   * `.menu` 从 Header 的 flex 行里挪走。
+   */
+  return mode === "inline" ? (
+    <div className={styles.scrollHost}>{menu}</div>
   ) : (
     menu
   );

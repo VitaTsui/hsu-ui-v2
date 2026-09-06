@@ -28,6 +28,17 @@ import Layout from "@hsu-react/ui/es/layout";
 
 `meta.secondary` 标记的路由进入**二级菜单**：主菜单只显示到一级，点进去之后左侧换成该模块的次级菜单，顶部可用 `secondaryHeader` 放返回入口、标题或检索框。
 
+### 滚动与滚动条
+
+`inline` 模式下本组件**自带滚动容器**：外层包一个撑满高度、自己不滚的宿主，菜单根 `overflow-y: auto` 负责滚。
+所以把 `Menu` 塞进任何一个**有确定高度**的容器（antd 的 `Layout.Sider`、或自己的 div）即可，不需要再补 `overflow` 规则；
+展开 / 收起子菜单的动画期间也不会有滚动条闪出来。宿主没有确定高度时菜单会被撑开、退回由页面滚，这时请给宿主一个高度。
+
+滚动条的**外观（显 / 隐 / 配色）本组件不管**，交给消费方的全局样式（`::-webkit-scrollbar` 那一套）。
+组件里刻意不写 `scrollbar-width` / `scrollbar-color`：**Chrome 121+ 一旦读到它们的非默认值，就会整套忽略该元素上的
+`::-webkit-scrollbar` 规则**，库里无差别写一句就会悄悄废掉消费方全站的滚动条皮肤。库内其它地方若确实需要这两个属性，
+必须锁在 `@supports (-moz-appearance: none)` 里，只给 Firefox 看。
+
 ## API
 
 | 属性 | 说明 | 类型 | 默认值 |
