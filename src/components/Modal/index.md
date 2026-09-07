@@ -74,6 +74,7 @@ Modal.config
 | edgeDetection | 拖拽时是否进行边缘检测，防止拖出视口 | `boolean` | `true` |
 | full | 是否以全屏方式展示 | `boolean` | `false` |
 | titleButtonGroup | 标题区右侧的按钮组配置 | `ButtonProps[]` | - |
+| minHeight | 高度**下界**，给内容要等接口回来才画得出的弹窗用（详情 / 消息 / 记录）。`true` 走标准档 700px；数字按 px；字符串原样当 CSS 长度。只是下界，内容更高照常撑开与滚动，并且与 `90vh` 取小，矮窗口不会被顶出屏幕。**短表单不要传**，否则平白留一片空白 | `number \| string \| boolean` | - |
 
 > 其余属性（`open`、`onOk`、`onCancel`、`footer`、`width` 等）与 antd `Modal` 一致。
 >

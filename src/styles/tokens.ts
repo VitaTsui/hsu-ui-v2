@@ -95,6 +95,17 @@ export const controlTokens = raw.control;
 export const modalWidth = raw.modalWidth;
 
 /**
+ * 内容异步加载的弹窗的**高度下界**（`<Modal minHeight>` 的默认档）。
+ *
+ * 取 700 不是拍的：`Panel.List.Modal` 从一开始就把自己钉在 `height: 700px`，那是
+ * 「搜索行 ＋ 工具条 ＋ 表头 ＋ 十行左右 ＋ 分页」放得下的高度。详情 / 消息 / 记录这类
+ * 弹窗与它同处一套后台，用同一个下界，纵向节奏才是一套的。
+ *
+ * 它只是**下界**：内容更高照常撑开，并且在 CSS 里与 `90vh` 取小，矮窗口不会被顶出屏幕。
+ */
+export const modalMinHeight = raw.modalMinHeight;
+
+/**
  * 断点。与 `styles/_responsive.scss` 的 mixin 同源，所以 JS 判断不会和 CSS 媒体查询错开。
  */
 export const breakpoints = raw.breakpoint;
