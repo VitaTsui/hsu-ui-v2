@@ -77,7 +77,7 @@ const Modal = ((props: ModalProps) => {
     setModal,
     setModalHeader,
     setOriginalStyle,
-  } = useModalElements({ open });
+  } = useModalElements({ open, moveable });
 
   useModalDrag({
     moveable,
