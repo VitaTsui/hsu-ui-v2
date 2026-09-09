@@ -1,6 +1,16 @@
+// 尺寸跟随父容器，**不是**视口。
+//
+// 这一层只是外观控制器的载体（写 html[data-theme] ＋ 挂导航渐变的 --nav-dark-*），
+// 它不该替消费方决定「应用有多大」—— 消费方的 #root 本来就自己定了尺寸（模板里
+// html/body/#root 都是 100%），写死 100vw/100vh 只是碰巧和它相等。
+//
+// 碰不巧的场合：消费方为了处理软键盘，会把 #root 的高度钉成「可视视口高」
+// （visualViewport.height），靠子孙 height:100% 层层跟随。中间夹一层 100vh 就把这条链
+// 断了 —— 实测 #root 设成 500px 时本层仍是 844px，底部输入框被 #root 的
+// overflow:hidden 裁掉，键盘一弹起对话框就没了。
 .theme {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 
   overflow: hidden;
 }
