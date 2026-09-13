@@ -11,9 +11,9 @@ import Button, { ButtonProps } from "../../../Button";
 import { CSS } from "@dnd-kit/utilities";
 import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
-import { HolderOutlined } from "@ant-design/icons";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { TableProps } from "../..";
+import Icon from "../../../Icon";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 interface RowContextProps {
@@ -35,7 +35,7 @@ const DragHandle: React.FC<ButtonProps> = (props) => {
     <Button
       type="text"
       size="small"
-      icon={icon ?? <HolderOutlined />}
+      icon={icon ?? <Icon icon="ant-design:holder-outlined" />}
       style={{ cursor: disabled ? "no-drop" : "move" }}
       disabled={disabled}
       ref={!disabled ? setActivatorNodeRef : undefined}

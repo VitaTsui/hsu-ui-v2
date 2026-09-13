@@ -59,6 +59,10 @@ function existsInSet(prefix: string, name: string, seen = new Set<string>()): bo
 
 function collectIconNames() {
   const found = new Map<string, string>(); // "prefix:name" -> "相对路径:行号"
+  /** 前缀是本库确实在用的图标集、名字却解析不出来 —— 基本只可能是拼错了 */
+  const typos = new Map<string, string>();
+  const raw: Array<[string, string, string]> = [];
+
   for (const file of walkSources(SRC)) {
     // 生成物自己就是注册数据，扫它等于自我循环
     if (file.endsWith("collections.generated.ts")) continue;
@@ -68,21 +72,55 @@ function collectIconNames() {
       let m: RegExpExecArray | null;
       while ((m = ICON_NAME_RE.exec(line))) {
         const [, prefix, name] = m;
-        if (!existsInSet(prefix, name)) continue;
-        const key = `${prefix}:${name}`;
-        if (!found.has(key))
-          found.set(key, `${path.relative(SRC, file)}:${i + 1}`);
+        raw.push([prefix, name, `${path.relative(SRC, file)}:${i + 1}`]);
       }
     });
   }
-  return found;
+
+  for (const [prefix, name, where] of raw) {
+    const key = `${prefix}:${name}`;
+    if (existsInSet(prefix, name)) {
+      if (!found.has(key)) found.set(key, where);
+    }
+  }
+
+  /**
+   * 拼错的图标名是这条缺陷最阴的一种形态：它同样只是悄悄空白，而上面那条
+   * 「已注册」断言**抓不到它** —— 拼错的名字在 @iconify/json 里根本不存在，
+   * 于是既不会进生成物、也不会被收进 found，整个从守卫眼皮底下溜走。
+   * （写这条测试的过程中就真拼错过一次 `ant-design:delete-bin-outlined`。）
+   *
+   * 判据收紧到「前缀是本库其它地方确实用过的图标集」，避免把普通字符串
+   * （时间、CSS 值、i18n key）误判成拼错的图标名。
+   */
+  const usedPrefixes = new Set([...found.keys()].map((k) => k.split(":")[0]));
+  for (const [prefix, name, where] of raw) {
+    const key = `${prefix}:${name}`;
+    if (found.has(key) || typos.has(key)) continue;
+    if (usedPrefixes.has(prefix) && !existsInSet(prefix, name))
+      typos.set(key, where);
+  }
+
+  return { found, typos };
 }
 
 describe("iconify 图标注册守卫", () => {
-  const names = collectIconNames();
+  const { found: names, typos } = collectIconNames();
 
   it("扫得到本库写死的图标名（守卫本身没瞎）", () => {
     expect(names.size).toBeGreaterThan(30);
+  });
+
+  it("没有拼错的图标名（拼错的同样静默空白，且不会出现在注册表里）", () => {
+    const wrong = [...typos.entries()].map(
+      ([name, where]) => `${name}  <-  ${where}`
+    );
+    expect(
+      wrong,
+      wrong.length
+        ? `以下图标名在它所属的图标集里查无此图标，基本可以断定是拼错了 —— 运行时会去公网拉、拉不到就空白且不报错：\n${wrong.join("\n")}`
+        : ""
+    ).toEqual([]);
   });
 
   it("每一枚都已注册，不会在断网时静默空白", () => {

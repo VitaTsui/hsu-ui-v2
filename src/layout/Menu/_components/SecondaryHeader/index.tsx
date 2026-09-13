@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import Icon from "../../../../components/Icon";
 import classNames from "classnames";
 
 import styles from "./index.module.scss";
@@ -45,7 +45,7 @@ const SecondaryHeader: React.FC<SecondaryHeaderProps> = (props) => {
         })}
         onClick={() => (onBack ? onBack() : navigate(-1))}
       >
-        <ArrowLeftOutlined />
+        <Icon icon="ant-design:arrow-left-outlined" />
         {!collapsed && <span className={styles.backText}>{backText}</span>}
       </div>
       {!collapsed && extra}

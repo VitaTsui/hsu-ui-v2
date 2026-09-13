@@ -4,7 +4,6 @@
 // 注册到的是另一个模块实例的存储，图标仍不显示。
 import { addCollection, IconifyJSON } from "@iconify/react";
 
-import antDesign from "@iconify/json/json/ant-design.json";
 import carbon from "@iconify/json/json/carbon.json";
 import ep from "@iconify/json/json/ep.json";
 import iconPark from "@iconify/json/json/icon-park.json";
@@ -33,7 +32,11 @@ import mi from "@iconify/json/json/mi.json";
 import ci from "@iconify/json/json/ci.json";
 
 addCollection(ep);
-addCollection(antDesign);
+// ant-design 这一套**刻意不在这儿注册**：库自己已经注册了它用到的那 17 枚，
+// 而且把 viewBox 修回了 antd 原本的 64 64 896 896（iconify 转出来的是 0 0 1024 1024，
+// 同样字号下小 12.5%，见 scripts/gen-icon-data.cjs 的 VIEWBOX_OVERRIDES）。
+// 这儿再整集注册一遍，文档站看到的尺寸就取决于两次 addCollection 谁后跑，
+// 跟消费方实际看到的可能不一样 —— 文档站必须和消费方一致，否则眼验没有意义。
 addCollection(mingcute);
 addCollection(materialSymbols as IconifyJSON);
 addCollection(carbon);

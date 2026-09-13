@@ -1,5 +1,4 @@
 import Button, { ButtonProps } from "../Button";
-import { FormOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Dropdown, Popconfirm, PopconfirmProps } from "antd";
 import React, { ReactNode, useCallback, useMemo } from "react";
 import { ItemType } from "antd/es/menu/interface";
@@ -9,6 +8,11 @@ import Icon from "../Icon";
 import useOperateEllipsis from "./_hooks/useOperateEllipsis";
 import classNames from "classnames";
 import moreImg from "./more.png";
+
+// 提到模块级：这两个元素每次渲染都新建的话，会顺着 defaultIcon 进到下游的 memo 依赖里
+// （参见 src/__tests__/freshObjectDepsGuard.test.ts 这条守卫）。图标是常量，没有理由重建。
+const EDIT_ICON = <Icon icon="ant-design:form-outlined" />;
+const DELETE_ICON = <Icon icon="ant-design:delete-outlined" />;
 
 export interface OperateProps
   extends Omit<ButtonProps, "children" | "title" | "onClick" | "hasPermi"> {
@@ -133,7 +137,7 @@ const Operate: React.FC<OperateProps> = (props) => {
     // Generate dropdown menu items (for the "more" button)
     const menuItems: ItemType[] = hiddenItems?.map((item) => {
       const hasConfirm = !!item.onConfirm;
-      const defaultIcon = item.delete ? <DeleteOutlined /> : <FormOutlined />;
+      const defaultIcon = item.delete ? DELETE_ICON : EDIT_ICON;
       const menuButtonContent = (
         <Button
           type="text"
@@ -224,11 +228,7 @@ const Operate: React.FC<OperateProps> = (props) => {
                 ].includes(key)
             )
           );
-          const defaultIcon = itemDelete ? (
-            <DeleteOutlined />
-          ) : (
-            <FormOutlined />
-          );
+          const defaultIcon = itemDelete ? DELETE_ICON : EDIT_ICON;
           const buttonContent = (
             <Button
               key={index}
@@ -295,7 +295,7 @@ const Operate: React.FC<OperateProps> = (props) => {
 
   // Single operate button
   const hasConfirm = !!onConfirm;
-  const defaultIcon = isDelete ? <DeleteOutlined /> : <FormOutlined />;
+  const defaultIcon = isDelete ? DELETE_ICON : EDIT_ICON;
   const buttonContent = (
     <Button
       icon={renderIcon(icon, defaultIcon)}

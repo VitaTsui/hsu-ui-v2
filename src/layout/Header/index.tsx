@@ -2,11 +2,6 @@ import React from "react";
 
 // Only components hsu-ui does not provide fall back to antd; Button comes from hsu-ui
 import { Avatar, Layout, Popover, Segmented, Space } from "antd";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
 import Button from "../../components/Button";
 import Icon from "../../components/Icon";
 import classNames from "classnames";
@@ -118,7 +113,15 @@ const Header: React.FC<HeaderProps> = observer((props) => {
           <Button
             className={styles.collapsed}
             type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            icon={
+              <Icon
+                icon={
+                  collapsed
+                    ? "ant-design:menu-unfold-outlined"
+                    : "ant-design:menu-fold-outlined"
+                }
+              />
+            }
             onClick={onToggleCollapsed}
           />
         )}
@@ -196,7 +199,9 @@ const Header: React.FC<HeaderProps> = observer((props) => {
                 换过品牌色的项目连用 CSS 都盖不住，一颗蓝点钉在整套配色里 */}
             <Avatar
               className={styles.avatar}
-              icon={nickname ? undefined : <UserOutlined />}
+              icon={
+                nickname ? undefined : <Icon icon="ant-design:user-outlined" />
+              }
             >
               {nickname?.[0]?.toUpperCase()}
             </Avatar>

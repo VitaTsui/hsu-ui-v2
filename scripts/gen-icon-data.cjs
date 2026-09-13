@@ -36,6 +36,24 @@ const OUT = path.join(ROOT, "src", "components", "Icon", "collections.generated.
 const ROOT_KEYS = ["width", "height", "left", "top", "rotate", "hFlip", "vFlip"];
 
 /**
+ * 逐集的 viewBox 修正。
+ *
+ * `ant-design` 这套是从 @ant-design/icons-svg 转出来的，但**转丢了 viewBox 的偏移**：
+ * antd 组件自己渲染时用 `viewBox="64 64 896 896"`，iconify 转出来的是
+ * `0 0 1024 1024` —— 路径数据一模一样，画布却大了一圈。实测（文档站量 getBBox）：
+ * 同一枚图标，antd 渲染墨迹占画布 89.3%，iconify 渲染只占 78.1%，
+ * **同样的 font-size 下小了约 12.5%**，在表格操作列这种密集场景里肉眼看得出来。
+ *
+ * 所以这里把画布改回 antd 自己的那个。规则很好记：
+ * **`ant-design:xxx` 渲染出来必须和同名的 antd 图标组件一模一样。**
+ * 不这么修，本库里 `<Icon icon="ant-design:form-outlined" />` 和消费方自己写的
+ * `<FormOutlined />` 摆在一起会差一号，属于说不清楚的那种别扭。
+ */
+const VIEWBOX_OVERRIDES = {
+  "ant-design": { left: 64, top: 64, width: 896, height: 896 },
+};
+
+/**
  * 纯文本匹配 `"前缀:名字"` 字面量。
  *
  * 这一路**刻意不设前缀白名单** —— 库里用了哪些图标集是组件作者说了算，白名单列不全
@@ -135,6 +153,7 @@ function build() {
     for (const key of ROOT_KEYS) {
       if (source[key] !== undefined) subset[key] = source[key];
     }
+    Object.assign(subset, VIEWBOX_OVERRIDES[prefix] ?? {});
     for (const name of [...byPrefix.get(prefix)].sort()) {
       resolveIcon(source, subset, name);
     }

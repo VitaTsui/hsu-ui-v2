@@ -10,7 +10,6 @@ import Upload, {
 import Icon from "../../Icon";
 import { RcFile } from "antd/es/upload";
 import React, { useState } from "react";
-import { UploadOutlined } from "@ant-design/icons";
 import classNames from "classnames";
 import { debounce } from "lodash";
 import styles from "./index.module.scss";
@@ -189,7 +188,10 @@ const FormUpload: FormUploadFC = (props) => {
               </>
             ) : (
               <>
-                <Button icon={<UploadOutlined />} className={styles.upBtn}>
+                <Button
+                  icon={<Icon icon="ant-design:upload-outlined" />}
+                  className={styles.upBtn}
+                >
                   {`${en ? "Supports" : "支持"} ${accept ? accept : "所有格式"}
                   ${en ? "file types" : "文件类型"}`}
                   {size &&

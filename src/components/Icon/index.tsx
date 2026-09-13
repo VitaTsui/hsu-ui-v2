@@ -18,7 +18,7 @@ import { useLatestRef } from "../../hooks/useLatestRef";
  *
  * 为什么必须由库来做：`@iconify/react` 对**没注册过**的图标名一律去
  * api.iconify.design 现拉。本库在几十处组件里写死了图标名（`ep:arrow-down`、
- * `icon-park:left`、`ci:copy`……），这些名字在消费方源码里一个字都搜不到，
+ * `icon-park:left`、`ci:copy`、`ant-design:form-outlined`……），这些名字在消费方源码里一个字都搜不到，
  * 于是消费方既扫不到、也不会想到要注册 —— 结果就是每个消费方都在替本库向公网
  * 发请求。断网 / 内网 / CSP 收紧的环境下那些图标直接空白，**而且不报错**。
  *

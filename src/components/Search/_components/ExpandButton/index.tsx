@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "../../../Button";
-import { DownOutlined, FilterFilled } from "@ant-design/icons";
 import classNames from "classnames";
+import Icon from "../../../Icon";
 import styles from "../../index.module.scss";
 
 interface ExpandButtonProps {
@@ -32,9 +32,9 @@ export const ExpandButton: React.FC<ExpandButtonProps> = ({
       })}
       icon={
         advancedFilters ? (
-          <FilterFilled className={styles.icon} />
+          <Icon icon="ant-design:filter-filled" className={styles.icon} />
         ) : (
-          <DownOutlined className={styles.icon} />
+          <Icon icon="ant-design:down-outlined" className={styles.icon} />
         )
       }
       iconPosition="end"

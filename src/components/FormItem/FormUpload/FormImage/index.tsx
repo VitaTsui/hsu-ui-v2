@@ -4,9 +4,9 @@ import ItemContainer, { ItemContainerProps } from "../../ItemContainer";
 import React, { ReactNode, useState } from "react";
 import Upload, { UploadProps as BasicUploadProps } from "../../../Upload";
 
-import { PlusOutlined } from "@ant-design/icons";
 import { RcFile } from "antd/es/upload";
 import FilePreview from "../../../FilePreview";
+import Icon from "../../../Icon";
 import { debounce } from "lodash";
 import { downloadFile } from "hsu-utils";
 
@@ -150,7 +150,7 @@ const FormImage: React.FC<FormImageProps> = (props) => {
             <>
               {children ?? (
                 <div className="formItem-upload-picture-add">
-                  <PlusOutlined />
+                  <Icon icon="ant-design:plus-outlined" />
                 </div>
               )}
             </>

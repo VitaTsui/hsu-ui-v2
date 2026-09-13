@@ -4,9 +4,9 @@ import {
   Space,
 } from "antd";
 import React, { useEffect, useRef, useState } from "react";
-import { CloseCircleFilled } from "@ant-design/icons";
 
 import classNames from "classnames";
+import Icon from "../../Icon";
 import styles from "./index.module.scss";
 import type { InputNumberRef } from "../../../types/antd";
 import { useLatestRef } from "../../../hooks/useLatestRef";
@@ -151,7 +151,8 @@ const InputNumber: React.FC<InputNumberProps> = (props) => {
       suffix={
         <>
           {showClear && (
-            <CloseCircleFilled
+            <Icon
+              icon="ant-design:close-circle-filled"
               className={styles.clearIcon}
               onClick={handleClear}
             />
