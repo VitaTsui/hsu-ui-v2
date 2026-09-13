@@ -7,10 +7,7 @@ import Table, { ColumnsType, TableProps } from "../../../Table";
 
 import { ButtonProps as HsuButtonProps } from "../../../Button";
 import { TabBarProps } from "../../../TabBar";
-import {
-  FullscreenExitOutlined,
-  FullscreenOutlined,
-} from "@ant-design/icons";
+import Icon from "../../../Icon";
 import classNames from "classnames";
 import { cloneDeep } from "lodash";
 import styles from "./index.module.scss";
@@ -213,10 +210,14 @@ const ListModalPanel: React.FC<ListModalPanelProps<SearchModeKeys>> = (
         titleButtonGroup={[
           {
             type: "text",
-            icon: isFullscreen ? (
-              <FullscreenExitOutlined />
-            ) : (
-              <FullscreenOutlined />
+            icon: (
+              <Icon
+                icon={
+                  isFullscreen
+                    ? "ant-design:fullscreen-exit-outlined"
+                    : "ant-design:fullscreen-outlined"
+                }
+              />
             ),
             title: isFullscreen ? "退出全屏" : "全屏",
             onClick: () => setIsFullscreen((v) => !v),

@@ -1,7 +1,6 @@
 import React from "react";
 import type { FormInstance } from "antd";
 import Form from "../../../../Form";
-import { FilterFilled } from "@ant-design/icons";
 import { FormItemProps } from "../../../../FormItem";
 import { DrawerFormProps } from "../../../../Form/DrawerForm";
 import Icon from "../../../../Icon";
@@ -58,7 +57,10 @@ export const AdvancedFiltersDrawer: React.FC<AdvancedFiltersDrawerProps> = ({
       onClose={() => setExpand(false)}
       title={
         <div className={styles.drawerTitle}>
-          <FilterFilled className={styles.drawerTitleIcon} />
+          <Icon
+            icon="ant-design:filter-filled"
+            className={styles.drawerTitleIcon}
+          />
           高级筛选
         </div>
       }

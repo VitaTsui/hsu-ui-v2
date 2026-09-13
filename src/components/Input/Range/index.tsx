@@ -4,7 +4,7 @@ import Input, { InputProps } from "../";
 import { InputNumberProps } from "../Number";
 import { Equal } from "hsu-utils";
 import classNames from "classnames";
-import { CloseCircleFilled } from "@ant-design/icons";
+import Icon from "../../Icon";
 
 type Value = [string | undefined, string | undefined];
 
@@ -204,7 +204,8 @@ const RangeInput: React.FC<RangeInputProps> = (props) => {
       >
         {contennt()}
         {allowClear && (
-          <CloseCircleFilled
+          <Icon
+            icon="ant-design:close-circle-filled"
             className={styles.RangeClear}
             onClick={() => {
               onChangeValue([undefined, undefined]);

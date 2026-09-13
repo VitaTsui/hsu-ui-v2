@@ -1,6 +1,6 @@
 {
   "name": "@hsu-react/ui",
-  "version": "2.5.10",
+  "version": "2.5.11",
   "description": "一套基于 React + Ant Design 的中后台业务组件库",
   "license": "MIT",
   "type": "module",
@@ -41,11 +41,13 @@
     "dev": "dumi dev",
     "docs:build": "dumi build",
     "docs:preview": "dumi preview",
-    "build": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
-    "prepublishOnly": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs --check && vitest run && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
+    "build": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs && node scripts/gen-icon-data.cjs && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
+    "prepublishOnly": "node scripts/clean-dist.cjs && node scripts/gen-tokens-scss.cjs --check && node scripts/gen-icon-data.cjs --check && vitest run && father build && node scripts/mark-cjs.cjs && node scripts/check-heavy-deps.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "check:deps": "node scripts/check-heavy-deps.cjs",
+    "icons": "node scripts/gen-icon-data.cjs",
+    "check:icons": "node scripts/gen-icon-data.cjs --check",
     "tokens": "node scripts/gen-tokens-scss.cjs",
     "check:tokens": "node scripts/gen-tokens-scss.cjs --check"
   },

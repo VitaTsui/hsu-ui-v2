@@ -1,5 +1,6 @@
 import { Popover, Space, Tabs, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
+import { addCollection, IconifyJSON } from "@iconify/react";
 
 import Icon from "../../Icon";
 import Input from "../../Input";
@@ -90,6 +91,11 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
       const json = ((module as { default?: unknown }).default ?? module) as {
         icons: Record<string, unknown>;
       };
+
+      // 整集已经在内存里了，顺手注册掉。不注册的话 `@iconify/react` 会为**每一枚**
+      // 格子里的图标去 api.iconify.design 现拉 —— 一屏几百个请求，断网 / 内网下
+      // 则是整面空白且不报错。注册是纯内存操作，不产生任何额外下载。
+      addCollection(json as unknown as IconifyJSON);
 
       setIconNames((prev) => ({
         ...prev,
