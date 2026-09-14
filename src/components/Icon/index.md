@@ -8,7 +8,7 @@ title: Icon 图标
 
 # Icon 图标
 
-统一图标入口：传入 antd 图标名（如 `UserOutlined`）走 `@ant-design/icons`，传入 iconify 名（如 `ph:user-bold`）走 `@iconify/react`。
+统一图标入口：传入 antd 图标名（如 `UserOutlined`）走 `@ant-design/icons`（**逐枚懒加载**，见下），传入 iconify 名（如 `ph:user-bold`）走 `@iconify/react`。
 
 ## 图标从哪儿来（离线/内网必读）
 
@@ -34,7 +34,14 @@ import { Icon } from "@hsu-react/ui";
 
 ## antd 图标
 
-antd 图标名（驼峰）：
+antd 图标名（驼峰）。这 846 个名字**逐枚懒加载**：传到哪一枚才下载哪一枚（几百字节），
+一个 antd 名字都不传的项目零字节、零请求。第一次渲染某一枚时它要等一个来回才到，
+那一帧用等宽等高的占位撑住、不抖布局。
+
+> 别从 `@ant-design/icons` 的包根取图标 —— 它的 barrel 被 `@ant-design/x` 等库静态引用着，
+> 谁再从包根引一次（`import * as` 或整包 `import()` 都算），那 846 枚就会被整体保留成一个
+> 静态可达的 chunk，约 200 KB gzip 落到每个消费方头上。本库的 `scripts/check-heavy-deps.cjs`
+> 会在构建期拦住这种写法。
 
 ```tsx
 import React from "react";

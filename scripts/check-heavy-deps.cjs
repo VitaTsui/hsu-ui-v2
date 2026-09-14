@@ -147,3 +147,120 @@ if (violations.length) {
 console.log(
   `✓ check-heavy-deps：${GUARDED_ENTRIES.length} 个高频入口均未静态可达重型依赖`
 );
+
+/* ------------------------------------------------------------------ *
+ * 第二道：`@ant-design/icons` 只准按单枚深引，不准碰包根 barrel
+ * ------------------------------------------------------------------ */
+
+/**
+ * 这条单独列出来，是因为上面那道 BFS 守卫**看不见它**：它只跟 es/ 内部的相对引用，
+ * 不穿透三方包，而这个坑恰恰藏在三方包里。
+ *
+ * 坑长这样：`@ant-design/icons` 的包根 barrel（`es/index.js`）被本库依赖的
+ * `@ant-design/x` 静态引用着（27 处 `import { XxxOutlined } from "@ant-design/icons"`）。
+ * 本库只要也去引一次那个 barrel —— **静态引是 `import * as`，动态引是 `import()`，
+ * 两种一样糟** —— 打包器就必须把 barrel 连同 846 枚图标整体保留成一个 chunk，
+ * 而它同时又是静态可达的，于是每个消费方都要下载那约 200 KB gzip。
+ * 2.5.10 踩的是第一种，2.5.11 改成第二种、以为修好了，实测整页流量一个字节没省。
+ *
+ * 唯一安全的形态是单枚深引：`@ant-design/icons/es/icons/UserOutlined`。
+ * 按名字分发的那张表由 scripts/gen-antd-icon-loaders.cjs 生成。
+ */
+const ICON_PKG = "@ant-design/icons";
+const SINGLE_ICON = /^@ant-design\/icons\/(es|lib)\/icons\/[A-Z][A-Za-z0-9]*$/;
+
+/**
+ * 去掉注释再扫。
+ *
+ * 不去的话这道守卫会**咬到解释它自己的那段注释** —— Icon 组件里写着
+ * 「2.5.11 的 `import("@ant-design/icons")` 错在哪」，正则一视同仁地把它算成一次引用，
+ * 于是「写清楚为什么不能这么干」反而导致构建失败。
+ *
+ * 只按字符走一遍：字符串（含模板串）里的内容原样留着，`//` 与 `/* *\/` 抹掉。
+ * `/` 只有后面跟着 `/` 或 `*` 才算注释开头，所以 `/(?:Outlined)$/` 这种正则字面量不会被误伤。
+ */
+function stripComments(code) {
+  let out = "";
+  let i = 0;
+  let quote = null;
+  while (i < code.length) {
+    const c = code[i];
+    const next = code[i + 1];
+    if (quote) {
+      if (c === "\\") {
+        out += c + (next ?? "");
+        i += 2;
+        continue;
+      }
+      if (c === quote) quote = null;
+      out += c;
+      i += 1;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === "`") {
+      quote = c;
+      out += c;
+      i += 1;
+      continue;
+    }
+    if (c === "/" && next === "/") {
+      while (i < code.length && code[i] !== "\n") i += 1;
+      continue;
+    }
+    if (c === "/" && next === "*") {
+      i += 2;
+      while (i < code.length && !(code[i] === "*" && code[i + 1] === "/")) i += 1;
+      i += 2;
+      continue;
+    }
+    out += c;
+    i += 1;
+  }
+  return out;
+}
+
+/** 抽出文件里所有模块说明符，**静态动态都要**（这条规则两种形态都禁） */
+function allSpecifiersOf(file) {
+  const code = stripComments(fs.readFileSync(file, "utf8"));
+  const specs = [];
+  const re =
+    /(?:^\s*(?:import|export)\s+(?:[^'"]*?\sfrom\s+)?|\bimport\s*\(\s*|\brequire\s*\(\s*)["']([^"']+)["']/gm;
+  let m;
+  while ((m = re.exec(code))) specs.push(m[1]);
+  return specs;
+}
+
+function walkJs(dir, out = []) {
+  for (const name of fs.readdirSync(dir)) {
+    const full = path.join(dir, name);
+    const stat = fs.statSync(full);
+    if (stat.isDirectory()) walkJs(full, out);
+    else if (full.endsWith(".js")) out.push(full);
+  }
+  return out;
+}
+
+const barrelHits = [];
+for (const file of walkJs(ES_DIR)) {
+  for (const spec of allSpecifiersOf(file)) {
+    if (spec !== ICON_PKG && !spec.startsWith(`${ICON_PKG}/`)) continue;
+    if (SINGLE_ICON.test(spec)) continue;
+    barrelHits.push({ file: path.relative(ES_DIR, file), spec });
+  }
+}
+
+if (barrelHits.length) {
+  console.error(
+    "\n✗ 引用了 @ant-design/icons 的包根 barrel —— 所有消费方会因此白背约 200 KB gzip：\n"
+  );
+  for (const h of barrelHits) console.error(`  es/${h.file}  →  "${h.spec}"`);
+  console.error(
+    "\n包根被 @ant-design/x 静态引用着，本库再引一次（import * as 或 import() 都算）\n" +
+      "就会让那 846 枚被整体保留成一个静态可达的 chunk。改成单枚深引：\n" +
+      '  import("@ant-design/icons/es/icons/UserOutlined")\n' +
+      "按名字分发请用 src/components/Icon/antdIcons.generated.ts（npm run icons 生成）。\n"
+  );
+  process.exit(1);
+}
+
+console.log("✓ check-heavy-deps：@ant-design/icons 全部按单枚深引，未碰包根 barrel");
