@@ -6,6 +6,10 @@ import {
   iconLoaded,
 } from "@iconify/react";
 import iconCollections from "./collections.generated";
+import type {
+  AntdIconLoader,
+  AntdNamedIconComponent,
+} from "./antdIcons.generated";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
@@ -50,45 +54,61 @@ const warnIfUnregistered = (name: string) => {
   );
 };
 
-type AntdNamedIconComponent = React.ForwardRefExoticComponent<
-  {
-    className?: string;
-    style?: React.CSSProperties;
-  } & React.RefAttributes<HTMLSpanElement>
->;
-
-type AntdIconsModule = Record<string, AntdNamedIconComponent | undefined>;
-
 /**
- * `@ant-design/icons` 改成**按需异步加载**，不再 `import * as`。
+ * antd 图标名走**逐枚**懒加载：一枚一个 chunk，只下载真被传到的那一枚。
  *
- * 为什么非改不可：本组件支持消费方传 antd 图标名（`<Icon icon="UserOutlined" />`），
- * 名字是运行时才知道的字符串，所以实现上只能 `AntdIcons[name]` 这样按下标取。
- * 而 `import * as X` ＋ 动态下标取值，**打包器无法摇树** —— 它没法证明哪些导出用不上，
- * 只能全留。实测（Vite 8 / rolldown，消费方同一套构建）：这么写一个入口就是
- * **1049 KB raw / 198 KB gzip**（全部 847 枚 antd 图标），而只具名引一枚是 8 KB / 3 KB。
- * 也就是说，**每个消费方都在为这条分发逻辑背将近 200 KB gzip**，哪怕它一个 antd 名字都没传过。
+ * 为什么不能从 `@ant-design/icons` 包根取：本组件支持消费方传 antd 图标名
+ * （`<Icon icon="UserOutlined" />`），名字是运行时才知道的字符串，所以只能按下标取。
+ * 历史上试过两种写法，**两种都让每个消费方白背约 200 KB gzip**：
  *
- * 改成固定字符串的 `import()` 之后（固定字符串，不是变量路径，打包器静态分析得了），
- * 这 198 KB 变成一个**独立 chunk**，只有真的传了 antd 名字才会去下载；
- * 入口只剩 749 bytes gzip。公开 API 一个字没动：还是传字符串名、还是那 847 个名字都认。
+ * - `import * as AntdIcons`（2.5.10 及之前）：命名空间 ＋ 动态下标，打包器无法摇树，
+ *   846 枚全进首屏（实测 1049 KB raw / 198 KB gzip）。
+ * - `import("@ant-design/icons")`（2.5.11）：看着是「按需」了，首屏 HTML 里确实没有它，
+ *   **但整页流量一个字节没省**。`import()` 要的是整个包根的命名空间，打包器必须把
+ *   `es/index.js` 连同 846 枚保留成一个 chunk；而这个包根**同时被静态引用**着 ——
+ *   本库依赖的 `@ant-design/x` 就有 27 处 `import { XxxOutlined } from "@ant-design/icons"`。
+ *   静态与动态落在同一个模块上，那 1 MB 的 chunk 就成了**静态依赖**：谁引到 Chat/Sender
+ *   谁就下载它，跟有没有传过 antd 图标名毫无关系。实测（消费方 agent-monitor-web，
+ *   Vite 8 / rolldown）portal 加载完之后仍有一次 203 KB 的下载；把这句 `import()` 拿掉
+ *   重新构建，那个 1,018,635 字节的 chunk 整个消失。
  *
- * 代价：首次渲染某个 antd 名字的图标时，模块要等一个来回才到，那一帧图标是空的。
- * 用等宽等高的占位撑住，不产生布局抖动；模块只加载一次，之后同步命中。
+ * 所以按需必须落到**单枚**这一级：`antdIcons.generated.ts` 里每枚一句固定字符串的
+ * `import()`（固定字符串，不是变量路径，打包器静态分析得了），打包器为每枚各切一个
+ * 几百字节的 chunk。那张表自身也藏在一次 `import()` 后面 —— 一个 antd 名字都不传的
+ * 消费方**零字节、零请求**。公开 API 一个字没动：还是传字符串名、还是这 846 个名字都认。
+ *
+ * 代价：首次渲染某个 antd 名字的图标时，要等一个来回才到，那一帧图标是空的。
+ * 用等宽等高的占位撑住，不产生布局抖动；每枚只加载一次，之后同步命中。
  * 服务端渲染场景下这一枚不会出现在首屏 HTML 里 —— 本库是纯客户端的中后台组件库，
  * 但用到 SSR 的话要知道这一条。
  */
-let antdIconsModule: AntdIconsModule | null = null;
-let antdIconsPromise: Promise<AntdIconsModule> | null = null;
+let antdIconLoadersPromise: Promise<
+  Record<string, AntdIconLoader | undefined>
+> | null = null;
 
-const loadAntdIcons = () => {
-  if (!antdIconsPromise) {
-    antdIconsPromise = import("@ant-design/icons").then((mod) => {
-      antdIconsModule = mod as unknown as AntdIconsModule;
-      return antdIconsModule;
-    });
+/** 已经取到的 antd 图标组件 */
+const antdIconComponents = new Map<string, AntdNamedIconComponent>();
+
+/**
+ * 已经**问过结果**的名字（无论取到没取到）。
+ *
+ * 「没取到」也要记：像 `FooOutlined` 这种符合命名规律、但 antd 里根本不存在的名字，
+ * 记下来才能让它立刻回落到 iconify 那条路，而不是永远停在占位上。
+ */
+const antdIconResolved = new Set<string>();
+
+const loadAntdIcon = async (name: string) => {
+  if (!antdIconLoadersPromise) {
+    antdIconLoadersPromise = import("./antdIcons.generated").then(
+      (mod) => mod.default
+    );
   }
-  return antdIconsPromise;
+  const loaders = await antdIconLoadersPromise;
+  const loader = loaders[name];
+  if (loader) {
+    antdIconComponents.set(name, (await loader()).default);
+  }
+  antdIconResolved.add(name);
 };
 
 /** 是不是 antd 图标名（`SettingOutlined` 这种驼峰名） */
@@ -143,20 +163,22 @@ const Icon = React.forwardRef<HTMLSpanElement, IconProps>((props, forwardedRef) 
 
   const onRefRef = useLatestRef(onRef);
 
-  // antd 图标名走异步加载：模块没到就先占位，到了再重渲染换成真图标。
+  // antd 图标名走异步加载：那一枚没到就先占位，到了再重渲染换成真图标。
   // hook 必须无条件调用，所以判断放在 effect 里，不放在提前 return 上面
   const wantsAntdIcon = isAntdIconName(icon);
+  // 逐枚加载，所以这里要拿**具体名字**当依赖：同一个 Icon 换个 antd 名字也得重新取
+  const antdIconName = wantsAntdIcon ? icon : undefined;
   const [, bumpAntdIcons] = useState(0);
   useEffect(() => {
-    if (!wantsAntdIcon || antdIconsModule) return;
+    if (!antdIconName || antdIconResolved.has(antdIconName)) return;
     let alive = true;
-    loadAntdIcons().then(() => {
+    loadAntdIcon(antdIconName).then(() => {
       if (alive) bumpAntdIcons((n) => n + 1);
     });
     return () => {
       alive = false;
     };
-  }, [wantsAntdIcon]);
+  }, [antdIconName]);
 
   // 回调 prop 不进依赖数组：消费方传内联箭头时每次渲染都是新引用，effect 会跟着
   // 重跑并再调一次回调 —— 回调里 setState 就是死循环（详见 Input/TextArea 的说明）
@@ -171,8 +193,8 @@ const Icon = React.forwardRef<HTMLSpanElement, IconProps>((props, forwardedRef) 
   };
 
   // Support AntD icon names (e.g. "SettingOutlined") by rendering the corresponding AntD icon component directly
-  const AntdNamedIcon = wantsAntdIcon
-    ? antdIconsModule?.[icon as string]
+  const AntdNamedIcon = antdIconName
+    ? antdIconComponents.get(antdIconName)
     : undefined;
 
   if (AntdNamedIcon) {
@@ -186,10 +208,10 @@ const Icon = React.forwardRef<HTMLSpanElement, IconProps>((props, forwardedRef) 
     );
   }
 
-  // antd 图标模块还在路上：占一个等宽等高的位置，等它到了再换成真图标。
+  // 这一枚 antd 图标还在路上：占一个等宽等高的位置，等它到了再换成真图标。
   // 不占位的话这一帧宽度是 0，图标到位时整行会横向抖一下。
-  // （模块已加载、但这个名字在 antd 里根本不存在 —— 那就往下走 iconify 那条，与改动前一致）
-  if (wantsAntdIcon && !antdIconsModule) {
+  // （问过了、antd 里根本没这个名字 —— 那就往下走 iconify 那条，与改动前一致）
+  if (antdIconName && !antdIconResolved.has(antdIconName)) {
     return (
       <span
         {...iconConfig}
