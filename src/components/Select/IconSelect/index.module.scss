@@ -16,6 +16,42 @@
   }
 }
 
+// 受限模式自己画的清除按钮。样式对齐 antd 自带的 `.ant-input-clear-icon`，
+// 换成本库令牌取色。为什么要自己画见 index.tsx 的 `onClear`
+.clear {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0;
+  padding: 0;
+
+  color: var(--vita-subtle-foreground);
+  font-size: var(--vita-font-size-sm);
+  line-height: 0;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--vita-muted-foreground);
+  }
+
+  &:focus-visible {
+    border-radius: var(--vita-radius-xs);
+    box-shadow: var(--vita-focus-ring);
+  }
+
+  // 没得清的时候只是看不见，位置还占着 —— 输入框宽度不会因为选没选图标而跳
+  &.clearHidden {
+    visibility: hidden;
+    cursor: default;
+  }
+}
+
 .popoverContent {
   display: flex;
   flex-direction: column;
