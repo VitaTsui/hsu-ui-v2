@@ -15,6 +15,7 @@ import usePermissions from "../../../hooks/usePermissions";
 import { useFormItems } from "./_hooks/useFormItems";
 import type { FormRef } from "../../../types/antd";
 import { mergeSemantic } from "../../../utils/semantic";
+import { isFieldValidateError } from "../../../utils/formValidateError";
 import { useAdaptiveColumnNum } from "./_hooks/useAdaptiveColumnNum";
 
 export type ExtraFormItem = React.ReactElement<ItemContainerProps>;
@@ -91,13 +92,24 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
 
   const _onOk = () => {
     if (!form) return;
-    form.validateFields().then((data) => {
-      if (onOk) {
-        onOk && onOk(data, form);
-      } else {
-        form.resetFields();
+    form.validateFields().then(
+      (data) => {
+        if (onOk) {
+          onOk(data, form);
+        } else {
+          form.resetFields();
+        }
+      },
+      (err: unknown) => {
+        /* 校验没通过：字段红字已经渲染出来，弹窗保持打开——这就是这条分支的完整处理，
+           到此为止。不接住它的话浏览器会多抛一条 unhandledrejection（见
+           `utils/formValidateError`）。判据是「有没有 errorFields 这个结构」，不是文案匹配。 */
+        if (isFieldValidateError(err)) return;
+        /* 其余异常（网络、接口、代码 bug）不归这里管，维持原样继续往上抛，
+           照旧在控制台报出来，不被这层吃掉。 */
+        throw err;
       }
-    });
+    );
   };
 
   const adaptiveColumnNum = useAdaptiveColumnNum(
