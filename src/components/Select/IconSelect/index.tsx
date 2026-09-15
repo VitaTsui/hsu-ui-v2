@@ -1,5 +1,5 @@
 import { Popover, Space, Tabs, Tooltip } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { IconifyJSON } from "@iconify/react/offline";
 
 import Icon, { addIconCollection } from "../../Icon";
@@ -66,7 +66,18 @@ interface IconSetView {
 }
 
 export interface IconSelectProps {
-  value?: string;
+  /**
+   * 当前图标全名。三种入参各是一种意思，**不要混用**：
+   *
+   * - **一次都不传** → 不受控，值由组件自己记着，外部不会把它冲掉；
+   * - **传 `null` 或 `""`** → 受控地表示「没有图标」，输入框会跟着清空；
+   * - **传字符串** → 受控地表示选中了它。
+   *
+   * `null` 单列出来是因为可空字段常常直接从后端原样传下来；它和 `""` 同义。
+   * `undefined` 则是「没给」——`Form.resetFields()` 把字段重置成的就是它，
+   * 所以**值变成 `undefined` 也会清空**，而不是被当成「外部没在控」。
+   */
+  value?: string | null;
   onChange?: (value: string) => void;
   disabled?: boolean;
   /**
@@ -90,7 +101,9 @@ export interface IconSelectProps {
 }
 
 const IconSelect: React.FC<IconSelectProps> = (props) => {
-  const { value = "", onChange, disabled, icons } = props;
+  // 这里**不能**给 `value` 兜一个 `= ""` 的默认值：那会把「一次都没给过」（undefined）
+  // 和「给了空」（""）折叠成同一个值，下面的同步就只剩「猜」这一条路了
+  const { value, onChange, disabled, icons } = props;
   const [_value, setValue] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   const [currentTab, setCurrentTab] = useState<string>("");
@@ -135,17 +148,51 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
     setCurrentTab((prev) => (names.includes(prev) ? prev : (names[0] ?? "")));
   }, [setNamesKey]);
 
-  useEffect(() => {
-    if (value && value !== _value) {
-      setValue(value);
+  /**
+   * 外部值最近一次是什么。初值必须是 `undefined` —— 不受控时 `value` 也永远是
+   * `undefined`，两者恒等，下面那个 effect 就一次都不会去动内部值
+   */
+  const prevValueRef = useRef<string | null | undefined>(undefined);
 
-      const prefix = value.split(":")[0];
-      if (setNamesKey.split(",").includes(prefix)) {
-        setCurrentTab(prefix);
-        setActiveIcon(value);
-      }
+  /**
+   * 外部 `value` → 内部值的同步。
+   *
+   * 判据是「**这个 prop 变了没有**」，不是「这个值真不真」。
+   *
+   * 旧写法是 `if (value && value !== _value)`，靠真值判断来猜「父级到底在不在控这个值」——
+   * 之所以要猜，是因为上面那个 `value = ""` 的默认值已经把 `undefined` 和 `""` 抹平了。
+   * 代价是父级把值重置为空的三种写法（`""` / `undefined` / `null`）一条都同步不下来，
+   * 输入框会留着上一次的图标名：`Form.resetFields()`、切换编辑对象、弹窗复用同一个实例
+   * 走的都是这条路，清除按钮发出的 `""` 被父级回写时也走这条路。
+   *
+   * 现在三种入参各归各位：
+   * - 一次都没给过 → `value` 恒为 `undefined`，与 ref 初值相同，内部值不被外部冲掉；
+   * - 给了 `null` / `""` → 「没有图标」，同步成空串；
+   * - 给了字符串 → 同步成它。
+   *
+   * 这跟本库 `Input` 的做法是同一套（`components/Input/index.tsx` 的 `prevValueRef`），
+   * 不是另起一份判断。
+   */
+  useEffect(() => {
+    if (prevValueRef.current === value) return;
+    prevValueRef.current = value;
+
+    // `null` 与 `undefined` 都是「没有图标」，统一成空串
+    const next = value ?? "";
+    setValue(next);
+
+    if (!next) {
+      // 外部清空了，面板里上一枚的高亮也要撤掉，不然「值空了但面板还亮着」
+      setActiveIcon("");
+      return;
     }
-  }, [value, _value, setNamesKey]);
+
+    const prefix = next.split(":")[0];
+    if (setNamesKey.split(",").includes(prefix)) {
+      setCurrentTab(prefix);
+      setActiveIcon(next);
+    }
+  }, [value, setNamesKey]);
 
   // Only fetch the current tab's icon names once the popover is open, and only once per set
   useEffect(() => {
