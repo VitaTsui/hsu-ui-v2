@@ -1,8 +1,9 @@
 // 文档站全局副作用：注册 iconify 图标集（真实项目在入口 index.tsx 里做），
 // 否则组件中以 iconify 名（如 "ph:user-bold"）引用的图标不显示。
-// 注意：必须与组件内 Icon 使用的入口一致（@iconify/react），否则 addCollection
-// 注册到的是另一个模块实例的存储，图标仍不显示。
-import { addCollection, IconifyJSON } from "@iconify/react";
+// 注册必须走本库导出的 addIconCollection：@iconify/react 与 @iconify/react/offline
+// 各带一份互相看不见的注册表，本库读的是 offline 那一份，注册错地方图标照样不显示。
+import { addIconCollection as addCollection } from "../src/components/Icon";
+import type { IconifyJSON } from "@iconify/react/offline";
 
 import carbon from "@iconify/json/json/carbon.json";
 import ep from "@iconify/json/json/ep.json";

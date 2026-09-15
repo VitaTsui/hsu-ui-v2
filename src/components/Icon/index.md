@@ -8,23 +8,38 @@ title: Icon 图标
 
 # Icon 图标
 
-统一图标入口：传入 antd 图标名（如 `UserOutlined`）走 `@ant-design/icons`（**逐枚懒加载**，见下），传入 iconify 名（如 `ph:user-bold`）走 `@iconify/react`。
+统一图标入口：传入 antd 图标名（如 `UserOutlined`）走 `@ant-design/icons`（**逐枚懒加载**，见下），传入 iconify 名（如 `ph:user-bold`）走 `@iconify/react/offline`。
 
-## 图标从哪儿来（离线/内网必读）
+## 图标从哪儿来（必读）
 
-`@iconify/react` 的规矩是：**注册过的图标名走本地，没注册过的去 `api.iconify.design` 现拉**。拉不到就是一片空白，**而且不报错** —— 断网、内网、CSP 收紧的环境下这个坑只能靠肉眼发现。
+**本库只画注册过的图标，一次公网请求都不发。**渲染走 `@iconify/react/offline` —— 没注册过的名字就是一个空位，不会去 `api.iconify.design` 现拉。
+
+> **2.6.0 破坏性变更**：2.5.x 及之前走的是联网版，没注册过的名字会去公网现拉。
+> 如果你的项目依赖「随便写个 iconify 名字就能显示」，升上来之后那些图标会变成空白。
+> 修法是把它们所在的图标集注册掉（见下），或把图标名换成已注册的那批。
+> 换来的是：**不再有任何一条通往公网的出口**，内网 / 断网 / CSP 收紧的环境下行为一致，
+> 也不会再有「开发时好好的、上线到内网一片空白且不报错」这种只能靠肉眼发现的坑。
 
 所以分两笔账：
 
-- **本库自己用到的图标**（`Select` 的下拉箭头、`Table` 翻页、`Copy`、`Tree` 搜索、`Chat` …… 共 60 枚）：**库已经自己注册好了**，永远走本地、零请求。消费方什么都不用做，子路径按需引入同样成立。数据由 `scripts/gen-icon-data.cjs` 从源码反扫生成，只裁用到的那几十枚（约 12 KB gzip）。
-- **你自己代码里写的 iconify 名**：仍然要你自己 `addCollection` 注册。忘了注册时，开发环境下 `Icon` 会在控制台打一条警告点名是哪个图标，别忽略它。
+- **本库自己用到的图标**（`Select` 的下拉箭头、`Table` 翻页、`Copy`、`Tree` 搜索、`Chat` …… 共 61 枚）：**库已经自己注册好了**，零请求。消费方什么都不用做，子路径按需引入同样成立。数据由 `scripts/gen-icon-data.cjs` 从源码反扫生成，只裁用到的那几十枚（约 12 KB gzip）。
+- **你自己代码里写的 iconify 名**：要你自己注册。忘了注册时，开发环境下 `Icon` 会在控制台打一条警告点名是哪个图标，别忽略它。
+
+注册请用本库导出的 `addIconCollection`：
 
 ```ts
-import { addCollection } from "@iconify/react";
+import { addIconCollection } from "@hsu-react/ui";
 import ph from "@iconify/json/json/ph.json";
 
-addCollection(ph); // 整集 4.3 MB，生产环境建议只裁用到的那几枚
+addIconCollection(ph); // 整集 4.3 MB，生产环境建议只裁用到的那几枚
 ```
+
+> **别用 `@iconify/react` 自带的 `addCollection`。**`@iconify/react` 和
+> `@iconify/react/offline` 是两个各自独立的产物，**各带一份互相看不见的注册表**
+> （实测：往 offline 那份注册后，联网版的 `iconLoaded()` 仍然返回 `false`）。
+> 本库读的是 offline 那一份，注册到联网版那一份等于没注册 —— 图标全白且不报错。
+> `addIconCollection` 存在的意义就是让这个选择题消失。
+> 还导出了 `isIconRegistered(name)`，可以问「这枚画得出来吗」。
 
 ## 引入
 
@@ -110,3 +125,10 @@ export default () => (
 | iconProps | 透传给 iconify 的属性 | `object` |
 
 继承原生 `span` 属性（`className` / `style` / `onClick` 等）。
+
+### 附带导出
+
+| 名称 | 说明 | 类型 |
+| --- | --- | --- |
+| addIconCollection | 把一个 iconify 图标集注册进本库的图标表（纯内存，无下载） | `(data: IconifyJSON, prefix?: string \| boolean) => void` |
+| isIconRegistered | 这枚图标名注册过没有（注册过才画得出来） | `(name: string) => boolean` |

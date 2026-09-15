@@ -1,22 +1,23 @@
 import path from "node:path";
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { iconLoaded } from "@iconify/react";
 import { walkSources } from "./depsScan";
 
-// 只为触发 Icon 模块的注册副作用 —— 组件本身在这个测试里不渲染
-import "../components/Icon";
+// 从组件出口取：顺带触发 Icon 模块的注册副作用（组件本身在这个测试里不渲染）。
+// 注册表由本库自己维护 —— `@iconify/react/offline` 不导出 `iconLoaded`，
+// 而联网版那个 `iconLoaded` 读的是另一份 storage，在这里问了也是白问
+import { isIconRegistered } from "../components/Icon";
 
 /**
  * 防回归守卫：**本库写死的 iconify 图标名，必须全部已注册**。
  *
- * 缺陷长什么样：`@iconify/react` 对没 `addCollection` 过的名字一律去
- * api.iconify.design 现拉。本库在几十处组件里写死了图标名，而这些名字在消费方
- * 源码里一个字都搜不到 —— 消费方既扫不到、也不会想到要注册。于是断网 / 内网 /
- * CSP 收紧的环境下那些图标直接空白，**控制台一条错都没有**，只能靠肉眼发现。
+ * 缺陷长什么样：渲染走 `@iconify/react/offline`，没 `addCollection` 过的名字
+ * **一律画不出来**。本库在几十处组件里写死了图标名，而这些名字在消费方源码里
+ * 一个字都搜不到 —— 消费方既扫不到、也不会想到要注册。漏一枚就是一个空格子，
+ * **控制台一条错都没有**，只能靠肉眼发现。
  *
  * 这条守卫存在的意义就是「没有信号」这四个字：漏注册一枚不会报错、不会变慢，
- * 只会在某个客户的内网里悄悄空一个格子。所以必须由机器每次跑一遍。
+ * 只会在某个页面上悄悄空一个格子。所以必须由机器每次跑一遍。
  *
  * 新增图标名后跑 `npm run icons` 重新生成子集即可；忘了跑，这条测试会点名。
  */
@@ -118,20 +119,20 @@ describe("iconify 图标注册守卫", () => {
     expect(
       wrong,
       wrong.length
-        ? `以下图标名在它所属的图标集里查无此图标，基本可以断定是拼错了 —— 运行时会去公网拉、拉不到就空白且不报错：\n${wrong.join("\n")}`
+        ? `以下图标名在它所属的图标集里查无此图标，基本可以断定是拼错了 —— 运行时画不出来且不报错：\n${wrong.join("\n")}`
         : ""
     ).toEqual([]);
   });
 
-  it("每一枚都已注册，不会在断网时静默空白", () => {
+  it("每一枚都已注册，不会静默空白", () => {
     const unregistered = [...names.entries()]
-      .filter(([name]) => !iconLoaded(name))
+      .filter(([name]) => !isIconRegistered(name))
       .map(([name, where]) => `${name}  <-  ${where}`);
 
     expect(
       unregistered,
       unregistered.length
-        ? `以下图标没进 src/components/Icon/collections.generated.ts，运行时会去公网拉（断网即空白且不报错）。跑 \`npm run icons\` 重新生成：\n${unregistered.join("\n")}`
+        ? `以下图标没进 src/components/Icon/collections.generated.ts，运行时画不出来（空白且不报错）。跑 \`npm run icons\` 重新生成：\n${unregistered.join("\n")}`
         : ""
     ).toEqual([]);
   });
