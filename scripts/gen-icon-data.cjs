@@ -70,10 +70,16 @@ function walk(dir, acc = []) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (entry.name === "node_modules") continue;
+      // 测试目录不扫：单测里写的图标名不是要发出去的界面，见下面那条
+      if (entry.name === "__tests__") continue;
       walk(full, acc);
     } else if (/\.(tsx?|jsx?)$/.test(entry.name)) {
       // 产物自己不参与扫描，否则是自我循环
       if (full === OUT) continue;
+      // 单测文件不扫。单测里为了造场景会写一些界面上根本不存在的图标名
+      // （`fa:rocket` 这种），扫进来就等于**把测试夹具的矢量数据发给每个消费方**，
+      // 而且没人看得出来它是多余的。判据是「界面上真用到的」，不是「源码里出现过的」。
+      if (/\.test\.(tsx?|jsx?)$/.test(entry.name)) continue;
       acc.push(full);
     }
   }
