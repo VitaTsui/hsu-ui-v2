@@ -101,7 +101,7 @@ const ALLOWED = ["ant-design:home-outlined", "ant-design:setting-outlined", "ep:
 
 | 属性 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| value | 图标全名（`prefix:name`） | `string` | - |
+| value | 图标全名（`prefix:name`）。**一次都不传** = 不受控，值由组件自己记着；传 `null` / `""` = 受控地表示「没有图标」，输入框跟着清空；`Form.resetFields()` 把字段重置成的 `undefined` 同样会清空 | `string \| null` | - |
 | onChange | 选中变化 | `(value: string) => void` | - |
 | disabled | 禁用 | `boolean` | - |
 | icons | 允许选择的图标全名清单；传了即进入受限模式 | `string[]` | - |

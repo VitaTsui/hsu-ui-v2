@@ -255,3 +255,117 @@ describe("IconSelect 向后兼容（不传 icons）", () => {
     expect(builtin!.className).not.toContain("ant-input-clear-icon-hidden");
   });
 });
+
+/**
+ * 外部 `value` → 输入框的同步。
+ *
+ * 2.6.1 及以前这条是坏的：`index.tsx:93` 给 `value` 带了 `= ""` 的默认值，把
+ * 「一次都没给过」（`undefined`）折叠成了「给了空」（`""`）；于是 `:139` 的同步分支
+ * 只能靠 `if (value && …)` 的**真值**判断来猜「父级到底在不在控这个值」。
+ * 结果就是父级把值重置为空的三种写法（`""` / `undefined` / `null`）一条都同步不下来，
+ * 输入框留着上一次的图标名 —— `Form.resetFields()`、切换编辑对象、弹窗复用同一个实例
+ * 走的都是这条路。
+ *
+ * 现在判据换成「**这个 prop 变了没有**」，三种入参各归各位（见 index.tsx 的说明）。
+ */
+describe("IconSelect 受控值同步", () => {
+  const inputOf = (c: HTMLElement) => c.querySelector("input")!;
+
+  it("父级把 value 从有值重置为空串 → 输入框跟着空", () => {
+    const { container, rerender } = render(
+      <IconSelect value="ant-design:form-outlined" />
+    );
+    expect(inputOf(container).value).toBe("ant-design:form-outlined");
+
+    rerender(<IconSelect value="" />);
+    expect(inputOf(container).value).toBe("");
+  });
+
+  it("父级把 value 重置为 undefined（Form.resetFields 走的就是这条）→ 输入框跟着空", () => {
+    const { container, rerender } = render(
+      <IconSelect value="ant-design:form-outlined" />
+    );
+    expect(inputOf(container).value).toBe("ant-design:form-outlined");
+
+    rerender(<IconSelect value={undefined} />);
+    expect(inputOf(container).value).toBe("");
+  });
+
+  it("父级把 value 给成 null（可空字段从后端直接回来）→ 输入框跟着空", () => {
+    const { container, rerender } = render(
+      <IconSelect value="ant-design:form-outlined" />
+    );
+    rerender(<IconSelect value={null} />);
+    expect(inputOf(container).value).toBe("");
+  });
+
+  it("父级把 value 从 x 换成 y → 照旧跟随（原行为不变）", () => {
+    const { container, rerender } = render(
+      <IconSelect value="ant-design:form-outlined" />
+    );
+    rerender(<IconSelect value="ant-design:close-outlined" />);
+    expect(inputOf(container).value).toBe("ant-design:close-outlined");
+  });
+
+  it("挂载时先没值、数据回来才给 value → 照旧跟随（弹窗异步取数走的就是这条）", () => {
+    const { container, rerender } = render(<IconSelect />);
+    expect(inputOf(container).value).toBe("");
+
+    rerender(<IconSelect value="ant-design:form-outlined" />);
+    expect(inputOf(container).value).toBe("ant-design:form-outlined");
+  });
+
+  it("不传 value 就是不受控 —— 内部选中的值不被外部冲掉（原行为不变）", async () => {
+    const { container, rerender } = render(<IconSelect icons={ALLOWED} />);
+    openPicker(container);
+    await waitFor(() => {
+      expect(iconCells().length).toBe(2);
+    });
+    fireEvent.click(iconCells()[0]);
+    await waitFor(() => {
+      expect(inputOf(container).value).toBe("ant-design:form-outlined");
+    });
+
+    // 父级重渲染、照旧不给 value：内部值该留着
+    rerender(<IconSelect icons={ALLOWED} />);
+    expect(inputOf(container).value).toBe("ant-design:form-outlined");
+  });
+
+  it("受限模式下这套语义一样成立", () => {
+    const { container, rerender } = render(
+      <IconSelect icons={ALLOWED} value="ant-design:form-outlined" />
+    );
+    expect(inputOf(container).value).toBe("ant-design:form-outlined");
+
+    rerender(<IconSelect icons={ALLOWED} value="" />);
+    expect(inputOf(container).value).toBe("");
+
+    rerender(<IconSelect icons={ALLOWED} value="ant-design:close-outlined" />);
+    expect(inputOf(container).value).toBe("ant-design:close-outlined");
+
+    rerender(<IconSelect icons={ALLOWED} value={undefined} />);
+    expect(inputOf(container).value).toBe("");
+  });
+
+  it("外部清空后，面板里上一枚的高亮也撤掉", async () => {
+    const { container, rerender } = render(
+      <IconSelect icons={ALLOWED} value="ant-design:form-outlined" />
+    );
+    openPicker(container);
+    await waitFor(() => {
+      expect(iconCells().length).toBe(2);
+    });
+    expect(
+      document.body.querySelectorAll('[class*="iconItem"][class*="active"]')
+        .length
+    ).toBe(1);
+
+    rerender(<IconSelect icons={ALLOWED} value="" />);
+    await waitFor(() => {
+      expect(
+        document.body.querySelectorAll('[class*="iconItem"][class*="active"]')
+          .length
+      ).toBe(0);
+    });
+  });
+});
