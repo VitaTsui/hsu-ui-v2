@@ -3,11 +3,12 @@
  * 从 src/ 里实际写死的 iconify 图标名，生成 src/components/Icon/collections.generated.ts。
  *
  * 这个脚本存在的理由，是一条**不报错的**缺陷：
- * `@iconify/react` 的规矩是「`addCollection` 注册过的名字走本地，没注册过的去
- * api.iconify.design 现拉」。本库在 46 处组件里写死了 iconify 图标名（Select 的下拉箭头
- * `ep:arrow-down`、Table 翻页、Copy、Tree 搜索、Chat……），却从不自己注册 —— 于是
- * **所有消费方默认都在替本库向公网发请求**。断网 / 内网 / CSP 收紧的环境里这些图标就是
- * 一片空白，而且控制台连个错都没有，只能靠肉眼发现。
+ * 渲染走 `@iconify/react/offline`，规矩是「`addCollection` 注册过的名字才画得出来」。
+ * 本库在 46 处组件里写死了 iconify 图标名（Select 的下拉箭头 `ep:arrow-down`、
+ * Table 翻页、Copy、Tree 搜索、Chat……），不自己注册就是**所有消费方都看到一片空白**，
+ * 而且控制台连个错都没有，只能靠肉眼发现。
+ * （2.6.0 之前渲染走的是联网版，表现为「联网时正常、断网/内网里静默空白」—— 同一条缺陷
+ * 换了个更难发现的皮。）
  *
  * 文档站看不出来：.dumi/global.ts 把 30 个整集全 addCollection 了，所以本地怎么看都正常。
  * 这正是它能活到今天的原因。
@@ -165,9 +166,9 @@ function build() {
 // 改图标请改组件里的图标名，然后跑 \`npm run icons\`（build / prepublishOnly 会自动跑）。
 //
 // 这是本库自己用到的 iconify 图标的**矢量数据子集**。Icon 组件在模块加载时把它注册进
-// @iconify/react，好让本库的图标永远走本地、不向 api.iconify.design 发请求 ——
-// 消费方在内网 / 断网环境下才不会看到一片空白图标（而且那种失败是不报错的）。
-import type { IconifyJSON } from "@iconify/react";
+// 本库的图标表（见 src/components/Icon/registry.ts）。渲染走 @iconify/react/offline，
+// 没注册过的名字画不出来，所以本库自己写死的这些图标必须随产物带上。
+import type { IconifyJSON } from "@iconify/react/offline";
 
 `;
 

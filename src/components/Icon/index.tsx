@@ -2,9 +2,8 @@ import {
   Icon as Iconify,
   IconifyIcon,
   IconProps as IconifyProps,
-  addCollection,
-  iconLoaded,
-} from "@iconify/react";
+} from "@iconify/react/offline";
+import { addIconCollection, isIconRegistered } from "./registry";
 import iconCollections from "./collections.generated";
 import type {
   AntdIconLoader,
@@ -19,11 +18,9 @@ import { useLatestRef } from "../../hooks/useLatestRef";
 /**
  * 本库自己用到的 iconify 图标，在模块加载时就注册掉。
  *
- * 为什么必须由库来做：`@iconify/react` 对**没注册过**的图标名一律去
- * api.iconify.design 现拉。本库在几十处组件里写死了图标名（`ep:arrow-down`、
+ * 为什么必须由库来做：本库在几十处组件里写死了图标名（`ep:arrow-down`、
  * `icon-park:left`、`ci:copy`、`ant-design:form-outlined`……），这些名字在消费方源码里一个字都搜不到，
- * 于是消费方既扫不到、也不会想到要注册 —— 结果就是每个消费方都在替本库向公网
- * 发请求。断网 / 内网 / CSP 收紧的环境下那些图标直接空白，**而且不报错**。
+ * 于是消费方既扫不到、也不会想到要注册 —— 不自带这份数据，本库自己的图标就全是空位。
  *
  * 数据由 scripts/gen-icon-data.cjs 从源码里的图标名反扫生成，只裁用到的那几十枚
  * （整集动辄几 MB）。放在 Icon 这个模块里注册，是因为本库所有图标都从这儿出：
@@ -31,7 +28,7 @@ import { useLatestRef } from "../../hooks/useLatestRef";
  * 子路径按需引入同样成立。反过来，一个图标都不用的消费方也不会被这份数据拖累。
  */
 iconCollections.forEach((collection) => {
-  addCollection(collection);
+  addIconCollection(collection);
 });
 
 /** 已经警告过的名字，同一个名字只吵一次 */
@@ -40,17 +37,20 @@ const warnedIcons = new Set<string>();
 /**
  * 消费方传进来的 iconify 名字如果没注册过，开发期吼一声。
  *
- * 这个缺陷本身没有任何信号：联网时一切正常，断网时一片空白、控制台干干净净。
- * 与其等上线到内网才靠肉眼发现，不如在开发期就把它变成一条可见的警告。
- * 只在非生产构建里跑，生产环境零开销。
+ * 渲染走的是 `@iconify/react/offline`：**没注册过的名字就是画不出来**，
+ * 一个空位、控制台干干净净、连一次失败的请求都没有。没有任何信号的缺陷
+ * 只能靠机器提醒，所以开发期把它变成一条可见的警告。生产构建里整段不执行。
  */
 const warnIfUnregistered = (name: string) => {
   if (process.env.NODE_ENV === "production") return;
-  if (!name.includes(":") || iconLoaded(name) || warnedIcons.has(name)) return;
+  if (!name.includes(":") || isIconRegistered(name) || warnedIcons.has(name))
+    return;
   warnedIcons.add(name);
   console.warn(
-    `[hsu-ui] Icon "${name}" 没有注册过，@iconify/react 会去 api.iconify.design 现拉：` +
-      `断网 / 内网环境下它会直接空白且不报错。请先 addCollection 注册这枚图标所在的集合。`
+    `[hsu-ui] Icon "${name}" 没有注册过，画不出来（会是一个空位且不报错）。` +
+      `请先用 \`addIconCollection\`（从 @hsu-react/ui 导出）注册这枚图标所在的集合。` +
+      `注意不要用 @iconify/react 自带的 addCollection —— 联网版与 offline 版各有一份` +
+      `互不相通的注册表，注册到联网版那一份等于没注册。`
   );
 };
 
@@ -242,5 +242,13 @@ const Icon = React.forwardRef<HTMLSpanElement, IconProps>((props, forwardedRef) 
 });
 
 Icon.displayName = "Icon";
+
+/**
+ * 图标注册入口。消费方要用本库没带的图标集时，从这里注册 ——
+ * **不要**用 `@iconify/react` 自带的 `addCollection`，见 registry.ts 的说明。
+ */
+export { addIconCollection, isIconRegistered } from "./registry";
+/** 图标集的数据形状。透出来是为了让消费方不必自己去依赖 `@iconify/react` */
+export type { IconifyJSON } from "@iconify/react/offline";
 
 export default Icon;
