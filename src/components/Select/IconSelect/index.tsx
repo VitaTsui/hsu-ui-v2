@@ -78,7 +78,7 @@ export interface IconSelectProps {
    * 传了就是**受限模式**：
    * - 面板里只出现清单里的这些图标，Tabs 按清单里出现过的前缀自动分组；
    * - 左侧输入框转为只读 —— 自由输入是这个组件唯一的旁路，不关掉的话「只给能用的」
-   *   就只是摆设。清空仍然可以（输入框自带清除按钮），因为「不设图标」总是合法的；
+   *   就只是摆设。清空仍然可以（组件自己渲染的那枚清除按钮），因为「不设图标」总是合法的；
    * - 那四套整集一个字节都不会下载。
    *
    * 注意：清单里的图标要**已经注册过**才画得出来（本库自带的那批，或消费方用
@@ -196,6 +196,31 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
     onChange?.(next);
   };
 
+  /**
+   * 受限模式下「清空」的唯一入口。
+   *
+   * 为什么不用 Input 自带的那枚：`allowClear` 的清除按钮由 `@rc-component/input`
+   * 的 `BaseInput` 渲染，而它算可见性时把 `readOnly` 一起判死了 ——
+   * `needClear = !disabled && !readOnly && value && …`（BaseInput.js:67），
+   * 不满足就挂上 `ant-input-clear-icon-hidden`（同文件 :81），antd 给这个类的样式是
+   * `visibility: hidden`。**只读 ＋ 自带清除按钮，这两件事在当前依赖版本下不能共存。**
+   *
+   * 这不是 rc 的 bug，是 `readOnly` 的语义本来就是「用户不能改这个值」，清空也是改。
+   * 所以受限模式关掉 `allowClear`，清除按钮由本组件自己渲染 —— 跟 antd 自家 Select
+   * 的做法一致（只读的 combobox input ＋ 自己画的 `.ant-select-clear`）。
+   *
+   * 按钮常驻、没得清时只是 `visibility: hidden`：受限模式的输入框任何时候都带 affix
+   * 包裹层，宽度不会因为有没有选中图标而跳一下。
+   */
+  const clearable = restricted && !disabled && !!_value;
+
+  const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // 别让这一下冒泡到外层去；面板的高亮也要跟着撤，不然清空后面板里还亮着上一枚
+    e.stopPropagation();
+    setActiveIcon("");
+    _onChange("");
+  };
+
   return (
     // antd v6 deprecated `addonAfter` in favour of Space.Compact + Space.Addon
     <Space.Compact className={styles.iconSelect}>
@@ -204,8 +229,29 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
         onChange={_onChange}
         disabled={disabled}
         // 受限模式下输入框只读：能选什么由清单说了算，自由输入会把这份约束整个绕过去。
-        // 清除按钮是 Input 自带的，只读也在，所以「不设图标」仍然做得到
+        // `readOnly` 是浏览器原生的，键盘、粘贴、拖放、输入法组字、密码管理器自动填充
+        // 一次全挡住，读屏软件也会念出「只读」—— 用 onKeyDown / beforeinput 拦是拦不全的
+        // （`insertCompositionText` 按规范就不可取消，中文输入法照样能打进去）。
+        // 代价是自带的清除按钮会被一起判死，所以受限模式下关掉 allowClear、自己画一枚，
+        // 见上面 `onClear` 处的说明。
         readOnly={restricted}
+        allowClear={!restricted}
+        suffix={
+          restricted ? (
+            <button
+              type="button"
+              aria-label="清除图标"
+              aria-hidden={!clearable}
+              tabIndex={clearable ? 0 : -1}
+              className={classNames(styles.clear, {
+                [styles.clearHidden]: !clearable,
+              })}
+              onClick={onClear}
+            >
+              <Icon icon="ant-design:close-circle-filled" />
+            </button>
+          ) : undefined
+        }
         placeholder={restricted ? "点击右侧图标选择" : undefined}
       />
       <Space.Addon>
