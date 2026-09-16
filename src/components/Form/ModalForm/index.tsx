@@ -30,8 +30,14 @@ export interface ModalFormProps extends Omit<ModalProps, "onCancel" | "onOk"> {
   hasPermi?: string[];
   formClassName?: string;
   formItemClassName?: string;
+  /**
+   * @deprecated 只是 `columnNum` 的旧写法：`"horizontal"` 等价于 `columnNum={2}`，
+   * 其余取值等价于 `columnNum={1}`。分栏与否现在只看 `columnNum`，新代码直接给 `columnNum`。
+   */
   layout?: "horizontal" | "vertical";
+  /** 表单项内部的 label 方向，透传给每个 `FormItem` */
   formItemLayout?: "horizontal" | "vertical";
+  /** 表单列数，`> 1` 即分栏（弹窗同时用宽档）。默认 1 列 */
   columnNum?: number;
   disabled?: boolean;
   outsideChildren?: React.ReactNode;
@@ -62,7 +68,7 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
     children,
     layout,
     formItemLayout,
-    columnNum = 2,
+    columnNum,
     disabled,
     outsideChildren,
     getFormRef,
@@ -112,9 +118,16 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
     );
   };
 
+  /* 分栏只有 `columnNum` 这一处判据。
+     旧设计把分栏样式挂在 `layout === "horizontal"` 加的 `.horizontal` 类上，`columnNum`
+     只喂给一个别处用不到的 CSS 变量 —— 于是「只给 `columnNum={2}`」的调用方静默拿到单栏，
+     还没有任何提示。现在 `layout` 退成 `columnNum` 的默认值来源，不再参与判断。 */
+  const _columnNum = columnNum ?? (layout === "horizontal" ? 2 : 1);
+  const multiColumn = _columnNum > 1;
+
   const adaptiveColumnNum = useAdaptiveColumnNum(
     formContainer,
-    columnNum,
+    _columnNum,
     true,
     1,
     undefined,
@@ -122,7 +135,7 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
     !!open
   );
 
-  const _formItems = useFormItems(formItems, layout, adaptiveColumnNum);
+  const _formItems = useFormItems(formItems, multiColumn, adaptiveColumnNum);
   /* `extraFormItems` 是 JSX 形态的表单项，同样可能重名（互斥字段） */
   const extraKeys = formItemKeys(
     extraFormItems?.map((i) => i.props as FormItemProps),
@@ -137,11 +150,13 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
       open={open}
       centered
       className={`${styles.ModalForm} ${className ?? ""} ${
-        layout === "horizontal" ? styles.horizontal : ""
+        multiColumn ? styles.multiColumn : ""
       }`}
       onCancel={_onCancel}
       onOk={_onOk}
-      width={layout === "horizontal" ? modalWidth.lg : modalWidth.md}
+      /* 宽度按**传进来的**列数选档，不能用 `adaptiveColumnNum`：
+         后者由容器宽度算出来，再拿它反过来定弹窗宽度就成了闭环，会来回抖。 */
+      width={multiColumn ? modalWidth.lg : modalWidth.md}
       classNames={mergeSemantic(classNames, (outer) => ({
         ...outer,
         body: `${styles.body} ${outer.body ?? ""}`,

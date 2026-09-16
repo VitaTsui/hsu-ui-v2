@@ -6,14 +6,14 @@ import { useColumnFormItems } from "./useColumnFormItems";
 /**
  * Handle form item layout and label width calculation
  * @param formItems Form item configuration
- * @param layout Layout mode
+ * @param multiColumn Whether the form is laid out in more than one column
  * @param columnNum Column count
  * @returns Processed form items
  */
 export const useFormItems = (
   formItems: FormItemProps[] | Record<string, FormItemProps[]>,
-  layout?: "horizontal" | "vertical",
-  columnNum: number = 2
+  multiColumn?: boolean,
+  columnNum: number = 1
 ) => {
   const [labelWidth, getLabelWidth] = useLabelWidth(
     Array.isArray(formItems) ? formItems : Object.values(formItems ?? {}).flat()
@@ -27,7 +27,8 @@ export const useFormItems = (
     );
     Object.keys(_formItems)?.forEach((key) => {
       _formItems[key]?.forEach((item, idx) => {
-        if (layout === "horizontal") {
+        /* 分栏时每一列各自对齐 label，单栏时全表共用一个宽度 */
+        if (multiColumn) {
           item.labelWidth = getLabelWidth(
             columnFormItems(_formItems[key], idx)
           );
@@ -37,7 +38,7 @@ export const useFormItems = (
       });
     });
     return _formItems;
-  }, [formItems, layout, getLabelWidth, columnFormItems, labelWidth]);
+  }, [formItems, multiColumn, getLabelWidth, columnFormItems, labelWidth]);
 
   return _formItems;
 };
