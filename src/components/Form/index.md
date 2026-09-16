@@ -70,6 +70,48 @@ export default () => {
 };
 ```
 
+## 多栏表单
+
+表单项多的时候给 `columnNum` 分栏，弹窗会自动换到宽档；容器变窄时列数会自适应往下降，不会把每一栏挤扁。
+
+> `columnNum` 是分栏的**唯一**开关。旧代码里的 `layout="horizontal"` 只是 `columnNum={2}` 的另一种写法，已废弃。
+
+```tsx
+import React, { useState } from "react";
+import { Form } from "@hsu-react/ui";
+import { Button } from "antd";
+
+export default () => {
+  const [open, setOpen] = useState(false);
+
+  const formItems = [
+    { type: "INPUT", name: "name", label: "姓名", required: true },
+    { type: "INPUT", name: "phone", label: "手机号" },
+    { type: "INPUT", name: "email", label: "邮箱" },
+    { type: "INPUTNUMBER", name: "age", label: "年龄" },
+    { type: "INPUT", name: "company", label: "所属公司" },
+    { type: "INPUT", name: "dept", label: "部门" },
+    { type: "TEXTAREA", name: "remark", label: "备注", width: "100%" },
+  ];
+
+  return (
+    <>
+      <Button type="primary" onClick={() => setOpen(true)}>
+        两栏表单
+      </Button>
+      <Form.Modal
+        open={open}
+        title="员工信息"
+        columnNum={2}
+        formItems={formItems}
+        onOk={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+      />
+    </>
+  );
+};
+```
+
 ## 抽屉表单
 
 抽屉形态的表单，用法与 `Form.Modal` 一致，通过 `formItems` 配置表单项，适合内容较多的录入场景。
@@ -199,8 +241,9 @@ Form.useFormInstance
 | onOk | 校验通过后的提交回调 | `(data, form: FormInstance) => void` | - |
 | onCancel | 取消回调 | `() => void` | - |
 | hasPermi | 权限码 | `string[]` | - |
-| layout / formItemLayout | 表单 / 表单项布局方向 | `'horizontal' \| 'vertical'` | - |
-| columnNum | 表单列数 | `number` | - |
+| columnNum | 表单列数，`> 1` 即分栏（弹窗同时用宽档，并随容器宽度自适应减列） | `number` | `1` |
+| formItemLayout | 表单项内部 label 的方向 | `'horizontal' \| 'vertical'` | - |
+| ~~layout~~ | **已废弃**，只是 `columnNum` 的旧写法：`'horizontal'` 等价于 `columnNum={2}` | `'horizontal' \| 'vertical'` | - |
 | disabled | 是否禁用整个表单 | `boolean` | - |
 | onValuesChange | 表单值变化回调 | `(value, values) => void` | - |
 
