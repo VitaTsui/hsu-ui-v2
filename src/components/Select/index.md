@@ -105,3 +105,4 @@ const ALLOWED = ["ant-design:home-outlined", "ant-design:setting-outlined", "ep:
 | onChange | 选中变化 | `(value: string) => void` | - |
 | disabled | 禁用 | `boolean` | - |
 | icons | 允许选择的图标全名清单；传了即进入受限模式 | `string[]` | - |
+| onOpenChange | 图标面板开合时叫一声。开合仍由组件自己决定，这个回调只报结果、不参与决定 | `(open: boolean) => void` | - |
