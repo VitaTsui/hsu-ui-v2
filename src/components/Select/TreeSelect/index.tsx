@@ -63,10 +63,33 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     ...antdTreeSelectConfig
   } = props;
   const cls = useMemo(() => generateRandomStr(10), []);
-  const ref = useRef<TreeSelectRef>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerElement, setContainerElement] =
     useState<HTMLDivElement | null>(null);
+
+  /* 这个组件要拿自己的根节点（带 `styles.treeSelect` 类名的那个 `.ant-select`）来干三件事：
+     给浮层算宽度、算 left、以及当浮层的挂载容器。从前它是从 `getPopupContainer` 的
+     参数里爬出来的，两处都错：
+
+     1. `getPopupContainer` 是 antd 的 Portal **在渲染期**调的回调，从前在里面直接
+        `setContainerElement()` —— 在别的组件渲染过程中改自己的 state，React 每次首开
+        都报 `Cannot update a component (TreeSelect) while rendering a different
+        component (Portal)`。
+     2. 爬法本身写错了：`triggerNode` 传进来的就是根节点本人，而代码写的是
+        `triggerNode.parentElement.closest('.treeSelect')` —— `closest` 从**父节点**往上
+        找，永远够不着它自己，于是每次都落到 `?? document.body` 的兜底上。
+        后果是这三样全是拿 `document.body` 量的：浮层宽度 = 整页宽（实测 1200px，
+        而触发元素只有 685px）、left = 0（触发元素在 300px）、`useSelectPopupPosition`
+        从第二次展开起把浮层顶到 `body.offsetHeight + 4` ≈ 941px，直接掉出可视区。
+
+     改成从 antd 自己的 ref 拿：`BaseSelectRef.nativeElement` 就是那个根节点。回调 ref 在
+     **提交阶段**执行，在里面 setState 合法，而且早于绘制 —— 首开就已经有宽度和 left，
+     不像从前要等那次「警告顺带触发的重渲染」才补上。 */
+  const attachContainer = useCallback((instance: TreeSelectRef | null) => {
+    const container = (instance?.nativeElement as HTMLDivElement) ?? null;
+    containerRef.current = container;
+    setContainerElement(container);
+  }, []);
   const { isComposing } = useSelectComposition({ onSearch });
   const [open, setOpen] = useState<boolean>(false);
 
@@ -173,15 +196,15 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     [onTreeExpand],
   );
 
-  const getPopupContainer = useCallback((triggerNode: HTMLElement) => {
-    const container =
-      (triggerNode?.parentElement?.closest(
-        `.${styles.treeSelect}`,
-      ) as HTMLDivElement) ?? (document.body as HTMLDivElement);
-    containerRef.current = container;
-    setContainerElement(container);
-    return container;
-  }, []);
+  // 纯读，没有副作用；和基础 `Select` 的 `getPopupContainer` 同一个写法。
+  // 浮层挂进根节点里，`index.module.scss` 里那一整块
+  // `.treeSelect .ant-tree-select-dropdown`（`position: fixed`、字体继承、
+  // `--tree-indent-unit-width` 等缩进变量）才生效 —— 也就是 `indent` / `switchWidth` /
+  // `switchGap` 三个 props 才真的有用。
+  const getPopupContainer = useCallback(
+    () => containerRef.current ?? document.body,
+    [],
+  );
 
   return (
     <AntdTreeSelect
@@ -241,7 +264,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
         },
       }}
       suffixIcon={<Icon icon="ep:arrow-down" />}
-      ref={ref}
+      ref={attachContainer}
     />
   );
 };
