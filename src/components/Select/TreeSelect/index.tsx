@@ -59,6 +59,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     switchWidth,
     switchGap,
     treeData,
+    onOpenChange,
     ...antdTreeSelectConfig
   } = props;
   const cls = useMemo(() => generateRandomStr(10), []);
@@ -190,7 +191,14 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       treeData={treeData}
       {...(treeExpandedKeys !== undefined && { treeExpandedKeys })}
       onTreeExpand={handleTreeExpand}
-      onOpenChange={setOpen}
+      /* `open` 由 `useSelectPopupPosition` 用着，所以这里必须自己记一份；但记完要把
+         消费方自己传的 `onOpenChange` 原样往下叫一声。从前这里只写 `setOpen`，它排在
+         `{...antdTreeSelectConfig}` 展开之后，于是消费方传进来的那个被整个盖掉、
+         静默丢失 —— 和 2.7.1 修基础 `Select` 时是同一个毛病。 */
+      onOpenChange={(visible) => {
+        setOpen(visible);
+        onOpenChange?.(visible);
+      }}
       className={classNames(styles.treeSelect, className)}
       onSearch={(value) => {
         if (!isComposing) {

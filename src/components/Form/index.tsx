@@ -1,12 +1,17 @@
 import DrawerForm, { DrawerFormProps } from "./DrawerForm";
 import ImportForm, { ImportFormProps } from "./ImportForm";
-import ModalForm, { ModalFormProps } from "./ModalForm";
+import ModalForm from "./ModalForm";
 
 import { Form as AntdForm } from "antd";
 import React from "react";
 
 interface FormType {
-  Modal: React.FC<ModalFormProps>;
+  /**
+   * `React.FC<ModalFormProps>` 会把 `ModalForm` 的类型参数抹平，
+   * 于是 `<Form.Modal<XSaveData> …>` 这种写法在类型层根本表达不出来。
+   * 这里直接用 `typeof ModalForm`，把泛型原样带出去。
+   */
+  Modal: typeof ModalForm;
   Drawer: React.FC<DrawerFormProps>;
   Import: React.FC<ImportFormProps>;
   /**

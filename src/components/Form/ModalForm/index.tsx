@@ -20,12 +20,21 @@ import { useAdaptiveColumnNum } from "./_hooks/useAdaptiveColumnNum";
 
 export type ExtraFormItem = React.ReactElement<ItemContainerProps>;
 
-export interface ModalFormProps extends Omit<ModalProps, "onCancel" | "onOk"> {
+/**
+ * 表单吐出来的那一份数据的形状。
+ *
+ * 默认 `Record<string, unknown>` —— 不显式传类型参数的调用方保持原样，一行都不用改。
+ * 想让编译器看住「表单交给 store 那一跳」的，显式写 `<Form.Modal<XSaveData> …>`：
+ * 之后 `onOk` 处理函数声明的入参形状会被逆变检查核一遍，多声明一个表单不产出的
+ * 字段就地编译不过，而不是等运行时才发现键对不上。
+ */
+export interface ModalFormProps<Values extends object = Record<string, unknown>>
+  extends Omit<ModalProps, "onCancel" | "onOk"> {
   formItems?: FormItemProps[] | Record<string, FormItemProps[]>;
   extraFormItems?: ExtraFormItem[];
   externalForm?: FormInstance;
   onCancel?: () => void;
-  onOk?: (data: Record<string, unknown>, form: FormInstance) => void;
+  onOk?: (data: Values, form: FormInstance) => void;
   value?: Record<string, unknown>;
   hasPermi?: string[];
   formClassName?: string;
@@ -51,7 +60,9 @@ export interface ModalFormProps extends Omit<ModalProps, "onCancel" | "onOk"> {
   formWrapperClassName?: string;
 }
 
-const ModalForm: React.FC<ModalFormProps> = (props) => {
+const ModalForm = <Values extends object = Record<string, unknown>>(
+  props: ModalFormProps<Values>
+): React.ReactElement | null => {
   const {
     formItems = [],
     extraFormItems,
@@ -101,7 +112,9 @@ const ModalForm: React.FC<ModalFormProps> = (props) => {
     form.validateFields().then(
       (data) => {
         if (onOk) {
-          onOk(data, form);
+          /* `validateFields()` 在 antd 这边就是 `Promise<any>`，形状的约定在
+             `Values` 上，由调用方声明、由上面的逆变检查把关。 */
+          onOk(data as Values, form);
         } else {
           form.resetFields();
         }

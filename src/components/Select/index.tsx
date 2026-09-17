@@ -246,8 +246,8 @@ const Select = ((props: SelectProps) => {
           /* `open` 是受控的，不把 antd 的开合请求接回来，antd 就**永远关不掉浮层**：
              Esc、点外面、选中一项、点清除按钮，rc-select 全都只是调这个回调，
              回调缺席就等于这些关闭动作被静默丢掉（实测：按 Esc 后 aria-expanded 仍是 true）。
-             同族的 TreeSelect / IconSelect / AutoCompleteSelect 一直是这么接的，
-             只有这个基础 Select 漏了。 */
+             接回来时还要把消费方自己的 `onOpenChange` 往下叫一声，否则就从「关不掉」
+             换成「关得掉但外面看不见」。 */
           onOpenChange: (visible: boolean) => {
             setOpen(visible);
             onOpenChange?.(visible);

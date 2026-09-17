@@ -369,3 +369,28 @@ describe("IconSelect 受控值同步", () => {
     });
   });
 });
+
+/**
+ * 面板开合外面看不见。`IconSelectProps` 是一份封闭的 props 清单，从前压根没有
+ * `onOpenChange` 这一项 —— 同族的 `Select` / `TreeSelect` 都能把开合告诉消费方，
+ * 只有它不能，消费方想在面板打开时预热数据、关上时收起联动，只能自己猜。
+ * 这里补的是这一项，开合仍由组件自己决定（受控给 `Popover`），回调只是报一声。
+ */
+describe("IconSelect 的开合回调", () => {
+  it("面板开合会把状态告诉消费方", async () => {
+    const seen: boolean[] = [];
+    const { container } = render(
+      <IconSelect
+        icons={ALLOWED}
+        onOpenChange={(open) => {
+          seen.push(open);
+        }}
+      />
+    );
+
+    openPicker(container);
+    await waitFor(() => {
+      expect(seen).toContain(true);
+    });
+  });
+});

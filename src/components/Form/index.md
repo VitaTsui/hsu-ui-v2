@@ -238,7 +238,7 @@ Form.useFormInstance
 | extraFormItems | 额外的自定义表单项节点 | `ExtraFormItem[]` | - |
 | externalForm | 外部传入的表单实例 | `FormInstance` | - |
 | value | 表单回填值 | `Record<string, unknown>` | - |
-| onOk | 校验通过后的提交回调 | `(data, form: FormInstance) => void` | - |
+| onOk | 校验通过后的提交回调。`data` 的形状由类型参数 `Values` 决定，见下方「把提交形状锁死」 | `(data: Values, form: FormInstance) => void` | - |
 | onCancel | 取消回调 | `() => void` | - |
 | hasPermi | 权限码 | `string[]` | - |
 | columnNum | 表单列数，`> 1` 即分栏（弹窗同时用宽档，并随容器宽度自适应减列） | `number` | `1` |
@@ -246,6 +246,28 @@ Form.useFormInstance
 | ~~layout~~ | **已废弃**，只是 `columnNum` 的旧写法：`'horizontal'` 等价于 `columnNum={2}` | `'horizontal' \| 'vertical'` | - |
 | disabled | 是否禁用整个表单 | `boolean` | - |
 | onValuesChange | 表单值变化回调 | `(value, values) => void` | - |
+
+#### 把提交形状锁死：`Form.Modal<Values>`
+
+`onOk` 带一个类型参数 `Values`，默认 `Record<string, unknown>`。
+
+- **不传** → 和从前一模一样，已有调用方一行都不用改；
+- **显式传** → `onOk` 处理函数声明的入参形状会被编译器核一遍，声明了写侧形状里
+  没有的键（读侧派生字段、后端不收的键）就地编译不过。
+
+```tsx | pure
+type RoleSaveData = { cd?: string; nm?: string };
+
+<Form.Modal<RoleSaveData>
+  open={open}
+  formItems={formItems}
+  onOk={(data) => save(data)} // data: RoleSaveData
+/>;
+```
+
+之所以要这一步：`Record<string, unknown>` 对**全可选**类型天然可赋值（目标的可选
+属性靠「不存在」就能满足），所以从前 `onOk` 的处理函数爱声明成什么形状就声明成
+什么形状，键对不对得上只能等运行时。
 
 ### Form.Drawer（DrawerFormProps）
 

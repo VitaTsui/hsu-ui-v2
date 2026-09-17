@@ -98,12 +98,17 @@ export interface IconSelectProps {
    * 引用最好稳定（模块级常量 / `useMemo`），每渲染新建一个数组会让分组白算一遍。
    */
   icons?: string[];
+  /**
+   * 图标面板开合时叫一声。面板的开合状态组件自己记着（受控给 antd `Popover`），
+   * 这个回调只是把结果告诉外面，不参与决定开不开。
+   */
+  onOpenChange?: (open: boolean) => void;
 }
 
 const IconSelect: React.FC<IconSelectProps> = (props) => {
   // 这里**不能**给 `value` 兜一个 `= ""` 的默认值：那会把「一次都没给过」（undefined）
   // 和「给了空」（""）折叠成同一个值，下面的同步就只剩「猜」这一条路了
-  const { value, onChange, disabled, icons } = props;
+  const { value, onChange, disabled, icons, onOpenChange } = props;
   const [_value, setValue] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   const [currentTab, setCurrentTab] = useState<string>("");
@@ -307,7 +312,10 @@ const IconSelect: React.FC<IconSelectProps> = (props) => {
           trigger="click"
           zIndex={1000}
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={(visible) => {
+            setOpen(visible);
+            onOpenChange?.(visible);
+          }}
           content={
             <div className={styles.popoverContent}>
               <Input
