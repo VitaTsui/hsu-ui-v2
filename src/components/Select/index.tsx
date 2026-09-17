@@ -75,12 +75,15 @@ const Select = ((props: SelectProps) => {
     optionRender,
     labelRender,
     suffixIcon: customSuffixIcon,
+    onOpenChange,
     ...antdSelctConfig
   } = props;
   const [focused, setFocused] = useState<boolean>(false);
   const ref = useRef<SelectRef>(null);
   const selectRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<boolean>(false);
+  /** 外壳装饰区被按下时的 `open`；null 表示这一次按下不归外壳管（落在 antd 自己的区域里） */
+  const openAtPressRef = useRef<boolean | null>(null);
   const [legacyHasErrorStatus, setLegacyHasErrorStatus] =
     useState<boolean>(false);
   const [legacyHasArrowOrClear, setLegacyHasArrowOrClear] =
@@ -188,11 +191,45 @@ const Select = ((props: SelectProps) => {
             }
           : undefined
       }
+      /* 只认「外壳自己」的那一圈内边距。
+         外壳是画在 antd 选择器外面的一层边框 ＋ 左右 11px 内边距，那一圈 antd 收不到点击，
+         所以由这里补一次开合。但它**不能**对着整棵子树无条件翻转 `open`：
+         下拉浮层由 `getPopupContainer` 挂在这个外壳里面，清除按钮（✕）也在 antd 选择器里，
+         点它们都会冒泡到这里。从前这里写的是 `setOpen(!open)`，于是点 ✕ 清空值
+         反而把浮层**打开**，而浮层是 position: fixed 贴在控件正下方的 —— 在成员列表这类
+         纵向堆叠的表单里，它正好盖住下一行的下拉框（实测行距 102px、浮层高 104px），
+         用户以为在点第 2 行，点到的是第 1 行的选项，值就写到了第 1 行头上。
+         所以这里把「外壳自己的装饰区」（内边距 ＋ prefix / suffix）和「antd 自己的区域」
+         （选择器与浮层）划成互不相交的两块：前者归这里，后者归 antd（见下面的
+         onOpenChange），不再两套判断并存。
+
+         开合按 **mousedown 那一刻**的状态翻转，不按 click 那一刻：
+         装饰区在 antd 的触发元素之外，rc-trigger 会把这里的 mousedown 当成「点了外面」
+         而先把浮层关掉（React 的事件挂在根容器上，早于 rc-trigger 挂在 document 上的监听），
+         等 click 跑到这里时 `open` 已经是 false，再翻转就等于又把它打开 —— 表现是点内边距
+         关不掉浮层。存一份按下时的状态，就是「按用户当时看到的样子翻转」。 */
+      onMouseDown={
+        !mode
+          ? (e) => {
+              const target = e.target as Element | null;
+              openAtPressRef.current = target?.closest(
+                ".ant-select, .ant-select-dropdown",
+              )
+                ? null
+                : open;
+            }
+          : undefined
+      }
       onClick={
         !mode
           ? () => {
+              const openAtPress = openAtPressRef.current;
+              openAtPressRef.current = null;
+              if (openAtPress === null) {
+                return;
+              }
               ref.current?.focus();
-              setOpen(!open);
+              setOpen(!openAtPress);
             }
           : undefined
       }
@@ -206,6 +243,15 @@ const Select = ((props: SelectProps) => {
           ...antdSelctConfig,
           mode,
           open,
+          /* `open` 是受控的，不把 antd 的开合请求接回来，antd 就**永远关不掉浮层**：
+             Esc、点外面、选中一项、点清除按钮，rc-select 全都只是调这个回调，
+             回调缺席就等于这些关闭动作被静默丢掉（实测：按 Esc 后 aria-expanded 仍是 true）。
+             同族的 TreeSelect / IconSelect / AutoCompleteSelect 一直是这么接的，
+             只有这个基础 Select 漏了。 */
+          onOpenChange: (visible: boolean) => {
+            setOpen(visible);
+            onOpenChange?.(visible);
+          },
           onFocus: (e) => {
             setFocused(true);
             onFocus?.(e);
