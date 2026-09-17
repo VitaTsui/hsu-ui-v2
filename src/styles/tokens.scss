@@ -29,7 +29,8 @@
   --vita-border-weak: #f4f4f5; // 更浅的分隔线
   --vita-foreground: #09090b; // 主文字
   --vita-muted-foreground: #71717a; // 次级文字
-  --vita-subtle-foreground: #a1a1aa; // 占位 / 禁用文字
+  --vita-placeholder-foreground: #71717a; // 占位文字（须过 AA 4.5:1）
+  --vita-subtle-foreground: #8a8a93; // 禁用态与装饰性图标，不要用于要读的文字
   --vita-hover: #f4f4f5; // 行 / 项 hover 背景
   --vita-success: #16a34a;
   --vita-warning: #f59e0b;
@@ -74,6 +75,7 @@ html[data-prefers-color-scheme="dark"] {
   --vita-border-weak: #1f1f23;
   --vita-foreground: #fafafa;
   --vita-muted-foreground: #a1a1aa;
+  --vita-placeholder-foreground: #8a8a93;
   --vita-subtle-foreground: #71717a;
   --vita-hover: #27272a;
   --vita-success: #22c55e;
