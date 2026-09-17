@@ -5,7 +5,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import TreeSelect from ".";
 
 /**
- * `open` 在这个组件里是自己记一份的（`useSelectPopupPosition` 要用），
+ * `open` 在这个组件里是自己记一份的（`useSelectPopupLeft` 要用），
  * 但从前落地时只写了 `onOpenChange={setOpen}`，而且它排在
  * `{...antdTreeSelectConfig}` 展开**之后** —— 消费方自己传的那个被整个盖掉，
  * 静默丢失。和 2.7.1 修基础 `Select` 时是同一个毛病，只是当时没顺手核同族。

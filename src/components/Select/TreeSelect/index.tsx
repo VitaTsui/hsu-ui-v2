@@ -14,9 +14,7 @@ import type { TreeSelectRef } from "../../../types/antd";
 import Icon from "../../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { useSelectComposition, useSelectPopupPosition } from "../_hooks";
-import { getElementLeft } from "../_utils";
-import { generateRandomStr } from "hsu-utils";
+import { useSelectComposition, useSelectPopupLeft } from "../_hooks";
 import {
   getExpandedKeysByLevel,
   getInitialTreeExpandedKeys,
@@ -62,7 +60,6 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     onOpenChange,
     ...antdTreeSelectConfig
   } = props;
-  const cls = useMemo(() => generateRandomStr(10), []);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerElement, setContainerElement] =
     useState<HTMLDivElement | null>(null);
@@ -79,7 +76,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
         `triggerNode.parentElement.closest('.treeSelect')` —— `closest` 从**父节点**往上
         找，永远够不着它自己，于是每次都落到 `?? document.body` 的兜底上。
         后果是这三样全是拿 `document.body` 量的：浮层宽度 = 整页宽（实测 1200px，
-        而触发元素只有 685px）、left = 0（触发元素在 300px）、`useSelectPopupPosition`
+        而触发元素只有 685px）、left = 0（触发元素在 300px）、当时那个轮询定位的 hook
         从第二次展开起把浮层顶到 `body.offsetHeight + 4` ≈ 941px，直接掉出可视区。
 
      改成从 antd 自己的 ref 拿：`BaseSelectRef.nativeElement` 就是那个根节点。回调 ref 在
@@ -93,7 +90,9 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
   const { isComposing } = useSelectComposition({ onSearch });
   const [open, setOpen] = useState<boolean>(false);
 
-  useSelectPopupPosition(containerRef, open, cls);
+  /* `TreeSelect` 没有外壳，根节点就是 antd 自己的触发节点，所以这里量出来的 left 与
+     antd 算的是同一个值；保持和 `Select` / `AutoCompleteSelect` 同一套写法，不另开一条。 */
+  const popupLeft = useSelectPopupLeft(containerRef, open);
 
   const style = useMemo<CSSProperties>(
     () =>
@@ -214,7 +213,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       treeData={treeData}
       {...(treeExpandedKeys !== undefined && { treeExpandedKeys })}
       onTreeExpand={handleTreeExpand}
-      /* `open` 由 `useSelectPopupPosition` 用着，所以这里必须自己记一份；但记完要把
+      /* `open` 由 `useSelectPopupLeft` 用着，所以这里必须自己记一份；但记完要把
          消费方自己传的 `onOpenChange` 原样往下叫一声。从前这里只写 `setOpen`，它排在
          `{...antdTreeSelectConfig}` 展开之后，于是消费方传进来的那个被整个盖掉、
          静默丢失 —— 和 2.7.1 修基础 `Select` 时是同一个毛病。 */
@@ -246,7 +245,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       getPopupContainer={getPopupContainer}
       // v6 replaced `popupClassName` / `dropdownStyle` with the `popup.root` semantic slot; this
       // component's own props keep the old names for consumers.
-      classNames={{ popup: { root: `${cls} ${popupClassName ?? ""}` } }}
+      classNames={{ popup: { root: popupClassName } }}
       style={style}
       popupMatchSelectWidth={
         popupMatchSelectWidth ??
@@ -256,9 +255,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
         popup: {
           root: {
             ...dropdownStyle,
-            left: containerElement
-              ? getElementLeft(containerElement)
-              : undefined,
+            left: popupLeft,
             right: "auto",
           },
         },

@@ -9,11 +9,10 @@ import React, {
 } from "react";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { generateRandomStr } from "hsu-utils";
 import { Prefix } from "../_components/Prefix";
 import { Suffix } from "../_components/Suffix";
-import { useSelectComposition, useSelectPopupPosition } from "../_hooks";
-import { getElementLeft, calculatePopupWidth } from "../_utils";
+import { useSelectComposition, useSelectPopupLeft } from "../_hooks";
+import { calculatePopupWidth } from "../_utils";
 import Icon from "../../Icon";
 import { isLegacyHasSelectorBrowser } from "../../../utils/cssSupports";
 
@@ -74,8 +73,6 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   const [legacyHasArrowOrClear, setLegacyHasArrowOrClear] =
     useState<boolean>(true);
   const legacyHasSelector = isLegacyHasSelectorBrowser();
-
-  const cls = useMemo(() => generateRandomStr(10), []);
 
   const handleSearch = useCallback(
     (searchValue: string) => {
@@ -164,7 +161,8 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   // the controlled state from drifting and leaving an empty popup behind
   const mergedOpen = open && filteredOptions.length > 0;
 
-  useSelectPopupPosition(autoCompleteRef, mergedOpen, cls);
+  /* 浮层的 left 按外壳测，其余定位交给 antd，详见 `useSelectPopupLeft`。 */
+  const popupLeft = useSelectPopupLeft(autoCompleteRef, mergedOpen);
 
   useEffect(() => {
     if (!legacyHasSelector) {
@@ -268,16 +266,14 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
             [styles.legacyHasArrowOrClear]:
               legacyHasSelector && legacyHasArrowOrClear,
           }),
-          classNames: { popup: { root: `${cls} ${popupClassName ?? ""}` } },
+          classNames: { popup: { root: popupClassName } },
           getPopupContainer: () => autoCompleteRef.current ?? document.body,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
           styles: {
             popup: {
               root: {
-                left: autoCompleteRef.current
-                  ? getElementLeft(autoCompleteRef.current)
-                  : undefined,
+                left: popupLeft,
                 right: "auto",
               },
             },

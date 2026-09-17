@@ -5,9 +5,8 @@ import { DefaultOptionType } from "antd/es/select";
 import Icon from "../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { generateRandomStr } from "hsu-utils";
-import { useSelectComposition, useSelectPopupPosition } from "./_hooks";
-import { getElementLeft, calculatePopupWidth, filterOption } from "./_utils";
+import { useSelectComposition, useSelectPopupLeft } from "./_hooks";
+import { calculatePopupWidth, filterOption } from "./_utils";
 import { Prefix } from "./_components/Prefix";
 import { Suffix } from "./_components/Suffix";
 import { isLegacyHasSelectorBrowser } from "../../utils/cssSupports";
@@ -90,11 +89,12 @@ const Select = ((props: SelectProps) => {
     useState<boolean>(true);
   const legacyHasSelector = isLegacyHasSelectorBrowser();
 
-  const cls = useMemo(() => generateRandomStr(10), []);
-
   const { isComposing } = useSelectComposition({ onSearch });
 
-  useSelectPopupPosition(selectRef, open, cls);
+  /* 浮层的 left 按**外壳**（`.select` 那层带边框与 11px 内边距的 div）测，其余定位交给
+     antd —— 外壳比 antd 自己的触发节点靠左 12px，而浮层宽度是按外壳给的，照 antd 的
+     left 摆会整体右移、右边探出控件。详见 `useSelectPopupLeft`。 */
+  const popupLeft = useSelectPopupLeft(selectRef, open);
 
   const selectWidth = selectRef.current ? selectRef.current.offsetWidth : 0;
 
@@ -306,16 +306,14 @@ const Select = ((props: SelectProps) => {
           }),
           // v6 replaced `popupClassName` / `dropdownStyle` with the `popup.root` semantic slot.
           // The public `popupClassName` prop of this component is kept as-is for consumers.
-          classNames: { popup: { root: `${cls} ${popupClassName ?? ""}` } },
+          classNames: { popup: { root: popupClassName } },
           getPopupContainer: () => selectRef.current ?? document.body,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
           styles: {
             popup: {
               root: {
-                left: selectRef.current
-                  ? getElementLeft(selectRef.current)
-                  : undefined,
+                left: popupLeft,
                 right: "auto",
               },
             },
