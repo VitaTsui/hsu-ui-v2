@@ -38,3 +38,47 @@ describe("TreeSelect 的开合回调归属", () => {
     });
   });
 });
+
+/**
+ * 浮层的宽度和 left 是拿选择器根节点的实际几何算出来的（`popupMatchSelectWidth`
+ * 与 `styles.popup.root.left`）。根节点从前是靠 antd 渲染期回调 `getPopupContainer`
+ * 的副作用捞到的，现在改成从 antd 的 ref 拿 —— 这条守的是「换了拿法之后定位能力还在」。
+ */
+const selectRoot = (container: HTMLElement) =>
+  container.querySelector(".ant-select") as HTMLElement;
+
+describe("TreeSelect 的浮层定位", () => {
+  it("浮层挂进选择器根节点，宽度与 left 取自根节点的实际几何", async () => {
+    const { container } = render(
+      <TreeSelect treeData={TREE_DATA} popupClassName="probe-popup" />,
+    );
+    const root = selectRoot(container);
+    Object.defineProperty(root, "offsetWidth", {
+      configurable: true,
+      value: 234,
+    });
+    root.getBoundingClientRect = () =>
+      ({
+        left: 57,
+        top: 0,
+        right: 291,
+        bottom: 0,
+        width: 234,
+        height: 0,
+        x: 57,
+        y: 0,
+        toJSON: () => ({}),
+      }) as DOMRect;
+
+    fireEvent.mouseDown(selector(container));
+
+    const popup = await waitFor(() => {
+      const el = root.querySelector(".probe-popup") as HTMLElement;
+      expect(el).toBeTruthy();
+      return el;
+    });
+
+    expect(popup.style.width).toBe("234px");
+    expect(popup.style.left).toBe("57px");
+  });
+});
