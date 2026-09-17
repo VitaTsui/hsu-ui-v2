@@ -153,11 +153,32 @@ CSS 变量自己监听 `html[data-theme="dark"]`；antd 的令牌是 JS 算的�
 --vita-background   页面画布      --vita-surface     卡片 / 面板
 --vita-muted        次级背景      --vita-hover       行 / 项 hover
 --vita-border       边框          --vita-border-weak 更浅的分隔线
---vita-foreground   主文字        --vita-muted-foreground / --vita-subtle-foreground
+--vita-foreground   主文字        --vita-muted-foreground  次级文字
+--vita-placeholder-foreground  占位文字     --vita-subtle-foreground  禁用态 / 装饰性图标
 --vita-success / --vita-warning / --vita-error
 --vita-radius-xs|sm|base|lg       --vita-shadow-1|2|3
 --vita-focus-ring / --vita-focus-ring-error
 ```
+
+#### 文字四档怎么选
+
+四档按**无障碍要求**分，不按深浅分 —— 选错档的代价是文字读不清，而且不报错、不告警：
+
+| 令牌 | 用在哪 | 门槛 |
+| --- | --- | --- |
+| `--vita-foreground` | 正文、表单值 | 远高于 AA |
+| `--vita-muted-foreground` | 次级文字：说明、描述、空态文案、面包屑 | WCAG 1.4.3 正文 **4.5:1** |
+| `--vita-placeholder-foreground` | 输入框占位符 | 占位符是**普通文字**，同样 **4.5:1** |
+| `--vita-subtle-foreground` | 禁用态、装饰性图标与分隔符 | 1.4.3 豁免非活动控件，按 1.4.11 非文本仍要 **3:1** |
+
+**`--vita-subtle-foreground` 不要用于任何需要阅读的文字。**它按「看得出不能用」来定值，
+读起来本来就吃力；空态文案、次要说明这类要读的东西一律用 `--vita-muted-foreground`。
+
+占位符单独一档，是因为 antd 默认把占位与禁用接在同一个令牌上（`colorTextQuaternary`），
+而这两件事的要求正好相反 —— 占位要读得清，禁用要看得出不能用，共用一个值必有一边是错的。
+本库在 `toAntdTheme` 里把 `colorTextPlaceholder` 单独接了出来，两边各归各位。
+
+`src/styles/contrast.test.ts` 会现算这几档的对比度，调浅到不达标直接跑挂。
 
 #### 从 `--cf-*` 迁移
 

@@ -29,7 +29,16 @@ export interface HsuThemeTokens {
   foreground: string;
   /** Secondary text */
   mutedForeground: string;
-  /** Placeholder / disabled text */
+  /**
+   * Placeholder text. Regulated by WCAG 1.4.3 like any other text, so it is held to 4.5:1 —
+   * which is why it is a token of its own and not a reuse of `subtleForeground`.
+   */
+  placeholderForeground: string;
+  /**
+   * Disabled states and decorative icons — everything WCAG exempts from the 4.5:1 text rule
+   * (1.4.3 "Incidental": inactive components) but still holds to 3:1 as non-text (1.4.11).
+   * **Not for text anyone is meant to read**; that is `mutedForeground`.
+   */
   subtleForeground: string;
   /** Row / item hover background */
   hover: string;
@@ -156,17 +165,19 @@ export const toAntdTheme = (options?: {
 
     colorText: t.foreground,
     colorTextSecondary: t.mutedForeground,
-    // antd 有四档文字色，本套令牌只有三档，压缩时分界线要放对：
-    // tertiary 在 antd 里是**描述性的可读文字**（面包屑、表单 extra、Descriptions 的
-    // 标签都吃它），quaternary 才是占位与禁用。原来两档都指向 subtleForeground，
-    // 于是面包屑拿到了占位级的对比度 —— 浅色下 #a1a1aa 压白只有 2.56:1，
-    // 14px 正文按 WCAG AA 要 4.5:1，连大字号的 3:1 都不到（消费方实测）。
+    // antd 有四档文字色，本套令牌按**无障碍要求**分档，不按深浅分档：
+    // tertiary 是描述性的可读文字（面包屑、表单 extra、Descriptions 的标签），归 muted；
+    // quaternary 是禁用态，WCAG 1.4.3 明文豁免（"Incidental"：非活动控件），留在 subtle；
+    // placeholder 是**普通文字**，一条豁免都不沾，所以单独成档、必须过 4.5:1。
     //
-    // 压深 subtleForeground 治不了：要够 4.5:1 得到 #767676，那已经和
-    // mutedForeground(#71717a, 4.83:1) 几乎同色，第三档等于不存在。
-    // 所以按语义分流 —— 可读的归 muted，只有占位/禁用留在 subtle。
+    // antd 默认把 placeholder 与 disabled 都接在 quaternary 上（alias.js:60），
+    // 这两件事的要求是相反的 —— 占位要读得清，禁用要看得出不能用。让它们共用一个值，
+    // 不管往哪边调都有一边是错的：浅色下 #a1a1aa 压白只有 2.56:1（占位读不清），
+    // 而够 4.5:1 的灰已经和 mutedForeground(#71717a) 同色（禁用看着像可用）。
+    // 所以不是去调那一个值，而是把 placeholder 从 quaternary 上摘下来单独给值。
     colorTextTertiary: t.mutedForeground,
     colorTextQuaternary: t.subtleForeground,
+    colorTextPlaceholder: t.placeholderForeground,
 
     colorBgContainer: t.surface,
     colorBgElevated: t.surface,
