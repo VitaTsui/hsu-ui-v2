@@ -1,12 +1,28 @@
-import { Select as AntdSelect, SelectProps as AntdSelectProps } from "antd";
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ConfigProvider,
+  Select as AntdSelect,
+  SelectProps as AntdSelectProps,
+} from "antd";
+import React, {
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { SelectRef } from "../../types/antd";
 import { DefaultOptionType } from "antd/es/select";
 import Icon from "../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { useSelectComposition, useSelectPopupRect } from "./_hooks";
-import { calculatePopupWidth, filterOption } from "./_utils";
+import { useSelectComposition, useSelectPopupMetrics } from "./_hooks";
+import {
+  buildSelectPopupPlacements,
+  calculatePopupWidth,
+  filterOption,
+} from "./_utils";
 import { Prefix } from "./_components/Prefix";
 import { Suffix } from "./_components/Suffix";
 import { isLegacyHasSelectorBrowser } from "../../utils/cssSupports";
@@ -78,7 +94,17 @@ const Select = ((props: SelectProps) => {
     ...antdSelctConfig
   } = props;
   const [focused, setFocused] = useState<boolean>(false);
-  const ref = useRef<SelectRef>(null);
+  const ref = useRef<SelectRef | null>(null);
+  /* antd 自己的触发节点（`.ant-select`）。浮层的横向定位由 antd 对着它算，而外壳比它
+     宽出一圈边框＋内边距（有 prefix 时更多），所以要量一次这个差补给 antd。
+     `BaseSelectRef.nativeElement` 就是那个根节点，回调 ref 在**提交阶段**执行，
+     早于 `useSelectPopupMetrics` 的 `useLayoutEffect`，首开就已经量得到。 */
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const attachSelect = useCallback((instance: SelectRef | null) => {
+    ref.current = instance;
+    triggerRef.current =
+      (instance?.nativeElement as HTMLElement | undefined) ?? null;
+  }, []);
   const selectRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<boolean>(false);
   /** 外壳装饰区被按下时的 `open`；null 表示这一次按下不归外壳管（落在 antd 自己的区域里） */
@@ -91,14 +117,19 @@ const Select = ((props: SelectProps) => {
 
   const { isComposing } = useSelectComposition({ onSearch });
 
-  /* 浮层的 left 与宽度都按**外壳**（`.select` 那层带边框与 11px 内边距的 div）测，其余
-     定位交给 antd —— 外壳比 antd 自己的触发节点靠左 12px，而浮层宽度是按外壳给的，照
-     antd 的 left 摆会整体右移、右边探出控件。宽度从前是渲染期读一次 `offsetWidth` 就
-     定死，控件变宽时组件不重渲染，浮层宽度就不跟；现在和 left 搭同一个
-     `ResizeObserver`。详见 `useSelectPopupRect`。 */
-  const { left: popupLeft, width: selectWidth } = useSelectPopupRect(
-    selectRef,
-    open,
+  /* 浮层宽度按**外壳**（`.select` 那层带边框与 11px 内边距的 div）给，横向位置则整条
+     交给 antd —— 只把「外壳比 antd 触发节点宽出来的那一圈」量出来，做成定位表里的
+     `offset` 补给 antd。从前是量出外壳 left 再用 `styles.popup.root.left` 盖掉 antd
+     那一份，连带把横向贴边收拢（`adjustX`）一起盖没了。详见 `useSelectPopupMetrics`。 */
+  const {
+    width: selectWidth,
+    insetStart,
+    insetEnd,
+  } = useSelectPopupMetrics(selectRef, triggerRef, open);
+  const { popupOverflow } = useContext(ConfigProvider.ConfigContext);
+  const builtinPlacements = useMemo(
+    () => buildSelectPopupPlacements(insetStart, insetEnd, popupOverflow),
+    [insetStart, insetEnd, popupOverflow],
   );
 
   const calculatedPopupWidth = popupMatchContentWidth
@@ -313,18 +344,11 @@ const Select = ((props: SelectProps) => {
           getPopupContainer: () => selectRef.current ?? document.body,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
-          styles: {
-            popup: {
-              root: {
-                left: popupLeft,
-                right: "auto",
-              },
-            },
-          },
+          builtinPlacements,
           suffixIcon: customSuffixIcon ?? <Icon icon="ep:arrow-down" />,
           placement,
         }}
-        ref={ref}
+        ref={attachSelect}
         disabled={disabled}
       />
       {suffix && <Suffix suffix={suffix} />}

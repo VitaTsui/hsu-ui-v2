@@ -1,7 +1,8 @@
-import { AutoComplete, AutoCompleteProps } from "antd";
+import { AutoComplete, AutoCompleteProps, ConfigProvider } from "antd";
 import React, {
   ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -11,8 +12,9 @@ import classNames from "classnames";
 import styles from "./index.module.scss";
 import { Prefix } from "../_components/Prefix";
 import { Suffix } from "../_components/Suffix";
-import { useSelectComposition, useSelectPopupRect } from "../_hooks";
-import { calculatePopupWidth } from "../_utils";
+import { useSelectComposition, useSelectPopupMetrics } from "../_hooks";
+import { buildSelectPopupPlacements, calculatePopupWidth } from "../_utils";
+import type { SelectRef } from "../../../types/antd";
 import Icon from "../../Icon";
 import { isLegacyHasSelectorBrowser } from "../../../utils/cssSupports";
 
@@ -66,6 +68,13 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   } = props;
   const [focused, setFocused] = useState<boolean>(false);
   const autoCompleteRef = useRef<HTMLDivElement>(null);
+  /* antd 自己的触发节点（`.ant-select`）；外壳比它宽出一圈边框＋内边距（有 prefix 时
+     更多），要量一次这个差补给 antd 的定位表。详见 `useSelectPopupMetrics`。 */
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const attachAutoComplete = useCallback((instance: SelectRef | null) => {
+    triggerRef.current =
+      (instance?.nativeElement as HTMLElement | undefined) ?? null;
+  }, []);
   const [open, setOpen] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const [legacyHasErrorStatus, setLegacyHasErrorStatus] =
@@ -146,10 +155,16 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   // the controlled state from drifting and leaving an empty popup behind
   const mergedOpen = open && filteredOptions.length > 0;
 
-  /* 浮层的 left 与宽度都按外壳测，其余定位交给 antd，详见 `useSelectPopupRect`。 */
-  const { left: popupLeft, width: autoCompleteWidth } = useSelectPopupRect(
-    autoCompleteRef,
-    mergedOpen,
+  /* 浮层宽度按外壳给，横向位置整条交给 antd，详见 `useSelectPopupMetrics`。 */
+  const {
+    width: autoCompleteWidth,
+    insetStart,
+    insetEnd,
+  } = useSelectPopupMetrics(autoCompleteRef, triggerRef, mergedOpen);
+  const { popupOverflow } = useContext(ConfigProvider.ConfigContext);
+  const builtinPlacements = useMemo(
+    () => buildSelectPopupPlacements(insetStart, insetEnd, popupOverflow),
+    [insetStart, insetEnd, popupOverflow],
   );
 
   const calculatedPopupWidth = popupMatchContentWidth
@@ -269,14 +284,7 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
           getPopupContainer: () => autoCompleteRef.current ?? document.body,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
-          styles: {
-            popup: {
-              root: {
-                left: popupLeft,
-                right: "auto",
-              },
-            },
-          },
+          builtinPlacements,
           placement,
           disabled,
           suffixIcon: <Icon icon="ep:arrow-down" />,
@@ -284,6 +292,7 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
             setOpen(false);
           },
         }}
+        ref={attachAutoComplete}
       />
       {suffix && <Suffix suffix={suffix} />}
     </div>
