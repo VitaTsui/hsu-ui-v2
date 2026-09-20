@@ -14,7 +14,7 @@ import type { TreeSelectRef } from "../../../types/antd";
 import Icon from "../../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { useSelectComposition, useSelectPopupRect } from "../_hooks";
+import { useSelectComposition, useSelectPopupMetrics } from "../_hooks";
 import {
   getExpandedKeysByLevel,
   getInitialTreeExpandedKeys,
@@ -78,20 +78,26 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
         从第二次展开起把浮层顶到 `body.offsetHeight + 4` ≈ 941px，直接掉出可视区。
 
      改成从 antd 自己的 ref 拿：`BaseSelectRef.nativeElement` 就是那个根节点。回调 ref 在
-     **提交阶段**执行，早于 `useSelectPopupRect` 的 `useLayoutEffect`，也早于绘制 ——
-     首开就已经有宽度和 left，不像从前要等那次「警告顺带触发的重渲染」才补上。 */
+     **提交阶段**执行，早于 `useSelectPopupMetrics` 的 `useLayoutEffect`，也早于绘制 ——
+     首开就已经有宽度，不像从前要等那次「警告顺带触发的重渲染」才补上。 */
   const attachContainer = useCallback((instance: TreeSelectRef | null) => {
     containerRef.current = (instance?.nativeElement as HTMLDivElement) ?? null;
   }, []);
   const { isComposing } = useSelectComposition({ onSearch });
   const [open, setOpen] = useState<boolean>(false);
 
-  /* `TreeSelect` 没有外壳，根节点就是 antd 自己的触发节点，所以这里量出来的 left 与
-     antd 算的是同一个值；保持和 `Select` / `AutoCompleteSelect` 同一套写法，不另开一条。
-     宽度也从这里出：从前是渲染期读一次 `containerElement.offsetWidth`，控件变宽时组件
-     不重渲染，浮层宽度就钉在展开那一刻的旧值上。详见 `useSelectPopupRect`。 */
-  const { left: popupLeft, width: containerWidth } = useSelectPopupRect(
+  /* 这里只要宽度：从前是渲染期读一次 `containerElement.offsetWidth`，控件变宽时组件
+     不重渲染，浮层宽度就钉在展开那一刻的旧值上。详见 `useSelectPopupMetrics`。
+
+     横向位置一个字都不用管 —— `TreeSelect` 没有外壳，根节点就是 antd 自己的触发节点。
+     2.8.1~2.8.3 这里也跟着 `Select` 写了一份 `styles.popup.root.left`，量的是同一个
+     节点、算出来就是 antd 自己那份（实测 leftDiff = −0.01px），纯属空转；而内联
+     `popupStyle` 在 `@rc-component/trigger` 里最后展开（`es/Popup/index.js:169`），
+     把 antd 的 `offsetStyle.left` 整条盖掉，顺手把横向贴边收拢（`adjustX`）也盖没了。
+     所以那份覆盖直接删掉，不留。 */
+  const { width: containerWidth } = useSelectPopupMetrics(
     containerRef,
+    null,
     open,
   );
 
@@ -214,7 +220,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       treeData={treeData}
       {...(treeExpandedKeys !== undefined && { treeExpandedKeys })}
       onTreeExpand={handleTreeExpand}
-      /* `open` 由 `useSelectPopupLeft` 用着，所以这里必须自己记一份；但记完要把
+      /* `open` 由 `useSelectPopupMetrics` 用着，所以这里必须自己记一份；但记完要把
          消费方自己传的 `onOpenChange` 原样往下叫一声。从前这里只写 `setOpen`，它排在
          `{...antdTreeSelectConfig}` 展开之后，于是消费方传进来的那个被整个盖掉、
          静默丢失 —— 和 2.7.1 修基础 `Select` 时是同一个毛病。 */
@@ -251,15 +257,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       popupMatchSelectWidth={
         popupMatchSelectWidth ?? (containerWidth || undefined)
       }
-      styles={{
-        popup: {
-          root: {
-            ...dropdownStyle,
-            left: popupLeft,
-            right: "auto",
-          },
-        },
-      }}
+      styles={{ popup: { root: dropdownStyle } }}
       suffixIcon={<Icon icon="ep:arrow-down" />}
       ref={attachContainer}
     />

@@ -1,5 +1,4 @@
 export { useSelectComposition } from "./useSelectComposition";
 export { useSelectInputOptions } from "./useSelectInputOptions";
-export { useSelectPopupRect } from "./useSelectPopupRect";
-export type { SelectPopupRect } from "./useSelectPopupRect";
-
+export { useSelectPopupMetrics } from "./useSelectPopupMetrics";
+export type { SelectPopupMetrics } from "./useSelectPopupMetrics";

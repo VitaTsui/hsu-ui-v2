@@ -2,21 +2,20 @@ import React from "react";
 import { describe, expect, it } from "vitest";
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 
-import Select from ".";
 import TreeSelect from "./TreeSelect";
 
 /**
- * 浮层的 left 从「`setInterval(…, 1)` 每毫秒重算一遍」换成事件驱动
- * （`useSelectPopupRect`：`ResizeObserver` ＋ 捕获阶段的 `scroll` ＋ 窗口 `resize`）。
- * 这一组守三件事：
+ * 浮层的测量从「`setInterval(…, 1)` 每毫秒重算一遍」换成事件驱动
+ * （`useSelectPopupMetrics` 的 `ResizeObserver`）。这一组守两件事：
  *
  * 1. 浮层开着的时候**没有任何定时器在重复测量**；
- * 2. 控件横向移动了（resize / 滚动）浮层要跟上 —— 旧实现里这一项是靠轮询兜的，
- *    而且首开时轮询根本没建起来，所以旧实现在首开后 resize 会偏（实测 156px）；
- * 3. 不再用 `popup.style.display` 内联覆盖 antd 自己的隐藏类。
+ * 2. 不再用 `popup.style.display` 内联覆盖 antd 自己的隐藏类。
+ *
+ * 横坐标本身已经整条还给 antd（见 `popupPlacement.test.tsx`），宽度跟随见
+ * `popupWidth.test.tsx`。
  *
  * jsdom 量不到真实几何，所以这里把根节点的 `getBoundingClientRect` 换成可控的桩，
- * 只验「读没读、跟没跟」，真实像素在浏览器里量。
+ * 只验「读没读」，真实像素在浏览器里量。
  */
 
 const TREE_DATA = [
@@ -58,7 +57,7 @@ const wait = (ms: number) =>
     });
   });
 
-describe("浮层的 left 不再靠轮询", () => {
+describe("浮层的测量不再靠轮询", () => {
   it("浮层开着的时候没有定时器在反复测量触发元素", async () => {
     const { container } = render(
       <TreeSelect treeData={TREE_DATA} popupClassName="probe-popup" />,
@@ -77,80 +76,6 @@ describe("浮层的 left 不再靠轮询", () => {
     await wait(300);
 
     expect(rect.reads - readsAfterOpen).toBeLessThan(10);
-  });
-
-  it("窗口 resize 之后 left 跟着触发元素走", async () => {
-    const { container } = render(
-      <TreeSelect treeData={TREE_DATA} popupClassName="probe-popup" />,
-    );
-    const root = container.querySelector(".ant-select") as HTMLElement;
-    const rect = stubRect(root, 57);
-
-    fireEvent.mouseDown(selector(container));
-    const popup = await waitFor(() => {
-      const el = root.querySelector(".probe-popup") as HTMLElement;
-      expect(el).toBeTruthy();
-      return el;
-    });
-    expect(popup.style.left).toBe("57px");
-
-    // 控件横向移动了，但没有任何东西让组件重渲染
-    rect.left = 213;
-    await act(async () => {
-      window.dispatchEvent(new Event("resize"));
-    });
-
-    expect(popup.style.left).toBe("213px");
-  });
-
-  it("祖先滚动之后 left 跟着触发元素走", async () => {
-    const { container } = render(
-      <TreeSelect treeData={TREE_DATA} popupClassName="probe-popup" />,
-    );
-    const root = container.querySelector(".ant-select") as HTMLElement;
-    const rect = stubRect(root, 57);
-
-    fireEvent.mouseDown(selector(container));
-    const popup = await waitFor(() => {
-      const el = root.querySelector(".probe-popup") as HTMLElement;
-      expect(el).toBeTruthy();
-      return el;
-    });
-
-    rect.left = 91;
-    // scroll 不冒泡，靠的是 window 上的捕获阶段监听
-    await act(async () => {
-      root.dispatchEvent(new Event("scroll", { bubbles: false }));
-    });
-
-    expect(popup.style.left).toBe("91px");
-  });
-
-  it("基础 Select 的 left 按外壳算，resize 之后照样跟得上", async () => {
-    const { container } = render(
-      <Select
-        options={[{ label: "甲", value: "a" }]}
-        popupClassName="probe-popup"
-      />,
-    );
-    // 外壳是最外面那层 div（带边框与 11px 内边距），比 antd 自己的触发节点靠左 12px
-    const shell = container.firstElementChild as HTMLElement;
-    const rect = stubRect(shell, 57);
-
-    fireEvent.mouseDown(selector(container));
-    const popup = await waitFor(() => {
-      const el = shell.querySelector(".probe-popup") as HTMLElement;
-      expect(el).toBeTruthy();
-      return el;
-    });
-    expect(popup.style.left).toBe("57px");
-
-    rect.left = 160;
-    await act(async () => {
-      window.dispatchEvent(new Event("resize"));
-    });
-
-    expect(popup.style.left).toBe("160px");
   });
 });
 

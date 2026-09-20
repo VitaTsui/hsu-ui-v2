@@ -5,7 +5,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import TreeSelect from ".";
 
 /**
- * `open` 在这个组件里是自己记一份的（`useSelectPopupLeft` 要用），
+ * `open` 在这个组件里是自己记一份的（`useSelectPopupMetrics` 要用），
  * 但从前落地时只写了 `onOpenChange={setOpen}`，而且它排在
  * `{...antdTreeSelectConfig}` 展开**之后** —— 消费方自己传的那个被整个盖掉，
  * 静默丢失。和 2.7.1 修基础 `Select` 时是同一个毛病，只是当时没顺手核同族。
@@ -40,15 +40,17 @@ describe("TreeSelect 的开合回调归属", () => {
 });
 
 /**
- * 浮层的宽度和 left 是拿选择器根节点的实际几何算出来的（`popupMatchSelectWidth`
- * 与 `styles.popup.root.left`）。根节点从前是靠 antd 渲染期回调 `getPopupContainer`
- * 的副作用捞到的，现在改成从 antd 的 ref 拿 —— 这条守的是「换了拿法之后定位能力还在」。
+ * 浮层宽度是拿选择器根节点的实际几何算出来的（`popupMatchSelectWidth`）。根节点从前
+ * 是靠 antd 渲染期回调 `getPopupContainer` 的副作用捞到的，现在改成从 antd 的 ref
+ * 拿 —— 这条守的是「换了拿法之后还量得到根节点」。
+ *
+ * 横坐标不在这里验：2.8.4 把它整条还给了 antd（见 `../popupPlacement.test.tsx`）。
  */
 const selectRoot = (container: HTMLElement) =>
   container.querySelector(".ant-select") as HTMLElement;
 
 describe("TreeSelect 的浮层定位", () => {
-  it("浮层挂进选择器根节点，宽度与 left 取自根节点的实际几何", async () => {
+  it("浮层挂进选择器根节点，宽度取自根节点的实际几何", async () => {
     const { container } = render(
       <TreeSelect treeData={TREE_DATA} popupClassName="probe-popup" />,
     );
@@ -79,6 +81,5 @@ describe("TreeSelect 的浮层定位", () => {
     });
 
     expect(popup.style.width).toBe("234px");
-    expect(popup.style.left).toBe("57px");
   });
 });
