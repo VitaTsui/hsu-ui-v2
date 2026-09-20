@@ -14,7 +14,7 @@ import type { TreeSelectRef } from "../../../types/antd";
 import Icon from "../../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { useSelectComposition, useSelectPopupLeft } from "../_hooks";
+import { useSelectComposition, useSelectPopupRect } from "../_hooks";
 import {
   getExpandedKeysByLevel,
   getInitialTreeExpandedKeys,
@@ -61,15 +61,13 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     ...antdTreeSelectConfig
   } = props;
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [containerElement, setContainerElement] =
-    useState<HTMLDivElement | null>(null);
 
   /* 这个组件要拿自己的根节点（带 `styles.treeSelect` 类名的那个 `.ant-select`）来干三件事：
      给浮层算宽度、算 left、以及当浮层的挂载容器。从前它是从 `getPopupContainer` 的
      参数里爬出来的，两处都错：
 
      1. `getPopupContainer` 是 antd 的 Portal **在渲染期**调的回调，从前在里面直接
-        `setContainerElement()` —— 在别的组件渲染过程中改自己的 state，React 每次首开
+        `setState` 把节点存下来 —— 在别的组件渲染过程中改自己的 state，React 每次首开
         都报 `Cannot update a component (TreeSelect) while rendering a different
         component (Portal)`。
      2. 爬法本身写错了：`triggerNode` 传进来的就是根节点本人，而代码写的是
@@ -80,19 +78,22 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
         从第二次展开起把浮层顶到 `body.offsetHeight + 4` ≈ 941px，直接掉出可视区。
 
      改成从 antd 自己的 ref 拿：`BaseSelectRef.nativeElement` 就是那个根节点。回调 ref 在
-     **提交阶段**执行，在里面 setState 合法，而且早于绘制 —— 首开就已经有宽度和 left，
-     不像从前要等那次「警告顺带触发的重渲染」才补上。 */
+     **提交阶段**执行，早于 `useSelectPopupRect` 的 `useLayoutEffect`，也早于绘制 ——
+     首开就已经有宽度和 left，不像从前要等那次「警告顺带触发的重渲染」才补上。 */
   const attachContainer = useCallback((instance: TreeSelectRef | null) => {
-    const container = (instance?.nativeElement as HTMLDivElement) ?? null;
-    containerRef.current = container;
-    setContainerElement(container);
+    containerRef.current = (instance?.nativeElement as HTMLDivElement) ?? null;
   }, []);
   const { isComposing } = useSelectComposition({ onSearch });
   const [open, setOpen] = useState<boolean>(false);
 
   /* `TreeSelect` 没有外壳，根节点就是 antd 自己的触发节点，所以这里量出来的 left 与
-     antd 算的是同一个值；保持和 `Select` / `AutoCompleteSelect` 同一套写法，不另开一条。 */
-  const popupLeft = useSelectPopupLeft(containerRef, open);
+     antd 算的是同一个值；保持和 `Select` / `AutoCompleteSelect` 同一套写法，不另开一条。
+     宽度也从这里出：从前是渲染期读一次 `containerElement.offsetWidth`，控件变宽时组件
+     不重渲染，浮层宽度就钉在展开那一刻的旧值上。详见 `useSelectPopupRect`。 */
+  const { left: popupLeft, width: containerWidth } = useSelectPopupRect(
+    containerRef,
+    open,
+  );
 
   const style = useMemo<CSSProperties>(
     () =>
@@ -248,8 +249,7 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       classNames={{ popup: { root: popupClassName } }}
       style={style}
       popupMatchSelectWidth={
-        popupMatchSelectWidth ??
-        (containerElement ? containerElement.offsetWidth : undefined)
+        popupMatchSelectWidth ?? (containerWidth || undefined)
       }
       styles={{
         popup: {

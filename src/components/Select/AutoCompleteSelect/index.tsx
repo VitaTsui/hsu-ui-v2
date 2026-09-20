@@ -11,7 +11,7 @@ import classNames from "classnames";
 import styles from "./index.module.scss";
 import { Prefix } from "../_components/Prefix";
 import { Suffix } from "../_components/Suffix";
-import { useSelectComposition, useSelectPopupLeft } from "../_hooks";
+import { useSelectComposition, useSelectPopupRect } from "../_hooks";
 import { calculatePopupWidth } from "../_utils";
 import Icon from "../../Icon";
 import { isLegacyHasSelectorBrowser } from "../../../utils/cssSupports";
@@ -86,21 +86,6 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   // (an in-progress pinyin input must not wipe out the option list)
   const { isComposing } = useSelectComposition({ onSearch: handleSearch });
 
-  const autoCompleteWidth = autoCompleteRef.current
-    ? autoCompleteRef.current.offsetWidth
-    : 0;
-
-  const calculatedPopupWidth = popupMatchContentWidth
-    ? calculatePopupWidth({
-        options: options?.map((opt) => ({
-          label: opt.label ?? opt.value,
-          value: opt.value,
-        })),
-        selectWidth: autoCompleteWidth,
-        optionFontSize,
-      })
-    : autoCompleteWidth;
-
   // Convert options into the format AutoComplete requires
   const autoCompleteOptions = useMemo(() => {
     return options?.map((option) => {
@@ -161,8 +146,22 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
   // the controlled state from drifting and leaving an empty popup behind
   const mergedOpen = open && filteredOptions.length > 0;
 
-  /* 浮层的 left 按外壳测，其余定位交给 antd，详见 `useSelectPopupLeft`。 */
-  const popupLeft = useSelectPopupLeft(autoCompleteRef, mergedOpen);
+  /* 浮层的 left 与宽度都按外壳测，其余定位交给 antd，详见 `useSelectPopupRect`。 */
+  const { left: popupLeft, width: autoCompleteWidth } = useSelectPopupRect(
+    autoCompleteRef,
+    mergedOpen,
+  );
+
+  const calculatedPopupWidth = popupMatchContentWidth
+    ? calculatePopupWidth({
+        options: options?.map((opt) => ({
+          label: opt.label ?? opt.value,
+          value: opt.value,
+        })),
+        selectWidth: autoCompleteWidth,
+        optionFontSize,
+      })
+    : autoCompleteWidth;
 
   useEffect(() => {
     if (!legacyHasSelector) {

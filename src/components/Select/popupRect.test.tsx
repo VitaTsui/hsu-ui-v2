@@ -7,7 +7,7 @@ import TreeSelect from "./TreeSelect";
 
 /**
  * 浮层的 left 从「`setInterval(…, 1)` 每毫秒重算一遍」换成事件驱动
- * （`useSelectPopupLeft`：`ResizeObserver` ＋ 捕获阶段的 `scroll` ＋ 窗口 `resize`）。
+ * （`useSelectPopupRect`：`ResizeObserver` ＋ 捕获阶段的 `scroll` ＋ 窗口 `resize`）。
  * 这一组守三件事：
  *
  * 1. 浮层开着的时候**没有任何定时器在重复测量**；

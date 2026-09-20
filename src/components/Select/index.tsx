@@ -5,7 +5,7 @@ import { DefaultOptionType } from "antd/es/select";
 import Icon from "../Icon";
 import classNames from "classnames";
 import styles from "./index.module.scss";
-import { useSelectComposition, useSelectPopupLeft } from "./_hooks";
+import { useSelectComposition, useSelectPopupRect } from "./_hooks";
 import { calculatePopupWidth, filterOption } from "./_utils";
 import { Prefix } from "./_components/Prefix";
 import { Suffix } from "./_components/Suffix";
@@ -91,12 +91,15 @@ const Select = ((props: SelectProps) => {
 
   const { isComposing } = useSelectComposition({ onSearch });
 
-  /* 浮层的 left 按**外壳**（`.select` 那层带边框与 11px 内边距的 div）测，其余定位交给
-     antd —— 外壳比 antd 自己的触发节点靠左 12px，而浮层宽度是按外壳给的，照 antd 的
-     left 摆会整体右移、右边探出控件。详见 `useSelectPopupLeft`。 */
-  const popupLeft = useSelectPopupLeft(selectRef, open);
-
-  const selectWidth = selectRef.current ? selectRef.current.offsetWidth : 0;
+  /* 浮层的 left 与宽度都按**外壳**（`.select` 那层带边框与 11px 内边距的 div）测，其余
+     定位交给 antd —— 外壳比 antd 自己的触发节点靠左 12px，而浮层宽度是按外壳给的，照
+     antd 的 left 摆会整体右移、右边探出控件。宽度从前是渲染期读一次 `offsetWidth` 就
+     定死，控件变宽时组件不重渲染，浮层宽度就不跟；现在和 left 搭同一个
+     `ResizeObserver`。详见 `useSelectPopupRect`。 */
+  const { left: popupLeft, width: selectWidth } = useSelectPopupRect(
+    selectRef,
+    open,
+  );
 
   const calculatedPopupWidth = popupMatchContentWidth
     ? calculatePopupWidth({
