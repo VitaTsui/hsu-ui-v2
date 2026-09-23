@@ -98,10 +98,6 @@
     }
   }
 
-  :global(.ant-table-tbody-virtual-scrollbar) {
-    display: none;
-  }
-
   :global(.ant-table-cell) {
     &.hidden {
       width: 0px !important;
@@ -228,6 +224,14 @@
           }
         }
       }
+    }
+
+    /* 虚拟模式：占满父级剩余高度，表体高度由 useVirtualScroll 按这一层量出来。
+       父级必须有确定高度（与 scroll 模式同一个前提）。 */
+    &.virtual {
+      flex: 1;
+      width: 100%;
+      min-height: 0px;
     }
 
     &.scroll {
