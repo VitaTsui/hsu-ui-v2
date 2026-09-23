@@ -66,6 +66,7 @@ Table.SELECTION_NONE
 | pagination | 分页配置；为 `false` 时不展示分页 | `false \| PaginationProps` | `{}` |
 | autoWidth | 列宽自适应 | `boolean` | - |
 | scrollAutoHeight | 自动计算并撑满可用高度 | `boolean` | `true` |
+| virtual | 虚拟滚动：只渲染可见的行与列，几千行、几十列的大表也不卡。**父级必须有确定高度**（表格撑满它、按它量出表体高度）；开启后 `scroll` / `scrollAutoHeight` 不再生效 | `boolean` | - |
 | hideScrollbar | 隐藏表头滚动条 | `boolean` | `true` |
 | thPadding | 表头单元格内边距 | `string` | - |
 | tdPadding | 表体单元格内边距 | `string` | - |

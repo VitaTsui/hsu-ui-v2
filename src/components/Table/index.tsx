@@ -23,11 +23,31 @@ import useScrollEnd from "./_hooks/useScrollEnd";
 import useEllipsisTooltip from "./_hooks/useEllipsisTooltip";
 import useTablePagination from "./_hooks/useTablePagination";
 import useTableColumns from "./_hooks/useTableColumns";
+import useVirtualScroll from "./_hooks/useVirtualScroll";
 
 export { Drag as TableDrag };
 
-export interface EllipsisTooltipConfig
-  extends Omit<TooltipProps, "title" | "children"> {
+/** 叶子列宽度之和（分组列展开到叶子；没写数字宽度的按 120 估） */
+const sumColumnsWidth = (cols?: readonly unknown[]): number =>
+  (cols ?? []).reduce<number>((sum, col) => {
+    const c = col as {
+      children?: unknown[];
+      width?: unknown;
+      hidden?: boolean;
+    };
+    if (c.children?.length) {
+      return sum + sumColumnsWidth(c.children);
+    }
+    if (c.hidden) {
+      return sum;
+    }
+    return sum + (typeof c.width === "number" ? c.width : 120);
+  }, 0);
+
+export interface EllipsisTooltipConfig extends Omit<
+  TooltipProps,
+  "title" | "children"
+> {
   ellipsisPosition?: "start" | "end";
   defaultWidth?: number; // Default Tooltip width (used when the column has no width set)
 }
@@ -60,8 +80,10 @@ export interface ColumnType<RecordType> extends AntColumnType<RecordType> {
    */
   measureText?: (record: RecordType) => string;
 }
-export interface ColumnsGroupType<RecordType>
-  extends Omit<AntColumnGroupType<RecordType>, "children"> {
+export interface ColumnsGroupType<RecordType> extends Omit<
+  AntColumnGroupType<RecordType>,
+  "children"
+> {
   title?: string;
   renderTitle?: (title: string) => ReactNode;
   titleSort?: (props: ColumnTitleProps<RecordType>) => ReactNode;
@@ -79,15 +101,13 @@ export interface ColumnsGroupType<RecordType>
   measureText?: (record: RecordType) => string;
 }
 export type ColumnsType<RecordType = AnyObject> = (
-  | ColumnType<RecordType>
-  | ColumnsGroupType<RecordType>
+  ColumnType<RecordType> | ColumnsGroupType<RecordType>
 )[];
 
-export interface TableProps<RecordType = AnyObject>
-  extends Omit<
-    AntdTableProps<RecordType>,
-    "scroll" | "pagination" | "columns"
-  > {
+export interface TableProps<RecordType = AnyObject> extends Omit<
+  AntdTableProps<RecordType>,
+  "scroll" | "pagination" | "columns"
+> {
   columns?: ColumnsType<RecordType>;
   scroll?: boolean | { y: boolean };
   autoWidth?: boolean;
@@ -126,7 +146,7 @@ export interface TableProps<RecordType = AnyObject>
 }
 
 type TableFC = (<T extends AnyObject>(
-  props: TableProps<T>
+  props: TableProps<T>,
 ) => JSX.Element | null) &
   React.FC<TableProps<AnyObject>> & {
     /** antd 的 `Table.Summary`，用来渲染合计行 */
@@ -199,6 +219,7 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
     ...paginationConfig
   } = typeof pagination === "boolean" ? ({} as PaginationProps) : pagination;
   const ref = useRef<HTMLDivElement>(null);
+  const antdTableRef = useRef<HTMLDivElement>(null);
   const cls = useMemo(() => generateRandomStr(10), []);
 
   const { enhanceColumns } = useEllipsisTooltip<T>(ellipsisTooltipConfig);
@@ -287,11 +308,22 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
     autoScrolling,
   });
 
+  const virtualScroll = useVirtualScroll({
+    enabled: Boolean(virtual),
+    mounted: _columns.length > 0,
+    wrapperRef: antdTableRef,
+    columnsWidth:
+      sumColumnsWidth(renderedColumns) +
+      (rowSelection ? 48 : 0) +
+      (expandable ? 48 : 0),
+  });
+
   if (!_columns.length) {
     return null;
   }
 
   const isScrollEnabled = Boolean(scroll && !virtual);
+  // 虚拟模式：表体高度由 useVirtualScroll 量出来的数字给（antd 只认数字），量到之前先不画表
   const isScrollYDisabled =
     typeof scroll === "object" && scroll.y === false && !virtual;
 
@@ -310,32 +342,42 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
         }
       >
         <div
+          ref={antdTableRef}
           className={classNames(styles.antdTable, tableClassName, {
             [styles.scroll]: isScrollEnabled,
+            [styles.virtual]: virtual,
             [styles["y-unScroll"]]: isScrollYDisabled,
             [styles.hideScrollbar]: hideScrollbar,
             [styles.hideEmpty]: hideEmpty,
             [styles.isExpandedCellTable]: isExpandedCellTable,
           })}
         >
-          <AntdTable
-            {...TableConfig}
-            bordered={bordered}
-            components={onDragEnd ? { body: { row: Drag.Row } } : undefined}
-            dataSource={paginatedDataSource}
-            columns={renderedColumns}
-            pagination={false}
-            scroll={isScrollEnabled ? { y: "" } : undefined}
-            expandable={
-              expandable ? { ...expandable, columnWidth: 48 } : undefined
-            }
-            className={antdTableClassName}
-            onChange={handleTableChange}
-            virtual={virtual}
-            rowSelection={
-              rowSelection ? { ...rowSelection, columnWidth: 48 } : undefined
-            }
-          />
+          {virtual && !virtualScroll ? null : (
+            <AntdTable
+              {...TableConfig}
+              bordered={bordered}
+              components={onDragEnd ? { body: { row: Drag.Row } } : undefined}
+              dataSource={paginatedDataSource}
+              columns={renderedColumns}
+              pagination={false}
+              scroll={
+                virtual
+                  ? virtualScroll
+                  : isScrollEnabled
+                    ? { y: "" }
+                    : undefined
+              }
+              expandable={
+                expandable ? { ...expandable, columnWidth: 48 } : undefined
+              }
+              className={antdTableClassName}
+              onChange={handleTableChange}
+              virtual={virtual}
+              rowSelection={
+                rowSelection ? { ...rowSelection, columnWidth: 48 } : undefined
+              }
+            />
+          )}
         </div>
         {pagination && (
           <Pagination
@@ -353,8 +395,8 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
               showTotal === false
                 ? undefined
                 : showTotal
-                ? showTotal
-                : (total) => `共 ${total} 条数据`
+                  ? showTotal
+                  : (total) => `共 ${total} 条数据`
             }
             {...paginationConfig}
           />
