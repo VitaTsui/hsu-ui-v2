@@ -84,11 +84,15 @@
     }
   }
 
+  // 弹窗整体被 `.content` 限在 90vh 内，正文区靠 flex: 1 ＋ min-height: 0 吃剩余高度——
+  // 这只是把盒子压矮，内容照样按自己的高度画出去。没有 overflow 的话，
+  // 内容一高就溢出弹窗框、盖到页脚按钮上。所以正文区自己滚。
   .body {
     flex: 1;
 
     min-height: 0px;
     padding: 0px 15px;
+    overflow: auto;
   }
 
   .footer {
