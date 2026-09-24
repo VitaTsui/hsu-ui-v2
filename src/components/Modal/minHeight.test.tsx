@@ -102,4 +102,15 @@ describe("Modal minHeight", () => {
       /min-height:\s*min\(var\(--vita-modal-min-height,\s*0px\),\s*90vh\)/
     );
   });
+
+  it("正文区自带滚动 —— 内容超过 90vh 不会溢出弹窗框、盖住页脚", () => {
+    const scss = fs.readFileSync(
+      path.resolve(__dirname, "index.module.scss"),
+      "utf8"
+    );
+    const body = scss.match(/\n  \.body \{([^}]*)\}/)?.[1] ?? "";
+
+    // 锚在行首：注释掉的 `// overflow: auto;` 不算数
+    expect(body).toMatch(/^\s*overflow:\s*auto;/m);
+  });
 });
