@@ -28,6 +28,23 @@
     overflow-y: auto;
   }
 
+  &:global(.ant-menu-inline):not(:global(.ant-menu-inline-collapsed)) {
+    // 浮动滚动条不占宽度，不能靠 scrollbar-gutter 提供菜单两侧的留白。
+    box-sizing: border-box;
+    padding-inline: 8px;
+
+    :global(.ant-menu-item),
+    :global(.ant-menu-submenu-title) {
+      width: 100%;
+      margin-inline: 0px;
+    }
+
+    // 与 rc-menu 为一级菜单项计算的行内 padding 共用同一个缩进值。
+    > :global(.ant-menu-item-group) > :global(.ant-menu-item-group-title) {
+      padding-inline: var(--menu-inline-indent, 16px);
+    }
+  }
+
   /* ===== 滚动条占位不许吃掉菜单项的内缩 =====
      上面那条规则把「谁滚」定在了菜单根上，但没有把几何契约收完：滚动条一旦
      **实占宽度**（消费方常见做法：槽宽恒定、只切 thumb 颜色，这样悬浮时不抖），
@@ -42,21 +59,14 @@
      重排」一并去掉）。槽宽由浏览器按该元素实际的滚动条算，**不是写死的 14px** ——
      消费方把滚动条改窄改宽，留白跟着变。
 
-     配套把菜单项自己的左右外边距清零：留白改由这条槽提供，不再叠加。不清的话
-     留白变成 `8 + 槽宽`（实测 22/24），230px 的侧栏里「MCP 连接器」直接被截断。
+     配套把菜单项自己的左右外边距清零：最小留白由根节点 padding 提供，滚动槽
+     另在两侧对称保留，不在每行再叠加一份 margin。
      纵向节奏与嵌套缩进不受影响 —— antd 的行内缩进走的是 padding，不是 margin。
 
-     `@supports` 兜底：不认这个属性的浏览器维持原样，不会两头落空。 */
+     `@supports` 兜底：不认这个属性的浏览器仍有根节点的最小留白。 */
   @supports (scrollbar-gutter: stable both-edges) {
     &:global(.ant-menu-inline) {
       scrollbar-gutter: stable both-edges;
-
-      :global(.ant-menu-item),
-      :global(.ant-menu-submenu-title) {
-        width: 100%;
-
-        margin-inline: 0px;
-      }
     }
   }
 

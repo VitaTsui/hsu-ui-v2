@@ -87,9 +87,18 @@ textarea,
 
 // Primary buttons are driven by the antd colorPrimary token (auto-picks color for light/dark appearance + correct hover/active derivation)
 
-.ant-menu-item,
-.ant-menu-submenu-title {
-  column-gap: 5px;
+.ant-menu:not(.ant-menu-inline-collapsed) {
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    // inline 模式是 flex，其他模式是 block；统一用 margin 表达实际间距，
+    // 避免 Ant Design 默认的图标 margin 与 column-gap 再叠加。
+    column-gap: 0;
+
+    > .ant-menu-item-icon + .ant-menu-title-content,
+    > .anticon + .ant-menu-title-content {
+      margin-inline-start: 4px;
+    }
+  }
 }
 
 // ===== Cloudflare style: side menu (shared by light/dark) =====
@@ -137,10 +146,8 @@ textarea,
     color: var(--vita-muted-foreground);
   }
 
-  // Items within a group use more restrained left-aligned indentation (closer to CF)
-  .ant-menu-item-group-list .ant-menu-item {
-    padding-left: 20px !important;
-  }
+  // 菜单项与子菜单标题的缩进交给 rc-menu 按 inlineIndent 和层级计算。
+  // 不覆盖它的行内 padding，否则所有嵌套项都会被压成相同缩进。
 }
 
 // ===== Cloudflare style: tables =====
