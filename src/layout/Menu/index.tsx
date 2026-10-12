@@ -63,7 +63,7 @@ const Menu: React.FC<MenuProps> = (props) => {
     style,
     theme = "dark",
     mode = "inline",
-    inlineIndent = 16,
+    inlineIndent = 12,
     getCurrChildItems,
     menuItems,
     onlyLvOneMenu = false,

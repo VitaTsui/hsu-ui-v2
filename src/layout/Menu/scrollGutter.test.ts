@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
  * 实际滚动条算），并把菜单项自己的左右外边距清零；最小留白由根节点 padding 提供，滚动槽两侧对称。
  *
  * 这条守卫只能扫源码：jsdom 不做布局，量不出滚动条占位。所以顺带把两种「硬拉回来」
- * 的写法也钉死 —— 写死滚动条宽度、或者用负 margin 把内容顶回去，换台机器就错开。
+ * 的写法也钉死 —— 写死系统滚动条的 14px/15px 占位、或者用负 margin 把内容顶回去，换台机器就错开。
  */
 
 const SCSS = fs.readFileSync(
@@ -33,7 +33,7 @@ describe("侧栏菜单的滚动条占位", () => {
     expect(SCSS).toMatch(/margin-inline:\s*0px/);
   });
 
-  it("不许写死滚动条宽度，也不许用负 margin 硬拉回来", () => {
+  it("不许按系统滚动条的 14px/15px 写死占位，也不许用负 margin 硬拉回来", () => {
     // 滚动条宽度按平台 / 用户设置变，写死会在别的机器上错开
     expect(SCSS).not.toMatch(/(?:width|margin|padding)[^;{}]*:\s*-?1[45]px/);
     expect(SCSS).not.toMatch(/margin[a-z-]*:\s*[^;{}]*-\d/);

@@ -74,7 +74,7 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
           itemColor: t.foreground,
           itemBorderRadius: 6,
           itemMarginInline: 8,
-          itemMarginBlock: 2,
+          itemMarginBlock: 8,
           itemHeight: 38,
           horizontalItemHoverBg: "#0000000a",
         },
