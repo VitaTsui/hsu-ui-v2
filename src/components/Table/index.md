@@ -67,13 +67,13 @@ Table.SELECTION_NONE
 | autoWidth | 列宽自适应 | `boolean` | - |
 | scrollAutoHeight | 自动计算并撑满可用高度 | `boolean` | `true` |
 | virtual | 虚拟滚动：只渲染可见的行与列，几千行、几十列的大表也不卡。**父级必须有确定高度**（表格撑满它、按它量出表体高度）；开启后 `scroll` / `scrollAutoHeight` 不再生效 | `boolean` | - |
-| hideScrollbar | 隐藏表头滚动条 | `boolean` | `true` |
+| hideScrollbar | 已废弃，表格滚动条始终隐藏（仍可滚动） | `boolean` | — |
 | thPadding | 表头单元格内边距 | `string` | - |
 | tdPadding | 表体单元格内边距 | `string` | - |
 | expandedCellPadding | 展开行单元格内边距 | `string` | `tdPadding` |
 | fillPanel | 撑满父级 Panel 高度 | `boolean` | - |
 | staticDataSource | 使用静态数据源（前端分页） | `boolean` | `false` |
-| serialNumberColumn | 是否展示序号列 | `boolean` | `false` |
+| serialNumberColumn | 是否展示独立的左侧固定序号列，展开按钮使用单独的左侧固定列 | `boolean` | `false` |
 | hideEmpty | 隐藏空数据占位 | `boolean` | `false` |
 | ellipsisTooltipConfig | 文本省略 Tooltip 配置 | `EllipsisTooltipConfig` | - |
 | onDragEnd | 行拖拽结束回调（开启后启用拖拽排序） | `DragProps["onDragEnd"]` | - |
