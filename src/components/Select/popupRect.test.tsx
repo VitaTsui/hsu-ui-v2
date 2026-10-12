@@ -67,7 +67,7 @@ describe("浮层的测量不再靠轮询", () => {
 
     fireEvent.mouseDown(selector(container));
     await waitFor(() => {
-      expect(root.querySelector(".probe-popup")).toBeTruthy();
+      expect(document.querySelector(".probe-popup")).toBeTruthy();
     });
 
     const readsAfterOpen = rect.reads;
@@ -89,7 +89,7 @@ describe("浮层的显隐归 antd 自己管", () => {
 
     fireEvent.mouseDown(selector(container));
     const popup = await waitFor(() => {
-      const el = root.querySelector(".probe-popup") as HTMLElement;
+      const el = document.querySelector(".probe-popup") as HTMLElement;
       expect(el).toBeTruthy();
       return el;
     });
@@ -106,7 +106,7 @@ describe("浮层的显隐归 antd 自己管", () => {
 
     fireEvent.mouseDown(selector(container));
     const popup = await waitFor(() => {
-      const el = root.querySelector(".probe-popup") as HTMLElement;
+      const el = document.querySelector(".probe-popup") as HTMLElement;
       expect(el).toBeTruthy();
       return el;
     });

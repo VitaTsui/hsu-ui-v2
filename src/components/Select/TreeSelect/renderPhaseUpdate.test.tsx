@@ -36,7 +36,7 @@ describe("TreeSelect 展开浮层", () => {
         container.querySelector(".ant-select-content") as HTMLElement,
       );
       await waitFor(() => {
-        expect(container.querySelector(".probe-popup")).toBeTruthy();
+        expect(document.querySelector(".probe-popup")).toBeTruthy();
       });
 
       expect(

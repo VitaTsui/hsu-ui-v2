@@ -50,7 +50,7 @@ const selectRoot = (container: HTMLElement) =>
   container.querySelector(".ant-select") as HTMLElement;
 
 describe("TreeSelect 的浮层定位", () => {
-  it("浮层挂进选择器根节点，宽度取自根节点的实际几何", async () => {
+  it("浮层挂在滚动区域外，宽度取自选择器根节点的实际几何", async () => {
     const { container } = render(
       <TreeSelect treeData={TREE_DATA} popupClassName="probe-popup" />,
     );
@@ -75,7 +75,7 @@ describe("TreeSelect 的浮层定位", () => {
     fireEvent.mouseDown(selector(container));
 
     const popup = await waitFor(() => {
-      const el = root.querySelector(".probe-popup") as HTMLElement;
+      const el = document.querySelector(".probe-popup") as HTMLElement;
       expect(el).toBeTruthy();
       return el;
     });
