@@ -31,39 +31,53 @@
   &:global(.ant-menu-inline):not(:global(.ant-menu-inline-collapsed)) {
     // 浮动滚动条不占宽度，不能靠 scrollbar-gutter 提供菜单两侧的留白。
     box-sizing: border-box;
-    padding-inline: 8px;
+    // 4px 内边距 + 两侧各 4px 的稳定滚动槽 = 8px 水平留白。
+    padding-inline: 4px;
+    padding-block: 0px;
 
     :global(.ant-menu-item),
     :global(.ant-menu-submenu-title) {
       width: 100%;
       margin-inline: 0px;
+      // 相邻块级项的竖向外边距合并，实际 gap 为 8px。
+      margin-block: 8px;
     }
 
     // 与 rc-menu 为一级菜单项计算的行内 padding 共用同一个缩进值。
     > :global(.ant-menu-item-group) > :global(.ant-menu-item-group-title) {
-      padding-inline: var(--menu-inline-indent, 16px);
+      padding-inline: var(--menu-inline-indent, 12px);
+    }
+
+    :global(.ant-menu-sub.ant-menu-inline) {
+      // 子菜单裁切形成独立区域，首尾不再叠加父项的间距。
+      > :global(.ant-menu-item:first-child),
+      > :global(.ant-menu-submenu:first-child)
+        > :global(.ant-menu-submenu-title) {
+        margin-block-start: 0px;
+      }
+
+      > :global(.ant-menu-item:last-child),
+      > :global(.ant-menu-submenu:last-child)
+        > :global(.ant-menu-submenu-title) {
+        margin-block-end: 0px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-width: 1px;
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
     }
   }
 
-  /* ===== 滚动条占位不许吃掉菜单项的内缩 =====
-     上面那条规则把「谁滚」定在了菜单根上，但没有把几何契约收完：滚动条一旦
-     **实占宽度**（消费方常见做法：槽宽恒定、只切 thumb 颜色，这样悬浮时不抖），
-     它就从菜单根的内容盒里切走一条 —— 而菜单项的左右外边距量的正是这个内容盒。
-     于是展开子菜单、菜单一超高，右边多出一条空白，左边纹丝不动：
-
-       展开前 菜单项 8..220（左留白 8 / 右留白 10）
-       展开后 菜单项 8..206（左留白 8 / 右留白 24）← 展开的那一项看着「右边距变大了」
-
-     `scrollbar-gutter: stable both-edges` 把这条槽**两侧对称保留**，且不论当下滚不滚
-     都保留：左右留白从此相等，展开 / 收起也不再有宽度变化（连带把「展开那一瞬内容
-     重排」一并去掉）。槽宽由浏览器按该元素实际的滚动条算，**不是写死的 14px** ——
-     消费方把滚动条改窄改宽，留白跟着变。
-
-     配套把菜单项自己的左右外边距清零：最小留白由根节点 padding 提供，滚动槽
-     另在两侧对称保留，不在每行再叠加一份 margin。
-     纵向节奏与嵌套缩进不受影响 —— antd 的行内缩进走的是 padding，不是 margin。
-
-     `@supports` 兜底：不认这个属性的浏览器仍有根节点的最小留白。 */
+  // 两侧对称、恒定保留滚动槽，展开后不改变菜单项宽度。
+  // 默认槽宽与内边距各 4px；不支持 gutter 的浏览器仍有根节点留白。
   @supports (scrollbar-gutter: stable both-edges) {
     &:global(.ant-menu-inline) {
       scrollbar-gutter: stable both-edges;
@@ -80,22 +94,8 @@
     overflow: hidden;
   }
 
-  /* ===== 滚动条外观：本组件不管，交给消费方 =====
-     这里曾经写着 `scrollbar-width: none` ＋ `::-webkit-scrollbar { width: 0 }`，
-     用「把滚动条永久藏掉」来遮上面那个闪动。现在闪动由 overflow 归属治本了，
-     这份「藏」不但多余，还有两处害处，所以整段删掉：
-
-     1. **Chrome 121+ 一旦读到 `scrollbar-width` / `scrollbar-color` 的非默认值，
-        就会整套忽略该元素上的 `::-webkit-scrollbar` 规则。** 库里无差别写下一句
-        `scrollbar-width: none`，等于在每个消费方的侧栏上悄悄废掉他们全站那套
-        滚动条皮肤，只剩系统细条 —— 而且不报错、很难查。
-        （所以本库任何地方要写这两个属性，都必须锁在
-        `@supports (-moz-appearance: none)` 里，让 Chrome 读不到。）
-     2. 滚动条的「显 / 隐 / 配色」是应用级的设计语言（有的应用要常驻，有的要
-        悬浮才显现），不是菜单组件的行为。库只该规定**谁滚**，不该用高权重规则
-        把可见性堵死、逼消费方回过头来盖。
-
-     消费方在全局写 `::-webkit-scrollbar` 那一套即可，会自然落到菜单根上。 */
+  // 菜单默认用 4px 细槽，颜色跟随消费方全局滚动条样式。
+  // 不设置 scrollbar-width / scrollbar-color，保留 Chrome 的伪元素皮肤。
 }
 
 // 弹出的子菜单挂在 body 上，够不到 .menu，所以由组件把这个类挂到 popup 上
@@ -110,7 +110,11 @@
       }
 
       &:global(.ant-menu-item-selected) {
-        background-color: color-mix(in srgb, var(--vita-primary) 8%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--vita-primary) 8%,
+          transparent
+        );
 
         color: var(--vita-primary) !important;
       }

@@ -7,8 +7,9 @@ order: 2
 
 从路由配置生成侧边 / 顶部菜单，自带选中态跟随、权限过滤与二级菜单。
 
-展开的侧栏两侧保留 8px 内边距，分组标题与同级菜单项对齐；嵌套菜单按
-`inlineIndent` 逐级缩进（默认 16px）。图标与文字的实际间距为 4px。
+展开的侧栏默认使用 4px 内边距与两侧各 4px 的细滚动槽，形成 8px 水平留白。
+菜单项之间的实际 gap 为 8px（包含展开的子菜单），行高为 38px。分组标题与同级菜单项对齐；
+`inlineIndent` 逐级缩进（默认 12px）。图标与文字的实际间距为 4px。
 展开子菜单的背景与菜单项使用相同圆角，边缘的悬浮和选中高亮按圆角裁切。
 
 ## 引入
@@ -38,23 +39,23 @@ import Layout from "@hsu-react/ui/es/layout";
 所以把 `Menu` 塞进任何一个**有确定高度**的容器（antd 的 `Layout.Sider`、或自己的 div）即可，不需要再补 `overflow` 规则；
 展开 / 收起子菜单的动画期间也不会有滚动条闪出来。宿主没有确定高度时菜单会被撑开、退回由页面滚，这时请给宿主一个高度。
 
-滚动条的**外观（显 / 隐 / 配色）本组件不管**，交给消费方的全局样式（`::-webkit-scrollbar` 那一套）。
+展开的菜单默认使用 4px 细滚动槽；滑块配色跟随消费方的全局 `::-webkit-scrollbar` 样式，槽宽也可通过自定义类覆盖。
 组件里刻意不写 `scrollbar-width` / `scrollbar-color`：**Chrome 121+ 一旦读到它们的非默认值，就会整套忽略该元素上的
 `::-webkit-scrollbar` 规则**，库里无差别写一句就会悄悄废掉消费方全站的滚动条皮肤。库内其它地方若确实需要这两个属性，
 必须锁在 `@supports (-moz-appearance: none)` 里，只给 Firefox 看。
 
 ## API
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| router | 路由配置 | `RouteType[]` | - |
-| collapsed | 是否收起（只显示图标） | `boolean` | `false` |
-| inlineIndent | inline 模式下每级子菜单的缩进（px），可覆盖默认值 | `number` | `16` |
-| menuItems | 直接指定菜单项，跳过从 router 推导 | `MenuType[]` | - |
-| onlyLvOneMenu | 只渲染一级菜单（mixed 布局的顶部菜单用） | `boolean` | `false` |
-| getCurrChildItems | 回传当前一级菜单的子项，供外部渲染 | `(children: MenuType[]) => void` | - |
-| secondaryHeader | 次级菜单顶部的自定义区域 | `ReactNode` | - |
-| secondaryItemFilter | 次级菜单项的额外过滤，按 key（绝对路径）判断 | `(key: string) => boolean` | - |
+| 属性                | 说明                                              | 类型                             | 默认值  |
+| ------------------- | ------------------------------------------------- | -------------------------------- | ------- |
+| router              | 路由配置                                          | `RouteType[]`                    | -       |
+| collapsed           | 是否收起（只显示图标）                            | `boolean`                        | `false` |
+| inlineIndent        | inline 模式下每级子菜单的缩进（px），可覆盖默认值 | `number`                         | `12`    |
+| menuItems           | 直接指定菜单项，跳过从 router 推导                | `MenuType[]`                     | -       |
+| onlyLvOneMenu       | 只渲染一级菜单（mixed 布局的顶部菜单用）          | `boolean`                        | `false` |
+| getCurrChildItems   | 回传当前一级菜单的子项，供外部渲染                | `(children: MenuType[]) => void` | -       |
+| secondaryHeader     | 次级菜单顶部的自定义区域                          | `ReactNode`                      | -       |
+| secondaryItemFilter | 次级菜单项的额外过滤，按 key（绝对路径）判断      | `(key: string) => boolean`       | -       |
 
 > 其余属性透传给 antd 的 [Menu](https://ant.design/components/menu-cn)。
 
@@ -79,11 +80,11 @@ import Layout, { SecondaryHeader } from "@hsu-react/ui/es/layout";
 />;
 ```
 
-| SecondaryHeader 属性 | 说明 | 类型 |
-| --- | --- | --- |
-| collapsed | 侧栏是否收起，收起时只剩箭头 | `boolean` |
-| theme | 明暗，跟随侧栏 | `"light" \| "dark"` |
-| backText | 返回入口文案 | `string` |
-| onBack | 自定义返回行为，不给则退回上一页 | `() => void` |
-| title | 当前实体名 | `string` |
-| extra | 返回入口与标题之间的插槽 | `ReactNode` |
+| SecondaryHeader 属性 | 说明                             | 类型                |
+| -------------------- | -------------------------------- | ------------------- |
+| collapsed            | 侧栏是否收起，收起时只剩箭头     | `boolean`           |
+| theme                | 明暗，跟随侧栏                   | `"light" \| "dark"` |
+| backText             | 返回入口文案                     | `string`            |
+| onBack               | 自定义返回行为，不给则退回上一页 | `() => void`        |
+| title                | 当前实体名                       | `string`            |
+| extra                | 返回入口与标题之间的插槽         | `ReactNode`         |
