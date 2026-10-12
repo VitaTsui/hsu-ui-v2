@@ -18,6 +18,7 @@
   // a single `.ant-select-content > input.ant-select-input` and lays it out with flexbox, so the
   // font-inheritance plumbing collapses to two selectors.
   &:global(.ant-select) {
+    align-items: center;
     background: var(--vita-surface) !important;
     border: 1px solid var(--vita-border) !important;
     border-radius: var(--vita-radius) !important;
@@ -50,6 +51,7 @@
 }
 
 .popup {
+  text-align: start;
   --tree-indent-unit-width: 19px;
   --tree-switcher-width: 16px;
   --tree-switcher-gap: 0px;

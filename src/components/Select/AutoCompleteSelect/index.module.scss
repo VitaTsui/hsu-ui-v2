@@ -5,7 +5,7 @@
   align-items: center;
 
   width: 100%;
-  height: 100%;
+  min-height: var(--vita-control-height);
   padding: 0px 11px;
 
   // CF style: outlined input control that follows appearance switching
@@ -106,7 +106,7 @@
     display: flex;
     align-items: center;
 
-    height: 100%;
+    align-self: stretch;
     margin: 0px !important;
 
     font-family: inherit;
@@ -122,7 +122,6 @@
     // fallback) are gone.
     &:global(.ant-select) {
       width: 100%;
-      height: 100%;
       padding: 0 !important;
 
       border: none !important;
@@ -149,12 +148,8 @@
       }
 
       :global(.ant-select-placeholder) {
-        display: inline-flex;
-        align-items: center;
-
-        height: 100%;
-
-        line-height: normal;
+        align-self: center;
+        line-height: inherit;
         font-family: inherit;
         font-size: inherit;
         font-weight: inherit;
@@ -238,6 +233,7 @@
 }
 
 .popup {
+  text-align: start;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
