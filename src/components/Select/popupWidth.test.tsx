@@ -46,7 +46,7 @@ const openPopup = async (host: HTMLElement, container: HTMLElement) => {
   fireEvent.mouseDown(selector(container));
 
   return waitFor(() => {
-    const el = host.querySelector(".probe-popup") as HTMLElement;
+    const el = document.querySelector(".probe-popup") as HTMLElement;
     expect(el).toBeTruthy();
     return el;
   });

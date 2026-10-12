@@ -1,3 +1,4 @@
+import { getUnclippedPopupContainer } from "../../../utils/getUnclippedPopupContainer";
 import {
   TreeSelect as AntdTreeSelect,
   TreeSelectProps as AntdTreeSelectProps,
@@ -202,14 +203,10 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     [onTreeExpand],
   );
 
-  // 纯读，没有副作用；和基础 `Select` 的 `getPopupContainer` 同一个写法。
-  // 浮层挂进根节点里，`index.module.scss` 里那一整块
-  // `.treeSelect .ant-tree-select-dropdown`（`position: fixed`、字体继承、
-  // `--tree-indent-unit-width` 等缩进变量）才生效 —— 也就是 `indent` / `switchWidth` /
-  // `switchGap` 三个 props 才真的有用。
+  // 弹层避开表格和弹窗内容的滚动区域；调用方仍可指定挂载容器。
   const getPopupContainer = useCallback(
-    () => containerRef.current ?? document.body,
-    [],
+    props.getPopupContainer ?? getUnclippedPopupContainer,
+    [props.getPopupContainer],
   );
 
   return (
@@ -252,12 +249,21 @@ const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       getPopupContainer={getPopupContainer}
       // v6 replaced `popupClassName` / `dropdownStyle` with the `popup.root` semantic slot; this
       // component's own props keep the old names for consumers.
-      classNames={{ popup: { root: popupClassName } }}
+      classNames={{ popup: { root: classNames(styles.popup, popupClassName) } }}
       style={style}
       popupMatchSelectWidth={
         popupMatchSelectWidth ?? (containerWidth || undefined)
       }
-      styles={{ popup: { root: dropdownStyle } }}
+      styles={{
+        popup: {
+          root: {
+            "--tree-indent-unit-width": `${indent ?? 19}px`,
+            "--tree-switcher-width": `${switchWidth ?? 16}px`,
+            "--tree-switcher-gap": `${switchGap ?? 0}px`,
+            ...dropdownStyle,
+          } as CSSProperties,
+        },
+      }}
       suffixIcon={<Icon icon="ep:arrow-down" />}
       ref={attachContainer}
     />

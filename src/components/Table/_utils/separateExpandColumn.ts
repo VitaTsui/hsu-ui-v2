@@ -19,27 +19,51 @@ export function separateExpandColumn<T extends AnyObject>(
   if (expandable?.expandedRowRender) {
     const { expandIconColumnIndex: _index, ...rowConfig } = config;
     return {
-      columns: [expandColumn, ...(columns || []).filter(col => col !== expandColumn)],
+      columns: [
+        expandColumn,
+        ...(columns || []).filter((col) => col !== expandColumn),
+      ],
       expandable: { ...rowConfig, fixed: "left" },
     };
   }
 
   const childrenKey = expandable?.childrenColumnName || "children";
-  const hasTreeRows = dataSource?.some(row => Array.isArray(row[childrenKey]));
+  const hasTreeRows = dataSource?.some((row) =>
+    Array.isArray(row[childrenKey]),
+  );
   if (!hasTreeRows) return { columns, expandable: config };
+
+  // 为最深层级预留缩进空间，展开/收起时固定列宽度保持不变。
+  const indentSize = expandable?.indentSize ?? 15;
+  const pending = (dataSource || []).map((record) => ({ record, depth: 0 }));
+  let maxDepth = 0;
+  while (pending.length) {
+    const { record, depth } = pending.pop()!;
+    maxDepth = Math.max(maxDepth, depth);
+    const children = record[childrenKey];
+    if (Array.isArray(children)) {
+      pending.push(...children.map((record) => ({ record, depth: depth + 1 })));
+    }
+  }
+  const treeColumnWidth = 48 + maxDepth * indentSize;
 
   return {
     columns: [
       {
         key: "__hsu_expand__",
-        width: 48,
+        width: treeColumnWidth,
         fixed: "left" as const,
-        align: "center" as const,
+        align: "left" as const,
         sorter: false,
         render: () => null,
       },
       ...(columns || []),
     ],
-    expandable: { ...config, fixed: "left", expandIconColumnIndex: 0 },
+    expandable: {
+      ...config,
+      columnWidth: treeColumnWidth,
+      fixed: "left",
+      expandIconColumnIndex: 0,
+    },
   };
 }

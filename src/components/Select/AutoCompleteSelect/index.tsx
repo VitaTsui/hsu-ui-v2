@@ -1,3 +1,4 @@
+import { getUnclippedPopupContainer } from "../../../utils/getUnclippedPopupContainer";
 import { AutoComplete, AutoCompleteProps, ConfigProvider } from "antd";
 import React, {
   ReactNode,
@@ -25,11 +26,10 @@ export interface AutoCompleteOption {
   [key: string]: unknown;
 }
 
-export interface AutoCompleteSelectProps
-  extends Omit<
-    AutoCompleteProps,
-    "options" | "filterOption" | "dropdownStyle" | "placement" | "children"
-  > {
+export interface AutoCompleteSelectProps extends Omit<
+  AutoCompleteProps,
+  "options" | "filterOption" | "dropdownStyle" | "placement" | "children"
+> {
   prefix?: ReactNode;
   suffix?: ReactNode;
   selectClassName?: string;
@@ -280,8 +280,15 @@ const AutoCompleteSelect: React.FC<AutoCompleteSelectProps> = (props) => {
             [styles.legacyHasArrowOrClear]:
               legacyHasSelector && legacyHasArrowOrClear,
           }),
-          classNames: { popup: { root: popupClassName } },
-          getPopupContainer: () => autoCompleteRef.current ?? document.body,
+          classNames: {
+            popup: {
+              root: classNames(styles.popup, popupClassName, {
+                [styles.popupMatchContentWidth]: popupMatchContentWidth,
+              }),
+            },
+          },
+          getPopupContainer:
+            props.getPopupContainer ?? getUnclippedPopupContainer,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
           builtinPlacements,
