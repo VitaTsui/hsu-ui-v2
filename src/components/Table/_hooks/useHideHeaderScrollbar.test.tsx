@@ -26,7 +26,7 @@ function Fixture({ hideScrollbar = true, legacy = false, bordered = false }) {
         </table>
       </div>
       <div className="ant-table-body">
-        <table><tbody><tr><td className={fixedClass} style={offset(0)}>Body</td></tr></tbody></table>
+        <table><tbody><tr><td className={fixedClass} style={offset(80)}>Body</td></tr></tbody></table>
       </div>
       <div className="ant-table-summary">
         <table>
@@ -65,7 +65,7 @@ describe("Table hidden header scrollbar", () => {
     expect(container.querySelectorAll(".ant-table-header col")).toHaveLength(2);
     expect(container.querySelectorAll(".ant-table-summary col")).toHaveLength(1);
     expect(container.querySelector<HTMLTableCellElement>("tfoot td")!.style.insetInlineEnd).toBe("0px");
-    expect(container.querySelector<HTMLTableCellElement>("tbody td")!.style.insetInlineEnd).toBe("0px");
+    expect(container.querySelector<HTMLTableCellElement>("tbody td")!.style.insetInlineEnd).toBe("80px");
   });
 
   it("corrects offsets rewritten after a render without subtracting twice", async () => {
