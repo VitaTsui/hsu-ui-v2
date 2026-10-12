@@ -310,6 +310,13 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
     autoScrolling,
   });
 
+  const expansion = separateExpandColumn(
+    renderedColumns,
+    { indentSize: props.indentSize, ...expandable },
+    dataSource,
+    AntdTable.EXPAND_COLUMN,
+  );
+
   const virtualScroll = useVirtualScroll({
     enabled: Boolean(virtual),
     mounted: _columns.length > 0,
@@ -317,7 +324,7 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
     columnsWidth:
       sumColumnsWidth(renderedColumns) +
       (rowSelection ? 48 : 0) +
-      (expandable ? 48 : 0),
+      (expandable ? (expansion.expandable.columnWidth as number) : 0),
   });
 
   if (!_columns.length) {
@@ -325,12 +332,6 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
   }
 
   const isScrollEnabled = Boolean(scroll && !virtual);
-  const expansion = separateExpandColumn(
-    renderedColumns,
-    expandable,
-    dataSource,
-    AntdTable.EXPAND_COLUMN,
-  );
   // 虚拟模式：表体高度由 useVirtualScroll 量出来的数字给（antd 只认数字），量到之前先不画表
   const isScrollYDisabled =
     typeof scroll === "object" && scroll.y === false && !virtual;

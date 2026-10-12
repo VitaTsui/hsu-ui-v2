@@ -18,7 +18,7 @@ import { describe, expect, it } from "vitest";
 
 const SCSS = fs.readFileSync(
   path.resolve(__dirname, "index.module.scss"),
-  "utf8"
+  "utf8",
 );
 
 describe("侧栏菜单的滚动条占位", () => {
@@ -41,7 +41,9 @@ describe("侧栏菜单的滚动条占位", () => {
 
   it("横向一律不滚、子菜单自己不滚 —— 上一轮修「闪滚动条」的口径没被冲掉", () => {
     expect(SCSS).toMatch(/overflow-x:\s*hidden/);
-    expect(SCSS).toMatch(/\.ant-menu-sub\.ant-menu-inline\)\s*\{\s*overflow:\s*hidden/);
+    expect(SCSS).toMatch(
+      /\.ant-menu-sub\.ant-menu-inline\)\s*\{[^}]*overflow:\s*hidden/,
+    );
   });
 
   it("不许在库里写 scrollbar-width / scrollbar-color —— Chrome 会整套忽略消费方的 ::-webkit-scrollbar", () => {

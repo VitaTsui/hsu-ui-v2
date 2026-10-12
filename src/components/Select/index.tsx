@@ -1,3 +1,4 @@
+import { getUnclippedPopupContainer } from "../../utils/getUnclippedPopupContainer";
 import {
   ConfigProvider,
   Select as AntdSelect,
@@ -228,9 +229,9 @@ const Select = ((props: SelectProps) => {
       /* 只认「外壳自己」的那一圈内边距。
          外壳是画在 antd 选择器外面的一层边框 ＋ 左右 11px 内边距，那一圈 antd 收不到点击，
          所以由这里补一次开合。但它**不能**对着整棵子树无条件翻转 `open`：
-         下拉浮层由 `getPopupContainer` 挂在这个外壳里面，清除按钮（✕）也在 antd 选择器里，
+         下拉浮层的 React 事件也会冒泡到外壳，清除按钮（✕）也在 antd 选择器里，
          点它们都会冒泡到这里。从前这里写的是 `setOpen(!open)`，于是点 ✕ 清空值
-         反而把浮层**打开**，而浮层是 position: fixed 贴在控件正下方的 —— 在成员列表这类
+         反而把浮层**打开**；在成员列表这类
          纵向堆叠的表单里，它正好盖住下一行的下拉框（实测行距 102px、浮层高 104px），
          用户以为在点第 2 行，点到的是第 1 行的选项，值就写到了第 1 行头上。
          所以这里把「外壳自己的装饰区」（内边距 ＋ prefix / suffix）和「antd 自己的区域」
@@ -340,8 +341,15 @@ const Select = ((props: SelectProps) => {
           }),
           // v6 replaced `popupClassName` / `dropdownStyle` with the `popup.root` semantic slot.
           // The public `popupClassName` prop of this component is kept as-is for consumers.
-          classNames: { popup: { root: popupClassName } },
-          getPopupContainer: () => selectRef.current ?? document.body,
+          classNames: {
+            popup: {
+              root: classNames(styles.popup, popupClassName, {
+                [styles.popupMatchContentWidth]: popupMatchContentWidth,
+              }),
+            },
+          },
+          getPopupContainer:
+            props.getPopupContainer ?? getUnclippedPopupContainer,
           popupMatchSelectWidth:
             popupMatchSelectWidth ?? (calculatedPopupWidth || undefined),
           builtinPlacements,
