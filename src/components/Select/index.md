@@ -11,6 +11,7 @@ title: Select 选择器
 基于 antd `Select` 封装的选择器，默认开启搜索与清除，支持前后缀、箭头动画、下拉宽度自适应内容、`label` 与 `value` 组合展示，并对中文输入法搜索做了优化。
 
 Select、TreeSelect 与 AutoComplete 的弹层默认挂在页面 body 或当前弹窗的外层，避开列表和弹窗内容的滚动区域。定位与滚动跟随交给 antd；可通过 `getPopupContainer` 指定挂载容器。
+弹层中的选项默认靠文字起始侧对齐，不继承居中弹窗或表格的文字对齐。placeholder 与输入内容共用行高，并随控件高度垂直居中。
 
 ## 引入
 

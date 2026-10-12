@@ -188,12 +188,8 @@
     }
 
     :global(.ant-select-placeholder) {
-      display: inline-flex;
-      align-items: center;
-
-      height: 100%;
-
-      line-height: normal;
+      align-self: center;
+      line-height: inherit;
       font-family: inherit;
       font-size: inherit;
       font-weight: inherit;
@@ -281,6 +277,7 @@
 }
 
 .popup {
+  text-align: start;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
