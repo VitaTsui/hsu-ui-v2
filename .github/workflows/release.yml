@@ -102,3 +102,11 @@ jobs:
             "${{ steps.ver.outputs.latest_flag }}"
         env:
           GH_TOKEN: ${{ github.token }}
+
+      # 发布任务成功还不足以保证 registry 已能解析新版本。保留明确的版本与校验值，
+      # 也方便区分发布失败和地区缓存传播延迟；已有 tag 的幂等重跑同样检查。
+      - name: 确认 npm 版本与发布包校验值
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          npm view "$NAME@$VERSION" version dist.integrity dist.shasum dist.tarball --json --prefer-online
