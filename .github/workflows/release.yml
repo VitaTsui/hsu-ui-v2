@@ -107,6 +107,16 @@ jobs:
       # 也方便区分发布失败和地区缓存传播延迟；已有 tag 的幂等重跑同样检查。
       - name: 确认 npm 版本与发布包校验值
         run: |
-          NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
-          npm view "$NAME@$VERSION" version dist.integrity dist.shasum dist.tarball --json --prefer-online
+          NPM_VERSION_PATH=$(node -p "require('./package.json').name.replace('/', '%2F') + '/' + require('./package.json').version")
+          # 查询单版本 endpoint，避免整包元数据缓存仍指向上一版；传播期间限次重试。
+          curl --fail --silent --show-error --retry 40 --retry-all-errors --retry-delay 15 --retry-max-time 600 --max-time 15 --connect-timeout 5 \
+            "https://registry.npmjs.org/$NPM_VERSION_PATH" -o "$RUNNER_TEMP/npm-release.json"
+          node - "$RUNNER_TEMP/npm-release.json" <<'NODE'
+          const fs = require('node:fs');
+          const expected = require('./package.json');
+          const published = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (published.name !== expected.name || published.version !== expected.version || !published.dist?.integrity) {
+            throw new Error('Registry version or integrity does not match the release');
+          }
+          console.log(JSON.stringify({ name: published.name, version: published.version, dist: published.dist }, null, 2));
+          NODE
