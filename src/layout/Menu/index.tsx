@@ -62,6 +62,7 @@ const Menu: React.FC<MenuProps> = (props) => {
     className,
     theme = "dark",
     mode = "inline",
+    inlineIndent = 16,
     getCurrChildItems,
     menuItems,
     onlyLvOneMenu = false,
@@ -148,6 +149,7 @@ const Menu: React.FC<MenuProps> = (props) => {
     <AntdMenu
       {...menuConfig}
       mode={mode}
+      inlineIndent={inlineIndent}
       inlineCollapsed={collapsed}
       items={
         onlyLvOneMenu

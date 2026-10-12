@@ -45,6 +45,7 @@ import Layout from "@hsu-react/ui/es/layout";
 | --- | --- | --- | --- |
 | router | 路由配置 | `RouteType[]` | - |
 | collapsed | 是否收起（只显示图标） | `boolean` | `false` |
+| inlineIndent | inline 模式下每级子菜单的缩进（px），可覆盖默认值 | `number` | `16` |
 | menuItems | 直接指定菜单项，跳过从 router 推导 | `MenuType[]` | - |
 | onlyLvOneMenu | 只渲染一级菜单（mixed 布局的顶部菜单用） | `boolean` | `false` |
 | getCurrChildItems | 回传当前一级菜单的子项，供外部渲染 | `(children: MenuType[]) => void` | - |
