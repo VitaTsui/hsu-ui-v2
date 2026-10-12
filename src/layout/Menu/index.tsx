@@ -60,6 +60,7 @@ const Menu: React.FC<MenuProps> = (props) => {
     router,
     collapsed = false,
     className,
+    style,
     theme = "dark",
     mode = "inline",
     inlineIndent = 16,
@@ -150,6 +151,9 @@ const Menu: React.FC<MenuProps> = (props) => {
       {...menuConfig}
       mode={mode}
       inlineIndent={inlineIndent}
+      style={
+        { "--menu-inline-indent": `${inlineIndent}px`, ...style } as React.CSSProperties
+      }
       inlineCollapsed={collapsed}
       items={
         onlyLvOneMenu
