@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useMutationObserver } from "ahooks";
+import { useEffect } from "react";
 
 interface Params {
   scroll?: boolean | { y: boolean };
@@ -10,80 +9,93 @@ interface Params {
 }
 
 const useHideHeaderScrollbar = (params: Params) => {
-  const { hideScrollbar, cls, ref, scroll, bordered } = params;
-  const [ready, setReady] = useState<boolean>(false);
+  const { hideScrollbar, ref, scroll } = params;
+  const scrollEnabled = Boolean(scroll);
 
   useEffect(() => {
-    if (hideScrollbar && ref && ref.current && scroll && ready) {
-      const timer = setInterval(() => {
-        const headerBar = document.querySelector(
-          `.${cls} .ant-table-cell-scrollbar`
-        ) as HTMLDivElement;
+    const root = ref?.current;
+    if (!hideScrollbar || !scrollEnabled || !root) return;
 
-        const fixedRight = document.querySelectorAll(
-          `.${cls} .ant-table-thead .ant-table-cell-fix-right`
-        ) as NodeListOf<HTMLDivElement>;
+    // antd v6 uses fix-end / inset-inline-end. Keep the legacy right styles
+    // supported too. Remember the gutter after removing its placeholder, since
+    // React can write the original sticky offset again on a later render.
+    const gutters = new WeakMap<HTMLTableElement, number>();
+    const adjustedOffsets = new WeakMap<HTMLElement, string>();
 
-        const cols = document.querySelectorAll(
-          `.${cls} .ant-table-header colgroup col`
-        ) as NodeListOf<HTMLDivElement>;
+    const update = () => {
+      const tables = root.querySelectorAll<HTMLTableElement>(
+        ".ant-table-header table, .ant-table-summary table",
+      );
+      let headerGutter: number | undefined;
 
-        const summaryCols = document.querySelectorAll(
-          `.${cls} .ant-table-summary colgroup col`
-        ) as NodeListOf<HTMLDivElement>;
-
+      tables.forEach((table) => {
+        const headerBar = table.querySelector<HTMLElement>(
+          ".ant-table-cell-scrollbar",
+        );
         if (headerBar) {
-          clearInterval(timer);
-
-          fixedRight?.forEach((item) => {
-            const border = getComputedStyle(item, "::after");
-            const right = parseInt(border.borderRightWidth);
-
-            item.style.right =
-              parseInt(item.style.right) -
-              (headerBar?.clientWidth || 0) -
-              right +
-              "px";
-          });
-
-          const summaryColBar = [...summaryCols]?.slice?.(
-            -1
-          )?.[0] as HTMLDivElement;
-
-          if (
-            summaryColBar &&
-            parseInt(summaryColBar.style.width) ===
-              headerBar?.clientWidth + (bordered ? 1 : 0)
-          ) {
-            summaryColBar?.remove();
-          }
-
-          const colBar = [...cols]?.slice?.(-1)?.[0] as HTMLDivElement;
-
-          if (
-            colBar &&
-            parseInt(colBar.style.width) ===
-              headerBar?.clientWidth + (bordered ? 1 : 0)
-          ) {
-            colBar?.remove();
-          }
-
+          const colBar = table.querySelector<HTMLTableColElement>(
+            "colgroup col:last-child",
+          );
+          // Measure the whole cell, including borders. With an empty data source
+          // antd can use a colgroup without a gutter col, so don't remove its last
+          // data column merely because a scrollbar cell exists.
+          const colWidth = Number.parseFloat(colBar?.style.width || "");
+          const gutter = headerBar.getBoundingClientRect().width;
+          if (!gutter) return;
+          gutters.set(table, gutter);
+          if (Math.abs(colWidth - gutter) < 0.5) colBar?.remove();
           headerBar.remove();
         }
-      }, 1);
-    }
-  }, [hideScrollbar, cls, ref, scroll, ready, bordered]);
 
-  useMutationObserver(
-    () => {
-      setReady(true);
-    },
-    ref,
-    {
+        if (table.closest(".ant-table-header")) {
+          headerGutter = gutters.get(table);
+        } else if (headerGutter !== undefined && !gutters.has(table)) {
+          // A separate fixed summary holder has a gutter col, but no scrollbar
+          // cell: its final summary cell spans across the gutter instead.
+          const colBar = table.querySelector<HTMLTableColElement>(
+            "colgroup col:last-child",
+          );
+          if (Number.parseFloat(colBar?.style.width || "") === headerGutter) {
+            gutters.set(table, headerGutter);
+            colBar?.remove();
+          }
+        }
+
+        const gutter = gutters.get(table);
+        if (gutter === undefined) return;
+
+        table
+          .querySelectorAll<HTMLElement>(
+            ".ant-table-cell-fix-end, .ant-table-cell-fix-right",
+          )
+          .forEach((cell) => {
+            const property = cell.style.insetInlineEnd
+              ? "insetInlineEnd"
+              : "right";
+            const current = cell.style[property];
+            if (current === adjustedOffsets.get(cell)) return;
+
+            const offset = Number.parseFloat(current);
+            if (!Number.isFinite(offset)) return;
+
+            const adjusted = `${Math.max(0, offset - gutter)}px`;
+            adjustedOffsets.set(cell, adjusted);
+            if (current !== adjusted) cell.style[property] = adjusted;
+          });
+      });
+    };
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, {
       childList: true,
       subtree: true,
-    }
-  );
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+    update();
+
+    return () => observer.disconnect();
+  }, [hideScrollbar, ref, scrollEnabled]);
 };
 
 export default useHideHeaderScrollbar;

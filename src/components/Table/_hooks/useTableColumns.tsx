@@ -260,6 +260,7 @@ const useTableColumns = <T extends AnyObject>(
           dataIndex: "serialNumber",
           width: 60,
           align: "center",
+          fixed: "left",
           render: (_, __, index) => {
             return pagination
               ? (_pageNum - 1) * _pageSize + (index + 1)

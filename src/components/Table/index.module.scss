@@ -153,9 +153,16 @@
 
     &.hideScrollbar {
       * {
+        scrollbar-width: none;
         &::-webkit-scrollbar {
           width: 0px;
+          height: 0px;
         }
+      }
+
+      :global(.ant-table-sticky-scroll),
+      :global(.ant-table-tbody-virtual-scrollbar) {
+        display: none !important;
       }
     }
 

@@ -16,6 +16,7 @@ import { generateRandomStr } from "hsu-utils";
 import classNames from "classnames";
 import styles from "./index.module.scss";
 import useHideHeaderScrollbar from "./_hooks/useHideHeaderScrollbar";
+import { separateExpandColumn } from "./_utils/separateExpandColumn";
 import useSetTableHeight from "./_hooks/useSetTableHeight";
 import { ColumnTitleProps } from "antd/lib/table/interface";
 import useAutoScrolling from "./_hooks/useAutoScrolling";
@@ -112,6 +113,7 @@ export interface TableProps<RecordType = AnyObject> extends Omit<
   scroll?: boolean | { y: boolean };
   autoWidth?: boolean;
   scrollAutoHeight?: boolean;
+  /** @deprecated 表格滚动条始终隐藏，此属性不再生效。 */
   hideScrollbar?: boolean;
   thPadding?: string;
   tdPadding?: string;
@@ -176,7 +178,7 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
     autoWidth,
     expandable = {},
     scrollAutoHeight = true,
-    hideScrollbar = true,
+    hideScrollbar: _hideScrollbar,
     thPadding,
     tdPadding,
     expandedCellPadding,
@@ -279,7 +281,7 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
   });
 
   useHideHeaderScrollbar({
-    hideScrollbar,
+    hideScrollbar: true,
     cls,
     ref,
     scroll,
@@ -323,6 +325,12 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
   }
 
   const isScrollEnabled = Boolean(scroll && !virtual);
+  const expansion = separateExpandColumn(
+    renderedColumns,
+    expandable,
+    dataSource,
+    AntdTable.EXPAND_COLUMN,
+  );
   // 虚拟模式：表体高度由 useVirtualScroll 量出来的数字给（antd 只认数字），量到之前先不画表
   const isScrollYDisabled =
     typeof scroll === "object" && scroll.y === false && !virtual;
@@ -343,14 +351,18 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
       >
         <div
           ref={antdTableRef}
-          className={classNames(styles.antdTable, tableClassName, {
-            [styles.scroll]: isScrollEnabled,
-            [styles.virtual]: virtual,
-            [styles["y-unScroll"]]: isScrollYDisabled,
-            [styles.hideScrollbar]: hideScrollbar,
-            [styles.hideEmpty]: hideEmpty,
-            [styles.isExpandedCellTable]: isExpandedCellTable,
-          })}
+          className={classNames(
+            styles.antdTable,
+            styles.hideScrollbar,
+            tableClassName,
+            {
+              [styles.scroll]: isScrollEnabled,
+              [styles.virtual]: virtual,
+              [styles["y-unScroll"]]: isScrollYDisabled,
+              [styles.hideEmpty]: hideEmpty,
+              [styles.isExpandedCellTable]: isExpandedCellTable,
+            },
+          )}
         >
           {virtual && !virtualScroll ? null : (
             <AntdTable
@@ -358,7 +370,7 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
               bordered={bordered}
               components={onDragEnd ? { body: { row: Drag.Row } } : undefined}
               dataSource={paginatedDataSource}
-              columns={renderedColumns}
+              columns={expansion.columns}
               pagination={false}
               scroll={
                 virtual
@@ -367,9 +379,7 @@ const Table: TableFC = <T extends AnyObject>(props: TableProps<T>) => {
                     ? { y: "" }
                     : undefined
               }
-              expandable={
-                expandable ? { ...expandable, columnWidth: 48 } : undefined
-              }
+              expandable={expansion.expandable}
               className={antdTableClassName}
               onChange={handleTableChange}
               virtual={virtual}
