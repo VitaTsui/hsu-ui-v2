@@ -109,7 +109,7 @@ jobs:
         run: |
           NPM_VERSION_PATH=$(node -p "require('./package.json').name.replace('/', '%2F') + '/' + require('./package.json').version")
           # 查询单版本 endpoint，避免整包元数据缓存仍指向上一版；传播期间限次重试。
-          curl --fail --silent --show-error --retry 12 --retry-all-errors --retry-delay 5 --max-time 15 \
+          curl --fail --silent --show-error --retry 40 --retry-all-errors --retry-delay 15 --retry-max-time 600 --max-time 15 --connect-timeout 5 \
             "https://registry.npmjs.org/$NPM_VERSION_PATH" -o "$RUNNER_TEMP/npm-release.json"
           node - "$RUNNER_TEMP/npm-release.json" <<'NODE'
           const fs = require('node:fs');
