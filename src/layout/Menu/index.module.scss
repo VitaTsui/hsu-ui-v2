@@ -75,6 +75,8 @@
      之后**那一帧：此时 ul 的高度刚回到 auto，若父级恰好差几像素，浏览器会先画出
      滚动条再重排。子菜单本来也永远不需要自己滚。 */
   :global(.ant-menu-sub.ant-menu-inline) {
+    // 与父级 submenu、菜单项共用 antd 的圆角；裁切背景与悬浮/选中高亮。
+    border-radius: inherit;
     overflow: hidden;
   }
 
