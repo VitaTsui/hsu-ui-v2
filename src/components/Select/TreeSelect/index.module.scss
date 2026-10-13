@@ -30,6 +30,10 @@
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
+  }
+
+  :global(.ant-select-content),
+  :global(.ant-select-input) {
     color: inherit;
   }
 
