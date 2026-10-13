@@ -260,10 +260,9 @@
     }
 
     &:global(.ant-select-multiple) {
-      // Keep the search input from claiming a slot of its own between the tags.
+      // Ant Design sizes this input from the text being typed. Leave its width
+      // intact so both multiple search and free-form tags remain visible.
       :global(.ant-select-input) {
-        width: 0px !important;
-
         margin-inline-start: 0px;
       }
     }
