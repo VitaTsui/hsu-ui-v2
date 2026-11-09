@@ -38,6 +38,13 @@ export interface Font {
   weight?: string;
 }
 
+/** Font of the option text. It drives both the rendered CSS and the "More" width measurement. */
+export const DEFAULT_FONT: Required<Font> = {
+  family: "PingFangSC-Regular, PingFang SC",
+  size: 16,
+  weight: "400",
+};
+
 interface OptionRowProps {
   option: SearchCardOption;
   value: Record<string, unknown>;
@@ -53,11 +60,7 @@ const OptionRow: React.FC<OptionRowProps> = memo((props) => {
     option,
     value,
     setValue,
-    font = {
-      family: "PingFangSC-Regular, PingFang SC",
-      size: 14,
-      weight: "400",
-    },
+    font = DEFAULT_FONT,
     padding = 8,
     gap = 8,
     legacyHasSelector = false,
