@@ -214,7 +214,8 @@
         font-weight: var(--searchCard-font-weight);
         font-size: var(--searchCard-font-size);
         font-family: var(--searchCard-font-family);
-        line-height: calc(var(--searchCard-font-size) + 6px);
+        // Same box as the option items (padding 3px + this line height), so 更多 lines up with them.
+        line-height: calc(var(--searchCard-font-size) + 10px);
         white-space: nowrap;
         column-gap: 1px;
 
