@@ -1,7 +1,12 @@
 import { Equal, get_string_size } from "hsu-utils";
 import { useEffect, useState, RefObject, useCallback } from "react";
 import { createRoot } from "react-dom/client";
-import { ElementItem, Font, SearchCardOption } from "../_components/OptionRow";
+import {
+  DEFAULT_FONT,
+  ElementItem,
+  Font,
+  SearchCardOption,
+} from "../_components/OptionRow";
 
 // Optimization: cache measurement results
 const measurementCache = new Map<string, number>();
@@ -81,11 +86,7 @@ function directMeasureWidth(element: React.ReactElement): Promise<number> {
 export function useSearchCardMoreOptions(
   containerRef: RefObject<HTMLDivElement>,
   options: SearchCardOption[],
-  font: Font = {
-    family: "PingFangSC-Regular, PingFang SC",
-    size: 14,
-    weight: "400",
-  },
+  font: Font = DEFAULT_FONT,
   padding: number = 8,
   gap: number = 8
 ) {

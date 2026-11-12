@@ -1,6 +1,9 @@
 :root {
   --searchCard-column-gap: 8px;
   --searchCard-padding-left-right: 8px;
+  --searchCard-font-family: PingFangSC-Regular, PingFang SC;
+  --searchCard-font-size: 16px;
+  --searchCard-font-weight: 400;
 }
 
 .SearchCard {
@@ -100,9 +103,9 @@
         padding: 3px 0px;
 
         font-weight: 500;
-        font-size: 16px;
-        font-family: PingFangSC-Medium, PingFang SC;
-        line-height: 26px;
+        font-size: var(--searchCard-font-size);
+        font-family: var(--searchCard-font-family);
+        line-height: calc(var(--searchCard-font-size) + 10px);
         white-space: nowrap;
       }
 
@@ -164,10 +167,10 @@
         > span {
           padding: 3px var(--searchCard-padding-left-right);
 
-          font-weight: 400;
-          font-size: 16px;
-          font-family: PingFangSC-Regular, PingFang SC;
-          line-height: 26px;
+          font-weight: var(--searchCard-font-weight);
+          font-size: var(--searchCard-font-size);
+          font-family: var(--searchCard-font-family);
+          line-height: calc(var(--searchCard-font-size) + 10px);
 
           border-radius: var(--vita-radius-sm);
 
@@ -196,7 +199,7 @@
           margin-left: 2px;
 
           color: var(--vita-muted-foreground);
-          font-size: 16px;
+          font-size: var(--searchCard-font-size);
         }
       }
 
@@ -208,10 +211,10 @@
         padding: 3px 0px;
 
         color: var(--vita-muted-foreground);
-        font-weight: 400;
-        font-size: 16px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        line-height: 22px;
+        font-weight: var(--searchCard-font-weight);
+        font-size: var(--searchCard-font-size);
+        font-family: var(--searchCard-font-family);
+        line-height: calc(var(--searchCard-font-size) + 6px);
         white-space: nowrap;
         column-gap: 1px;
 
@@ -239,10 +242,10 @@
         padding: 3px var(--searchCard-padding-left-right);
 
         color: var(--vita-foreground);
-        font-weight: 400;
-        font-size: 16px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        line-height: 22px;
+        font-weight: var(--searchCard-font-weight);
+        font-size: var(--searchCard-font-size);
+        font-family: var(--searchCard-font-family);
+        line-height: calc(var(--searchCard-font-size) + 6px);
 
         border-radius: var(--vita-radius-sm);
 

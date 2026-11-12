@@ -1,7 +1,8 @@
-import React, { CSSProperties, useRef, memo } from "react";
+import React, { CSSProperties, useRef, useMemo, memo } from "react";
 import classNames from "classnames";
 import styles from "./index.module.scss";
 import OptionRow, {
+  DEFAULT_FONT,
   ElementItem,
   SearchCardOption,
   Font,
@@ -35,11 +36,7 @@ const SearchCard: React.FC<SearchCardProps> = memo((props) => {
     onChange,
     padding = 8,
     gap = 8,
-    font = {
-      family: "PingFangSC-Regular, PingFang SC",
-      size: 14,
-      weight: "400",
-    },
+    font: fontProp,
     className,
     defaultCollapse = false,
     collapseExpand = true,
@@ -48,6 +45,11 @@ const SearchCard: React.FC<SearchCardProps> = memo((props) => {
     searchField = "",
   } = props;
   const ref = useRef<HTMLDivElement>(null);
+  // A partial font (e.g. only `size`) keeps the other defaults; stable identity avoids re-measuring every render.
+  const font = useMemo<Required<Font>>(
+    () => ({ ...DEFAULT_FONT, ...fontProp }),
+    [fontProp?.family, fontProp?.size, fontProp?.weight]
+  );
   const legacyHasSelector = isLegacyHasSelectorBrowser();
 
   const { value, setValue, internalValue, setInternalValue, getRealValues } =
@@ -78,6 +80,9 @@ const SearchCard: React.FC<SearchCardProps> = memo((props) => {
         {
           "--searchCard-column-gap": `${gap}px`,
           "--searchCard-padding-left-right": `${padding}px`,
+          "--searchCard-font-family": font.family,
+          "--searchCard-font-size": `${font.size}px`,
+          "--searchCard-font-weight": font.weight,
         } as CSSProperties
       }
     >
