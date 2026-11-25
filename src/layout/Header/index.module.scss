@@ -36,8 +36,9 @@
       align-items: center;
       justify-content: center;
 
-      width: 230px;
-      min-width: 230px;
+      // 与左侧栏同宽（`siderWidth`，见 index.tsx）
+      width: var(--sider-width, 230px);
+      min-width: var(--sider-width, 230px);
       height: 100%;
       padding: 0px 20px;
 
@@ -53,10 +54,10 @@
         width 0.2s,
         min-width 0.2s;
 
-      // 侧栏收起时标题一起收窄，宽度和收起后的侧栏对齐
+      // 侧栏收起时标题一起收窄，宽度和收起后的侧栏对齐（`siderCollapsedWidth`）
       &.titleCollapsed {
-        width: 80px;
-        min-width: 80px;
+        width: var(--sider-collapsed-width, 80px);
+        min-width: var(--sider-collapsed-width, 80px);
         padding: 0px 10px;
       }
 

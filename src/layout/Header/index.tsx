@@ -56,6 +56,15 @@ export interface HeaderProps {
    * 这些 antd 内建文案还是要它）。
    */
   showLocale?: boolean;
+  /**
+   * 左侧栏展开 / 收起时的宽度（px），默认 230 / 80 —— 与 antd `Sider` 的
+   * `width` / `collapsedWidth` 填**同一组数**。
+   *
+   * 左上角的标题块要和下面的侧栏左右对齐，所以它的宽度跟着侧栏走。原来这两个数
+   * 写死在样式里（230 / 80），消费方只要把侧栏调窄一点，标题块就比侧栏宽出一截
+   */
+  siderWidth?: number;
+  siderCollapsedWidth?: number;
 }
 
 const Header: React.FC<HeaderProps> = observer((props) => {
@@ -69,6 +78,8 @@ const Header: React.FC<HeaderProps> = observer((props) => {
     title,
     smallTitle,
     showLocale = true,
+    siderWidth = 230,
+    siderCollapsedWidth = 80,
   } = props;
   const { layout, headerTheme, appearance, setAppearance } = ThemeStore;
   const { locale, setLocale } = I18nStore;
@@ -99,6 +110,12 @@ const Header: React.FC<HeaderProps> = observer((props) => {
             className={classNames(styles.title, {
               [styles.titleCollapsed]: collapsed,
             })}
+            style={
+              {
+                "--sider-width": `${siderWidth}px`,
+                "--sider-collapsed-width": `${siderCollapsedWidth}px`,
+              } as React.CSSProperties
+            }
           >
             {collapsed ? smallTitle ?? title : title}
           </div>

@@ -117,6 +117,8 @@ import type {
 | onChildItems | mixed 布局下把顶部菜单的子项回传给左侧栏 | `(items: MenuType[]) => void` | - |
 | menu | 账号下拉里的动作项（改密、退出等） | `AccountAction[]` | - |
 | showLocale | 是否显示语言切换 | `boolean` | `true` |
+| siderWidth | 左侧栏展开宽度（px），与 `Sider` 的 `width` 填同一个数，左上角标题块按它对齐 | `number` | `230` |
+| siderCollapsedWidth | 左侧栏收起宽度（px），与 `Sider` 的 `collapsedWidth` 填同一个数 | `number` | `80` |
 
 只有中文一种文案的项目请把 `showLocale` 关掉：留着会给用户一个「切了之后只有 antd 内建
 文案变化、业务文案纹丝不动」的开关，比没有更糟。关掉后 [`Layout.I18n`](/layouts/i18n) 仍
